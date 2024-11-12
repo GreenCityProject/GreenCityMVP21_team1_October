@@ -9,6 +9,8 @@ import greencity.dto.habitfact.*;
 import greencity.dto.language.LanguageDTO;
 import greencity.dto.language.LanguageTranslationDTO;
 import greencity.dto.language.LanguageVO;
+import greencity.dto.notification.NotificationDto;
+import greencity.dto.notification.NotificationPopUpDto;
 import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.search.SearchNewsDto;
 import greencity.dto.shoppinglistitem.CustomShoppingListItemResponseDto;
@@ -43,6 +45,38 @@ public class ModelUtils {
     public static String TEST_EMAIL_2 = "test2@mail.com";
     public static ZonedDateTime zonedDateTime = ZonedDateTime.now();
     public static LocalDateTime localDateTime = LocalDateTime.now();
+
+    public static Notification getNotification() {
+        return new Notification(
+                1L,
+                new Date(),
+                NotificationOrigin.GREEN_CITY,
+                NotificationType.ECO_NEWS_LIKE,
+                "description1",
+                "content1",
+                false
+        );
+    }
+
+    public static NotificationPopUpDto getNotificationPopUpDto() {
+        return new NotificationPopUpDto(
+                1L,
+                NotificationOrigin.GREEN_CITY,
+                "description1",
+                "content1"
+        );
+    }
+
+    public static NotificationDto getNotificationDto() {
+        return new NotificationDto(
+                1L,
+                NotificationOrigin.GREEN_CITY,
+                NotificationType.ECO_NEWS_LIKE,
+                new Date(),
+                "description1",
+                "content1"
+        );
+    }
 
     public static Tag getTag() {
         return new Tag(1L, TagType.ECO_NEWS, getTagTranslations(), Collections.emptyList(), Collections.emptySet());
