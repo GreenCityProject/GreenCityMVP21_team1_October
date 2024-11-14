@@ -221,7 +221,7 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     /**
-     * Method for sending notification to user by user`s email.
+     * Method for sending notification to user by user`s id.
      *
      * @param userId id of the user who receives the notification.
      * @param notificationOrigin the notification origin.
@@ -249,6 +249,26 @@ public class NotificationServiceImpl implements NotificationService {
                 markedAsRead
         );
         notificationRepo.save(notification);
+    }
+
+    /**
+     * Method for getting all notification types
+     *
+     * @return array of {@link NotificationType}
+     */
+    @Override
+    public NotificationType[] getNotificationTypes() {
+        return NotificationType.values();
+    }
+
+    /**
+     * Method for getting all notification origins
+     *
+     * @return array of {@link NotificationOrigin}
+     */
+    @Override
+    public NotificationOrigin[] getNotificationOrigins() {
+        return NotificationOrigin.values();
     }
 
     private List<NotificationDto> getNotificationDtoList(List<Notification> notifications) {

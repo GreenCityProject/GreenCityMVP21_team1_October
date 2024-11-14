@@ -153,4 +153,20 @@ public class NotificationControllerTest {
         verify(notificationService).markAsUnread(notificationId);
     }
 
+    @Test
+    void getNotificationTypesTest() throws Exception {
+        mockMvc.perform(get(notificationsLink + "/notificationTypes"))
+                .andExpect(status().isOk());
+
+        verify(notificationService).getNotificationTypes();
+    }
+
+    @Test
+    void getNotificationOriginsTest() throws Exception {
+        mockMvc.perform(get(notificationsLink + "/notificationOrigins"))
+                .andExpect(status().isOk());
+
+        verify(notificationService).getNotificationOrigins();
+    }
+
 }

@@ -180,4 +180,20 @@ public class NotificationServiceImplTest {
 
         verify(notificationRepo, times(1)).save(any());
     }
+
+    @Test
+    void getNotificationTypesTest() {
+        NotificationType[] expected = NotificationType.values();
+        NotificationType[] actual = notificationServiceImpl.getNotificationTypes();
+
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    void getNotificationOriginsTest() {
+        NotificationOrigin[] expected = NotificationOrigin.values();
+        NotificationOrigin[] actual = notificationServiceImpl.getNotificationOrigins();
+
+        assertArrayEquals(expected, actual);
+    }
 }

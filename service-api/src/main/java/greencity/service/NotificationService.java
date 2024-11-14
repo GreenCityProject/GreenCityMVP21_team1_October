@@ -103,7 +103,7 @@ public interface NotificationService {
     void sendEcoNewsCommentedNotification(EcoNewsVO ecoNewsVO, UserVO userVO);
 
     /**
-     * Method for sending notification to user by user`s email.
+     * Method for sending notification to user by user`s id.
      *
      * @param userId id of the user who receives the notification.
      * @param notificationOrigin the notification origin.
@@ -112,4 +112,18 @@ public interface NotificationService {
      * @author Max Kozak
      */
     void save(Long userId, NotificationOrigin notificationOrigin, NotificationType notificationType, String content);
+
+    /**
+     * Method for getting all notification types
+     *
+     * @return array of {@link NotificationType}
+     */
+    NotificationType[] getNotificationTypes();
+
+    /**
+     * Method for getting all notification origins
+     *
+     * @return array of {@link NotificationOrigin}
+     */
+    NotificationOrigin[] getNotificationOrigins();
 }

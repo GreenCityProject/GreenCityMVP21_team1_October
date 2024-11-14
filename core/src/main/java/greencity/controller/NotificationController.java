@@ -24,6 +24,16 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
+    @GetMapping("/notificationTypes")
+    public ResponseEntity<NotificationType[]> getNotificationTypes() {
+        return ResponseEntity.status(HttpStatus.OK).body(notificationService.getNotificationTypes());
+    }
+
+    @GetMapping("/notificationOrigins")
+    public ResponseEntity<NotificationOrigin[]> getNotificationOrigins() {
+        return ResponseEntity.status(HttpStatus.OK).body(notificationService.getNotificationOrigins());
+    }
+
     @GetMapping("/byUser/popUp")
     public ResponseEntity<List<NotificationPopUpDto>> getPopUpNotificationsByUser(
             @Parameter(hidden = true) @CurrentUser UserVO userVO
