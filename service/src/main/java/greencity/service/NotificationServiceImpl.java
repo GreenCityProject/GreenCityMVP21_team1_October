@@ -27,8 +27,6 @@ public class NotificationServiceImpl implements NotificationService {
 
     /**
      * {@inheritDoc}
-     *
-     * @author Max Kozak
      */
     @Override
     public List<NotificationPopUpDto> getPopUpNotificationsByUser(UserVO userVO) {
@@ -39,8 +37,6 @@ public class NotificationServiceImpl implements NotificationService {
 
     /**
      * {@inheritDoc}
-     *
-     * @author Max Kozak
      */
     @Override
     public List<NotificationDto> getNotificationsByUser(UserVO userVO) {
@@ -51,8 +47,6 @@ public class NotificationServiceImpl implements NotificationService {
 
     /**
      * {@inheritDoc}
-     *
-     * @author Max Kozak
      */
     @Override
     public List<NotificationDto> getNotificationsByUserAndNotificationType(UserVO userVO, NotificationType notificationType) {
@@ -63,8 +57,6 @@ public class NotificationServiceImpl implements NotificationService {
 
     /**
      * {@inheritDoc}
-     *
-     * @author Max Kozak
      */
     @Override
     public List<NotificationDto> getNotificationsByUserAndNotificationOrigin(UserVO userVO, NotificationOrigin notificationOrigin) {
@@ -75,8 +67,6 @@ public class NotificationServiceImpl implements NotificationService {
 
     /**
      * {@inheritDoc}
-     *
-     * @author Max Kozak
      */
     @Override
     public void delete(Long notificationId) {
@@ -85,8 +75,6 @@ public class NotificationServiceImpl implements NotificationService {
 
     /**
      * {@inheritDoc}
-     *
-     * @author Max Kozak
      */
     @Override
     public void markAsRead(Long notificationId) {
@@ -99,8 +87,6 @@ public class NotificationServiceImpl implements NotificationService {
 
     /**
      * {@inheritDoc}
-     *
-     * @author Max Kozak
      */
     @Override
     public void markAsUnread(Long notificationId) {
@@ -113,8 +99,6 @@ public class NotificationServiceImpl implements NotificationService {
 
     /**
      * {@inheritDoc}
-     *
-     * @author Max Kozak
      */
     @Override
     public void sendEcoNewsCommentRepliedNotification(EcoNewsCommentVO ecoNewsCommentVO, UserVO userVO) {
@@ -138,8 +122,6 @@ public class NotificationServiceImpl implements NotificationService {
 
     /**
      * {@inheritDoc}
-     *
-     * @author Max Kozak
      */
     @Override
     public void sendEcoNewsCommentLikedNotification(EcoNewsCommentVO ecoNewsCommentVO, UserVO userVO) {
@@ -163,8 +145,6 @@ public class NotificationServiceImpl implements NotificationService {
 
     /**
      * {@inheritDoc}
-     *
-     * @author Max Kozak
      */
     @Override
     public void sendEcoNewsLikedNotification(EcoNewsVO ecoNewsVO, UserVO userVO) {
@@ -186,8 +166,6 @@ public class NotificationServiceImpl implements NotificationService {
 
     /**
      * {@inheritDoc}
-     *
-     * @author Max Kozak
      */
     @Override
     public void sendEcoNewsCommentedNotification(EcoNewsVO ecoNewsVO, UserVO userVO) {
@@ -209,8 +187,6 @@ public class NotificationServiceImpl implements NotificationService {
 
     /**
      * {@inheritDoc}
-     *
-     * @author Max Kozak
      */
     public void save(
             Long userId,
@@ -236,8 +212,6 @@ public class NotificationServiceImpl implements NotificationService {
 
     /**
      * {@inheritDoc}
-     *
-     * @author Max Kozak
      */
     @Override
     public NotificationType[] getNotificationTypes() {
@@ -246,8 +220,6 @@ public class NotificationServiceImpl implements NotificationService {
 
     /**
      * {@inheritDoc}
-     *
-     * @author Max Kozak
      */
     @Override
     public NotificationOrigin[] getNotificationOrigins() {
