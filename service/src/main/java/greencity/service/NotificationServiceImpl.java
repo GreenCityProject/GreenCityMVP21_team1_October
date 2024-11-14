@@ -26,10 +26,9 @@ public class NotificationServiceImpl implements NotificationService {
     private final ModelMapper modelMapper;
 
     /**
-     * Method to get user`s notifications.
+     * {@inheritDoc}
      *
-     * @param userVO addressee of the notifications.
-     * @return list of {@link NotificationPopUpDto}.
+     * @author Max Kozak
      */
     @Override
     public List<NotificationPopUpDto> getPopUpNotificationsByUser(UserVO userVO) {
@@ -39,10 +38,9 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     /**
-     * Method to get user`s notifications.
+     * {@inheritDoc}
      *
-     * @param userVO addressee of the notifications.
-     * @return list of {@link NotificationDto}.
+     * @author Max Kozak
      */
     @Override
     public List<NotificationDto> getNotificationsByUser(UserVO userVO) {
@@ -52,11 +50,9 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     /**
-     * Method to get user`s notifications filtered by notification type.
+     * {@inheritDoc}
      *
-     * @param userVO user whose notifications are being filtered.
-     * @param notificationType {@link NotificationType} the notification type.
-     * @return list of {@link NotificationDto} filtered by notification type.
+     * @author Max Kozak
      */
     @Override
     public List<NotificationDto> getNotificationsByUserAndNotificationType(UserVO userVO, NotificationType notificationType) {
@@ -66,11 +62,9 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     /**
-     * Method to get user`s notifications filtered by notification origin.
+     * {@inheritDoc}
      *
-     * @param userVO user whose notifications are being filtered.
-     * @param notificationOrigin {@link NotificationOrigin} the notification origin.
-     * @return list of {@link NotificationDto} filtered by notification origin.
+     * @author Max Kozak
      */
     @Override
     public List<NotificationDto> getNotificationsByUserAndNotificationOrigin(UserVO userVO, NotificationOrigin notificationOrigin) {
@@ -80,9 +74,9 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     /**
-     * Method for deleting the notification.
+     * {@inheritDoc}
      *
-     * @param notificationId id of the notification being deleted.
+     * @author Max Kozak
      */
     @Override
     public void delete(Long notificationId) {
@@ -90,9 +84,9 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     /**
-     * Method for marking notification as read.
+     * {@inheritDoc}
      *
-     * @param notificationId id of the notification being marked read.
+     * @author Max Kozak
      */
     @Override
     public void markAsRead(Long notificationId) {
@@ -104,9 +98,9 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     /**
-     * Method for marking notification as unread.
+     * {@inheritDoc}
      *
-     * @param notificationId id of the notification being marked unread.
+     * @author Max Kozak
      */
     @Override
     public void markAsUnread(Long notificationId) {
@@ -118,10 +112,8 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     /**
-     * Method for sending notification about a reply to the eco news comment`s author.
+     * {@inheritDoc}
      *
-     * @param ecoNewsCommentVO eco news comment being replied to.
-     * @param userVO {@link UserVO} user that is replying to the comment.
      * @author Max Kozak
      */
     @Override
@@ -145,10 +137,8 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     /**
-     * Method for sending notification about eco news comment being liked to the eco news comment`s author.
+     * {@inheritDoc}
      *
-     * @param ecoNewsCommentVO eco news comment being liked.
-     * @param userVO {@link UserVO} that wants to like the comment.
      * @author Max Kozak
      */
     @Override
@@ -172,9 +162,8 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     /**
-     * Method for sending notification about eco news being liked to eco news` author.
-     * @param userVO {@link UserVO} that likes news.
-     * @param ecoNewsVO eco news being liked.
+     * {@inheritDoc}
+     *
      * @author Max Kozak
      */
     @Override
@@ -196,10 +185,8 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     /**
-     * Method for sending notification about eco news being commented to the eco news` author.
+     * {@inheritDoc}
      *
-     * @param ecoNewsVO eco news being commented.
-     * @param userVO {@link UserVO} that saves the comment.
      * @author Max Kozak
      */
     @Override
@@ -221,12 +208,8 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     /**
-     * Method for sending notification to user by user`s id.
+     * {@inheritDoc}
      *
-     * @param userId id of the user who receives the notification.
-     * @param notificationOrigin the notification origin.
-     * @param notificationType the notification type.
-     * @param content the detailed content of the notification
      * @author Max Kozak
      */
     public void save(
@@ -252,9 +235,9 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     /**
-     * Method for getting all notification types
+     * {@inheritDoc}
      *
-     * @return array of {@link NotificationType}
+     * @author Max Kozak
      */
     @Override
     public NotificationType[] getNotificationTypes() {
@@ -262,9 +245,9 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     /**
-     * Method for getting all notification origins
+     * {@inheritDoc}
      *
-     * @return array of {@link NotificationOrigin}
+     * @author Max Kozak
      */
     @Override
     public NotificationOrigin[] getNotificationOrigins() {

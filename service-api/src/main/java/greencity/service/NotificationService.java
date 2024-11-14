@@ -13,7 +13,7 @@ import java.util.List;
 public interface NotificationService {
 
     /**
-     * Method to get user`s notifications.
+     * Method to get user`s notifications showed in pop up notifications window.
      *
      * @param userVO addressee of the notifications.
      * @return list of {@link NotificationPopUpDto}.
@@ -72,7 +72,6 @@ public interface NotificationService {
      *
      * @param ecoNewsCommentVO eco news comment being replied to.
      * @param userVO {@link UserVO} user that is replying to the comment.
-     * @author Max Kozak
      */
     void sendEcoNewsCommentRepliedNotification(EcoNewsCommentVO ecoNewsCommentVO, UserVO userVO);
 
@@ -81,7 +80,6 @@ public interface NotificationService {
      *
      * @param ecoNewsCommentVO eco news comment being liked.
      * @param userVO {@link UserVO} that wants to like the comment.
-     * @author Max Kozak
      */
     void sendEcoNewsCommentLikedNotification(EcoNewsCommentVO ecoNewsCommentVO, UserVO userVO);
 
@@ -89,7 +87,6 @@ public interface NotificationService {
      * Method for sending notification about eco news being liked to eco news` author.
      * @param userVO {@link UserVO} that likes news.
      * @param ecoNewsVO eco news being liked.
-     * @author Max Kozak
      */
     void sendEcoNewsLikedNotification(EcoNewsVO ecoNewsVO, UserVO userVO);
 
@@ -98,7 +95,6 @@ public interface NotificationService {
      *
      * @param ecoNewsVO eco news being commented.
      * @param userVO {@link UserVO} that saves the comment.
-     * @author Max Kozak
      */
     void sendEcoNewsCommentedNotification(EcoNewsVO ecoNewsVO, UserVO userVO);
 
@@ -109,7 +105,6 @@ public interface NotificationService {
      * @param notificationOrigin the notification origin.
      * @param notificationType the notification type.
      * @param content the detailed content of the notification
-     * @author Max Kozak
      */
     void save(Long userId, NotificationOrigin notificationOrigin, NotificationType notificationType, String content);
 
