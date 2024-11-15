@@ -13,7 +13,8 @@ public enum NotificationType {
     EVENT_JOINED("Someone joined your event"),
     EVENT_COMMENTED("Your event received a comment"),
     FRIEND_REQUEST_RECEIVED("You received a new friend request"),
-    FRIEND_REQUEST_ACCEPTED("Your friend request was accepted");
+    FRIEND_REQUEST_ACCEPTED("Your friend request was accepted"),
+    FRIEND_REQUEST_DECLINED("Your friend request was declined");
 
     private final String notificationDescription;
     NotificationType(String notificationDescription) {

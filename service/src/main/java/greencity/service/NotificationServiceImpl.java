@@ -188,6 +188,48 @@ public class NotificationServiceImpl implements NotificationService {
     /**
      * {@inheritDoc}
      */
+    @Override
+    public void sendFriendRequestReceivedNotification(UserVO sender, UserVO recipient) {
+        String content = "You got a friend request from " + sender.getName();
+
+        save(
+                recipient.getId(),
+                NotificationOrigin.GREEN_CITY,
+                NotificationType.FRIEND_REQUEST_RECEIVED,
+                content
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void sendFriendRequestAcceptedNotification(UserVO sender, UserVO recipient) {
+        String content = "Your friend request was accepted by " + recipient.getName();
+
+        save(
+                sender.getId(),
+                NotificationOrigin.GREEN_CITY,
+                NotificationType.FRIEND_REQUEST_ACCEPTED,
+                content
+        );
+    }
+
+    @Override
+    public void sendFriendRequestDeclinedNotification(UserVO sender, UserVO recipient) {
+        String content = "Your friend request was declined by " + recipient.getName();
+
+        save(
+                sender.getId(),
+                NotificationOrigin.GREEN_CITY,
+                NotificationType.FRIEND_REQUEST_DECLINED,
+                content
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public void save(
             Long userId,
             NotificationOrigin notificationOrigin,

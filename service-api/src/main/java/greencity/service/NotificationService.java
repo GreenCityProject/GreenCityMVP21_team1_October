@@ -99,6 +99,30 @@ public interface NotificationService {
     void sendEcoNewsCommentedNotification(EcoNewsVO ecoNewsVO, UserVO userVO);
 
     /**
+     * Method for sending notification about friend request was received by user.
+     *
+     * @param sender {@link UserVO} is the user who sent the friend request.
+     * @param recipient {@link UserVO} is the user who received the friend request.
+     */
+    void sendFriendRequestReceivedNotification(UserVO sender, UserVO recipient);
+
+    /**
+     * Method for sending notification to user about his friend request was accepted.
+     *
+     * @param sender {@link UserVO} is the user who sent the friend request.
+     * @param recipient {@link UserVO} is the new friend who accepted the friend request.
+     */
+    void sendFriendRequestAcceptedNotification(UserVO sender, UserVO recipient);
+
+    /**
+     * Method for sending notification to user about his friend request was declined.
+     *
+     * @param sender {@link UserVO} is the user who sent the friend request.
+     * @param recipient {@link UserVO} is the new friend who declined the friend request.
+     */
+    void sendFriendRequestDeclinedNotification(UserVO sender, UserVO recipient);
+
+    /**
      * Method for sending notification to user by user`s id.
      *
      * @param userId id of the user who receives the notification.
