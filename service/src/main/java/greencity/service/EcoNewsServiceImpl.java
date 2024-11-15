@@ -18,10 +18,7 @@ import greencity.entity.*;
 import greencity.entity.localization.TagTranslation;
 import greencity.enums.Role;
 import greencity.enums.TagType;
-import greencity.exception.exceptions.BadRequestException;
-import greencity.exception.exceptions.NotFoundException;
-import greencity.exception.exceptions.NotSavedException;
-import greencity.exception.exceptions.UnsupportedSortException;
+import greencity.exception.exceptions.*;
 import greencity.filters.EcoNewsSpecification;
 import greencity.filters.SearchCriteria;
 import greencity.repository.EcoNewsRepo;
@@ -317,8 +314,11 @@ public class EcoNewsServiceImpl implements EcoNewsService {
     @Override
     public void delete(Long id, UserVO user) {
         EcoNewsVO ecoNewsVO = findById(id);
-        if (user.getRole() != Role.ROLE_ADMIN && !user.getId().equals(ecoNewsVO.getAuthor().getId())) {
+        if (user.getRole() != Role.ROLE_ADMIN) {
             throw new BadRequestException(ErrorMessage.USER_HAS_NO_PERMISSION);
+        }
+        if(!user.getId().equals(ecoNewsVO.getAuthor().getId())) {
+            throw new UserHasNoPermissionToAccessException(ErrorMessage.USER_HAS_NO_PERMISSION);
         }
         String accessToken = httpServletRequest.getHeader(AUTHORIZATION);
         CompletableFuture.runAsync(
@@ -488,8 +488,11 @@ public class EcoNewsServiceImpl implements EcoNewsService {
     @Override
     public EcoNewsGenericDto update(UpdateEcoNewsDto updateEcoNewsDto, MultipartFile image, UserVO user) {
         EcoNews toUpdate = modelMapper.map(findById(updateEcoNewsDto.getId()), EcoNews.class);
-        if (user.getRole() != Role.ROLE_ADMIN && !user.getId().equals(toUpdate.getAuthor().getId())) {
+        if (user.getRole() != Role.ROLE_ADMIN) {
             throw new BadRequestException(ErrorMessage.USER_HAS_NO_PERMISSION);
+        }
+        if(!user.getId().equals(toUpdate.getAuthor().getId())) {
+            throw new UserHasNoPermissionToAccessException(ErrorMessage.USER_HAS_NO_PERMISSION);
         }
         enhanceWithNewData(toUpdate, updateEcoNewsDto, image);
         ecoNewsRepo.save(toUpdate);
@@ -747,15 +750,13 @@ public class EcoNewsServiceImpl implements EcoNewsService {
             .build();
     }
 
-    private EcoNews genericSave(AddEcoNewsDtoRequest addEcoNewsDtoRequest,
-        MultipartFile image, String email) {
+    private EcoNews genericSave(AddEcoNewsDtoRequest addEcoNewsDtoRequest, MultipartFile image, String email) {
         EcoNews toSave = modelMapper.map(addEcoNewsDtoRequest, EcoNews.class);
         UserVO byEmail = restClient.findByEmail(email);
         User user = modelMapper.map(byEmail, User.class);
         toSave.setAuthor(user);
-        if (addEcoNewsDtoRequest.getImage() != null) {
-            image = fileService.convertToMultipartImage(addEcoNewsDtoRequest.getImage());
-        }
+
+        // Видалено обробку поля addEcoNewsDtoRequest.getImage() оскільки це поле більше не існує
         if (image != null) {
             toSave.setImagePath(fileService.upload(image));
         }
@@ -767,16 +768,16 @@ public class EcoNewsServiceImpl implements EcoNewsService {
         }
 
         List<TagVO> tagVOS = tagService.findTagsByNamesAndType(
-            addEcoNewsDtoRequest.getTags(), TagType.ECO_NEWS);
+                addEcoNewsDtoRequest.getTags(), TagType.ECO_NEWS);
 
         toSave.setTags(modelMapper.map(tagVOS,
-            new TypeToken<List<Tag>>() {
-            }.getType()));
+                new TypeToken<List<Tag>>() {
+                }.getType()));
         try {
             ecoNewsRepo.save(toSave);
             String accessToken = httpServletRequest.getHeader(AUTHORIZATION);
             CompletableFuture.runAsync(
-                () -> ratingCalculation.ratingCalculation(RatingCalculationEnum.ADD_ECO_NEWS, byEmail, accessToken));
+                    () -> ratingCalculation.ratingCalculation(RatingCalculationEnum.ADD_ECO_NEWS, byEmail, accessToken));
         } catch (DataIntegrityViolationException e) {
             throw new NotSavedException(ErrorMessage.ECO_NEWS_NOT_SAVED);
         }
