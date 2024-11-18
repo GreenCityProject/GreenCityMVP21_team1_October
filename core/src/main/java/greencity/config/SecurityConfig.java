@@ -266,6 +266,8 @@ public class SecurityConfig {
                                 USER_SHOPPING_LIST + "/user-shopping-list-items",
                                 "/friends/{friendId}/declineFriend")
                         .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)
+                        .requestMatchers(HttpMethod.DELETE, "/friends/{friendId}")
+                        .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)
                         .requestMatchers(HttpMethod.GET,
                                 "/newsSubscriber",
                                 "/comments",
