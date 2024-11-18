@@ -153,4 +153,17 @@ public class FriendsControllerTest {
 
         verify(friendsService).declineFriendRequest(userVO.getId(), friendId);
     }
+
+    @Test
+    void deleteFriendTest() throws Exception {
+        Long friendId = 1L;
+        UserVO userVO = getUserVO();
+        when(userService.findByEmail(anyString())).thenReturn(userVO);
+
+        mockMvc
+                .perform(delete(String.format("%s/%d", friendPrefixLink, friendId)).principal(principal))
+                .andExpect(status().isOk());
+
+        verify(friendsService).deleteFriend(userVO.getId(), friendId);
+    }
 }
