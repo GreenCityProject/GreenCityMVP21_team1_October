@@ -17,10 +17,6 @@ jobs:
           java-version: '21'
           distribution: 'amazon-corretto'
           cache: maven
-      - name: Set up Maven
-        uses: s4u/setup-maven-action@v2
-        with:
-          maven-version: '3.9'
       - name: Build and test with Maven
         run:  mvn --version
 #        run: mvn --batch-mode package -DskipTests -Dcheckstyle.skip
