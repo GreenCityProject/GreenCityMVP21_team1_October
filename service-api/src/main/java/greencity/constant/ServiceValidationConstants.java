@@ -19,7 +19,7 @@ public final class ServiceValidationConstants {
     public static final String MIN_AMOUNT_OF_TAGS = "{greenCity.validation.empty.tags}";
     public static final int MAX_AMOUNT_OF_SOCIAL_NETWORK_LINKS = 5;
     public static final int COMMENT_MIN_LENGTH = 5;
-    public static final int COMMENT_MAX_LENGTH = 300;
+    public static final int COMMENT_MAX_LENGTH = 8000;
     public static final String LAT_MIN_VALIDATION = "{greenCity.validation.min.lat}";
     public static final String LAT_MAX_VALIDATION = "{greenCity.validation.max.lat}";
     public static final String LNG_MIN_VALIDATION = "{greenCity.validation.min.lng}";
