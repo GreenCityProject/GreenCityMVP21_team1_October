@@ -17,6 +17,10 @@ jobs:
           java-version: '21'
           distribution: 'corretto'
           cache: maven
+      - name: Set up Maven 3.9
+        uses: stCarolas/setup-maven@v5
+        with:
+          maven-version: 3.9.9
       - name: Build and test with Maven
+        #run: mvn --batch-mode package -DskipTests -Dcheckstyle.skip
         run:  mvn --version
-#        run: mvn --batch-mode package -DskipTests -Dcheckstyle.skip
