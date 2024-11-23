@@ -1,22 +1,19 @@
 package greencity.dto.event;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-@NoArgsConstructor
-@AllArgsConstructor
+@Builder
 @Getter
 @Setter
-@Builder
-@EqualsAndHashCode
-public class EventDayDto {
+@AllArgsConstructor
+@NoArgsConstructor
+public class EventDayResponseDto {
+
+    Long id;
 
     @Schema(example = "2024-11-09", description = "Date of the event day")
     private LocalDate eventDate;

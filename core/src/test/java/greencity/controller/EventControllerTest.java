@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import greencity.ModelUtils;
-import greencity.dto.event.EventDetailsUpdate;
+import greencity.dto.event.EventRequestDto;
 import greencity.dto.event.EventResponseDto;
 import greencity.service.EventService;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,7 +39,7 @@ class EventControllerTest {
     private EventService eventService;
     @InjectMocks
     private EventController eventController;
-    private EventDetailsUpdate eventRequestDto;
+    private EventRequestDto eventRequestDto;
     private EventResponseDto eventResponseDto;
 
     @BeforeEach
@@ -62,7 +62,7 @@ class EventControllerTest {
     void update() throws Exception {
         MockMultipartFile jsonFile = getMockMultipartFile();
 
-        Mockito.when(eventService.update(eq(eventRequestDto), eq(principal.getName()), any()))
+        Mockito.when(eventService.update(1L,eq(eventRequestDto), eq(principal.getName()), any()))
                 .thenReturn(eventResponseDto);
 
         mockMvc.perform(multipart(BASE_LINK +"/{eventId}", 1L)
@@ -82,7 +82,7 @@ class EventControllerTest {
                 .andExpect(jsonPath("$.dayList[0].eventStartTime").value("09:00:00"))
                 .andExpect(jsonPath("$.dayList[0].eventEndTime").value("20:00:00"));
 
-        verify(eventService).update(eq(eventRequestDto), eq(principal.getName()), any());
+        verify(eventService).update(1L,eq(eventRequestDto), eq(principal.getName()), any());
     }
 
     private static MockMultipartFile getMockMultipartFile() {

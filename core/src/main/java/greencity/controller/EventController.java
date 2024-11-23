@@ -1,12 +1,10 @@
 package greencity.controller;
 
 import greencity.annotations.EventValidation;
-import greencity.constant.ErrorMessage;
 import greencity.constant.HttpStatuses;
-import greencity.dto.event.EventDetailsUpdate;
+import greencity.dto.event.EventRequestDto;
 import greencity.dto.event.EventResponseDto;
 import greencity.dto.user.UserVO;
-import greencity.exception.exceptions.WrongIdException;
 import greencity.service.EventService;
 import greencity.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,11 +16,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.security.Principal;
 
 @RestController
@@ -52,18 +52,13 @@ public class EventController {
             @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND,
                     content = @Content(examples = @ExampleObject(HttpStatuses.NOT_FOUND)))
     })
-    @PutMapping(value = "/{eventId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{event_id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<EventResponseDto> update(
-        @Parameter(required = true) @EventValidation @RequestPart EventDetailsUpdate requestDto,
-        @Parameter(hidden = true) Principal principal,
-        @PathVariable Long eventId,
-        @RequestPart(required = false) @Nullable MultipartFile[] file) {
-
-        if (!eventId.equals(requestDto.getId())) {
-            throw new WrongIdException(ErrorMessage.EVENT_ID_IN_PATH_PARAM_AND_ENTITY_NOT_EQUAL);
-        }
-
-        return ResponseEntity.ok().body(eventService.update(requestDto, principal.getName(), file));
+            @Parameter(required = true) @EventValidation @RequestPart EventRequestDto requestDto,
+            @Parameter(hidden = true) Principal principal,
+            @PathVariable(name = "event_id") Long eventId,
+            @RequestPart(required = false) @Nullable MultipartFile[] file) {
+        return ResponseEntity.ok().body(eventService.update(eventId, requestDto, principal.getName(), file));
     }
 
     /**
@@ -96,5 +91,26 @@ public class EventController {
         Long userId = currentUser.getId();
         eventService.deleteEvent(eventId, userId);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "Create event")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = HttpStatuses.CREATED,
+                    content = @Content(schema = @Schema(implementation = EventResponseDto.class))),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST,
+                    content = @Content(examples = @ExampleObject(HttpStatuses.BAD_REQUEST))),
+            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED,
+                    content = @Content(examples = @ExampleObject(HttpStatuses.UNAUTHORIZED))),
+            @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN,
+                    content = @Content(examples = @ExampleObject(HttpStatuses.FORBIDDEN)))
+    })
+    @PostMapping
+    public ResponseEntity<EventResponseDto> save(
+            @Parameter(required = true) @EventValidation @RequestPart EventRequestDto eventRequestDto,
+                                                 @Parameter(hidden = true) Principal principal,
+                                                 @RequestPart(required = false) @Nullable MultipartFile[] files) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(eventService.save(eventRequestDto,
+                principal.getName(),
+                files));
     }
 }

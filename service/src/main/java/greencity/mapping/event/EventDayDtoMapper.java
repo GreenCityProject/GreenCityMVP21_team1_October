@@ -11,7 +11,6 @@ public class EventDayDtoMapper extends AbstractConverter<EventDayDto, EventDay> 
     @Override
     protected EventDay convert(EventDayDto source) {
         return EventDay.builder()
-                .id(source.getId())
                 .eventDate(source.getEventDate())
                 .eventStartTime(source.getEventStartTime())
                 .eventEndTime(source.getEventEndTime())

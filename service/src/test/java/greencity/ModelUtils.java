@@ -5,7 +5,8 @@ import greencity.dto.PageableAdvancedDto;
 import greencity.dto.econews.*;
 import greencity.dto.econewscomment.*;
 import greencity.dto.event.EventDayDto;
-import greencity.dto.event.EventDetailsUpdate;
+import greencity.dto.event.EventDayResponseDto;
+import greencity.dto.event.EventRequestDto;
 import greencity.dto.event.EventResponseDto;
 import greencity.dto.habit.*;
 import greencity.dto.habitfact.*;
@@ -688,7 +689,7 @@ public class ModelUtils {
                 .id(1L)
                 .title("Lectures on garbage segregation")
                 .description("An event focused on promoting environmental awareness and sustainability practices within the community")
-                .dayList(List.of(EventDayDto.builder()
+                .dayList(List.of(EventDayResponseDto.builder()
                         .id(1L)
                         .eventDate(LocalDate.parse("2024-12-16"))
                         .eventStartTime(LocalTime.parse("09:00:00"))
@@ -703,13 +704,11 @@ public class ModelUtils {
                 .build();
     }
 
-    public static EventDetailsUpdate getEventDetailsUpdate() {
-        return EventDetailsUpdate.builder()
-                .id(1L)
+    public static EventRequestDto getEventDetailsUpdate() {
+        return EventRequestDto.builder()
                 .title("Lectures on garbage segregation")
                 .description("An event focused on promoting environmental awareness and sustainability practices within the community")
                 .eventDays(List.of(EventDayDto.builder()
-                        .id(1L)
                         .eventDate(LocalDate.parse("2024-12-16"))
                         .eventStartTime(LocalTime.parse("09:00:00"))
                         .eventEndTime(LocalTime.parse("20:00:00"))
@@ -718,8 +717,6 @@ public class ModelUtils {
                         .isOnline(true)
                         .onlineLink("https://example.com/event-link")
                         .build()))
-                .additionalImages(Collections.emptyList())
-                .image(AppConstant.DEFAULT_EVENT_IMAGE)
                 .build();
     }
 

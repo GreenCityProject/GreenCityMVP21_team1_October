@@ -3,7 +3,7 @@ package greencity.service;
 import greencity.ModelUtils;
 import greencity.client.RestClient;
 import greencity.dto.event.EventDayDto;
-import greencity.dto.event.EventDetailsUpdate;
+import greencity.dto.event.EventRequestDto;
 import greencity.dto.event.EventResponseDto;
 import greencity.dto.user.UserVO;
 import greencity.entity.Event;
@@ -37,7 +37,7 @@ class EventServiceImplUpdateTest {
     @Test
     void update() {
         Event eventToUpdate = ModelUtils.getEvent();
-        EventDetailsUpdate eventDetailsUpdate = ModelUtils.getEventDetailsUpdate();
+        EventRequestDto eventRequestDto = ModelUtils.getEventDetailsUpdate();
         EventResponseDto eventResponseDto = ModelUtils.getEventResponseDto();
         User user = ModelUtils.getUser();
         UserVO userVO = ModelUtils.getUserVO();
@@ -51,7 +51,7 @@ class EventServiceImplUpdateTest {
                 .thenReturn(eventDay);
         when(modelMapper.map(eventToUpdate, EventResponseDto.class)).thenReturn(eventResponseDto);
 
-        EventResponseDto updated = eventServiceImpl.update(eventDetailsUpdate, user.getEmail(), null);
+        EventResponseDto updated = eventServiceImpl.update(1L,eventRequestDto, user.getEmail(), null);
 
         assertEquals(eventResponseDto, updated);
         verify(eventRepo).save(eventToUpdate);

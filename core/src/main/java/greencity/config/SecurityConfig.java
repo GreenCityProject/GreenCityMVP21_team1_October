@@ -1,6 +1,5 @@
 package greencity.config;
 
-import greencity.constant.AppConstant;
 import greencity.security.filters.AccessTokenAuthenticationFilter;
 import greencity.security.jwt.JwtTool;
 import greencity.security.providers.JwtAuthenticationProvider;
@@ -45,7 +44,7 @@ public class SecurityConfig {
     private static final String USER_CUSTOM_SHOPPING_LIST_ITEMS = "/user/{userId}/custom-shopping-list-items";
     private static final String CUSTOM_SHOPPING_LIST = "/custom/shopping-list-items/{userId}";
     private static final String CUSTOM_SHOPPING_LIST_URL = "/custom/shopping-list-items/{userId}/"
-                                                           + "custom-shopping-list-items";
+            + "custom-shopping-list-items";
     private static final String CUSTOM_SHOPPING_LIST_ITEMS = "/{userId}/custom-shopping-list-items";
     private static final String HABIT_ASSIGN_ID = "/habit/assign/{habitId}";
     private static final String USER_SHOPPING_LIST = "/user/shopping-list-items";
@@ -201,8 +200,8 @@ public class SecurityConfig {
                                 "/habit/{habitId}/friends/profile-pictures",
                                 "/friends",
                                 "/friends/friendRequests",
-                            "/friends/not-friends-yet",
-                            "/friends/user/{userId}")
+                                "/friends/not-friends-yet",
+                                "/friends/user/{userId}")
                         .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)
                         .requestMatchers(HttpMethod.POST,
                                 "/category",
@@ -296,7 +295,7 @@ public class SecurityConfig {
                         .hasAnyRole(ADMIN)
                         .requestMatchers(HttpMethod.DELETE,
                                 "/event/{eventId}")
-                        .hasAnyRole(ADMIN, ORGANIZER)
+                        .hasAnyRole(ADMIN)
                         .requestMatchers(HttpMethod.DELETE,
                                 "/facts/{factId}",
                                 "/comments")

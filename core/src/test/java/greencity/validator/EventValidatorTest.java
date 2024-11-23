@@ -2,7 +2,7 @@ package greencity.validator;
 
 import greencity.annotations.EventValidation;
 import greencity.dto.event.EventDayDto;
-import greencity.dto.event.EventDetailsUpdate;
+import greencity.dto.event.EventRequestDto;
 import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.Payload;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,21 +29,18 @@ public class EventValidatorTest {
     @Mock
     private ConstraintValidatorContext context;
 
-    private EventDetailsUpdate validEvent;
+    private EventRequestDto validEvent;
 
     @BeforeEach
     void setUp() {
-        validEvent = new EventDetailsUpdate();
-        validEvent.setId(1L);
+        validEvent = new EventRequestDto();
         validEvent.setIsOpenEvent(true);
         validEvent.setTitle("Valid event title");
         var eventDay1 = new EventDayDto();
-        eventDay1.setId(1L);
         eventDay1.setEventDate(LocalDate.now().plusDays(1));
         eventDay1.setEventStartTime(LocalTime.now());
         eventDay1.setEventEndTime(LocalTime.now().plusHours(2));
         var eventDay2 = new EventDayDto();
-        eventDay2.setId(2L);
         eventDay2.setEventDate(LocalDate.now().plusDays(2));
         eventDay2.setEventStartTime(LocalTime.now());
         eventDay2.setEventEndTime(LocalTime.now().plusHours(4));
