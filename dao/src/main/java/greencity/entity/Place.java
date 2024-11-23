@@ -9,8 +9,6 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.validator.constraints.Length;
 
-import java.util.List;
-
 @Entity
 @Table(name = "places")
 @NoArgsConstructor
