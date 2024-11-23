@@ -199,6 +199,7 @@ public class SecurityConfig {
                                 "/habit/tags/search",
                                 "/habit/search",
                                 "/habit/{habitId}/friends/profile-pictures",
+                                "/place",
                                 "/friends",
                                 "/friends/friendRequests",
                                 "/friends/not-friends-yet",
