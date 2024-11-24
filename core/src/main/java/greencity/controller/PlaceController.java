@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @Validated
 @RestController
 @RequestMapping("/place")
@@ -52,7 +54,7 @@ public class PlaceController {
         return ResponseEntity.ok(placeService.getPlace(id));
     }
 
-    @Operation(summary = "Get places by status(APPROVED, PROPOSED, DECLINED, DELETED).")
+    @Operation(summary = "Get places by status (APPROVED, PROPOSED, DECLINED, DELETED).")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
             @ApiResponse(responseCode = "303", description = HttpStatuses.SEE_OTHER),
@@ -64,5 +66,18 @@ public class PlaceController {
     public ResponseEntity<PageableDto<PlaceInfoDto>> getPlaces(@PathVariable PlaceStatus status,
                                                                @Parameter(hidden = true) Pageable page) {
         return ResponseEntity.ok(placeService.getPlaces(status, page));
+    }
+
+
+    @Operation(summary = "Get array of available place statuses.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "303", description = HttpStatuses.SEE_OTHER),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+            @ApiResponse(responseCode = "403", description = HttpStatuses.NOT_FOUND)
+    })
+    @GetMapping("/statuses")
+    public ResponseEntity<List<String>> getStatuses() {
+        return ResponseEntity.ok(placeService.getStatuses());
     }
 }
