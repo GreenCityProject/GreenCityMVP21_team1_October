@@ -202,6 +202,7 @@ public class SecurityConfig {
                                 "/place",
                                 "/place/info/{id}",
                                 "/place/about/{id}",
+                                "/place/place/{status}",
                                 "/friends",
                                 "/friends/friendRequests",
                                 "/friends/not-friends-yet",
