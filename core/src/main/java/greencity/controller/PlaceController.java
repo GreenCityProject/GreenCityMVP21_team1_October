@@ -6,6 +6,7 @@ import greencity.dto.PageableDto;
 import greencity.dto.place.PlaceInfoDto;
 import greencity.dto.place.PlaceUpdateDto;
 import greencity.enums.PlaceStatus;
+import greencity.filters.FilterPlaceCategory;
 import greencity.service.PlaceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -80,4 +81,13 @@ public class PlaceController {
     public ResponseEntity<List<String>> getStatuses() {
         return ResponseEntity.ok(placeService.getStatuses());
     }
+
+@Operation(summary = "Return all place categories to filter.")
+@ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK)
+})
+@GetMapping("/v2/filteredPlacesCategories")
+public ResponseEntity<List<FilterPlaceCategory>> getFilteredPlacesCategories() {
+    return ResponseEntity.ok(placeService.getFilteredPlacesCategories());
+}
 }

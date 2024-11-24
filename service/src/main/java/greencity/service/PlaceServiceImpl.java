@@ -7,6 +7,7 @@ import greencity.dto.place.PlaceUpdateDto;
 import greencity.entity.Place;
 import greencity.enums.PlaceStatus;
 import greencity.exception.exceptions.NotFoundException;
+import greencity.filters.FilterPlaceCategory;
 import greencity.mapping.PlaceInfoDtoMapper;
 import greencity.mapping.PlaceUpdateDtoMapper;
 import greencity.repository.PlaceRepository;
@@ -55,6 +56,17 @@ public class PlaceServiceImpl implements PlaceService {
     public List<String> getStatuses() {
         return Arrays.stream(PlaceStatus.values())
                 .map(Enum::name)
+                .toList();
+    }
+
+    @Override
+    public List<FilterPlaceCategory> getFilteredPlacesCategories() {
+        return placeRepository.findAll().stream()
+                .map(e -> FilterPlaceCategory.builder()
+                        .id(e.getId())
+                        .name(e.getCategory().getName())
+                        .nameUa(e.getCategory().getNameUa())
+                        .build())
                 .toList();
     }
 }
