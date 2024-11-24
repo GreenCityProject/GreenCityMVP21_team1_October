@@ -7,9 +7,12 @@ import greencity.dto.place.PlaceUpdateDto;
 import greencity.entity.Place;
 import greencity.enums.PlaceStatus;
 import greencity.exception.exceptions.NotFoundException;
+import greencity.exception.exceptions.WrongIdException;
+import greencity.filters.FilterPlaceCategory;
 import greencity.mapping.PlaceInfoDtoMapper;
 import greencity.mapping.PlaceUpdateDtoMapper;
 import greencity.repository.PlaceRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -56,5 +59,32 @@ public class PlaceServiceImpl implements PlaceService {
         return Arrays.stream(PlaceStatus.values())
                 .map(Enum::name)
                 .toList();
+    }
+
+    @Override
+    public List<FilterPlaceCategory> getFilteredPlacesCategories() {
+        return placeRepository.findAll().stream()
+                .map(e -> FilterPlaceCategory.builder()
+                        .id(e.getId())
+                        .name(e.getCategory().getName())
+                        .nameUa(e.getCategory().getNameUa())
+                        .build())
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    public Long bulkDeletePlaces(String ids) {
+        List<Long> idList;
+        try {
+            idList = Arrays.stream(ids.split(","))
+                    .map(Long::valueOf)
+                    .toList();
+        } catch (NumberFormatException e) {
+            throw new WrongIdException(ErrorMessage.WRONG_ID_LIST);
+        }
+        long countBefore = placeRepository.count();
+        placeRepository.deleteAllById(idList);
+        return countBefore - placeRepository.count();
     }
 }

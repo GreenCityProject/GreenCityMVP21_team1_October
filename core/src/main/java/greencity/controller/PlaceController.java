@@ -6,6 +6,7 @@ import greencity.dto.PageableDto;
 import greencity.dto.place.PlaceInfoDto;
 import greencity.dto.place.PlaceUpdateDto;
 import greencity.enums.PlaceStatus;
+import greencity.filters.FilterPlaceCategory;
 import greencity.service.PlaceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -15,10 +16,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -74,10 +72,31 @@ public class PlaceController {
             @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
             @ApiResponse(responseCode = "303", description = HttpStatuses.SEE_OTHER),
             @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-            @ApiResponse(responseCode = "403", description = HttpStatuses.NOT_FOUND)
+            @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
     @GetMapping("/statuses")
     public ResponseEntity<List<String>> getStatuses() {
         return ResponseEntity.ok(placeService.getStatuses());
+    }
+
+    @Operation(summary = "Return all place categories to filter.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK)
+    })
+    @GetMapping("/v2/filteredPlacesCategories")
+    public ResponseEntity<List<FilterPlaceCategory>> getFilteredPlacesCategories() {
+        return ResponseEntity.ok(placeService.getFilteredPlacesCategories());
+    }
+
+    @Operation(summary = "Bulk delete places.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "303", description = HttpStatuses.SEE_OTHER),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+            @ApiResponse(responseCode = "403", description = HttpStatuses.NOT_FOUND)
+    })
+    @DeleteMapping
+    public ResponseEntity<Long> bulkDeletePlaces(@Parameter(description = "Ids to delete separated by comma") @RequestParam String ids) {
+        return ResponseEntity.ok(placeService.bulkDeletePlaces(ids));
     }
 }

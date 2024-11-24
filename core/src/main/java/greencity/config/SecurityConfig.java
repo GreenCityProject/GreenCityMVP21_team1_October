@@ -199,7 +199,7 @@ public class SecurityConfig {
                                 "/habit/tags/search",
                                 "/habit/search",
                                 "/habit/{habitId}/friends/profile-pictures",
-                                "/place",
+                                "/place/v2/filteredPlacesCategories",
                                 "/place/info/{id}",
                                 "/place/about/{id}",
                                 "/place/{status}",
@@ -273,6 +273,7 @@ public class SecurityConfig {
                                 "/social-networks",
                                 USER_CUSTOM_SHOPPING_LIST_ITEMS,
                                 USER_SHOPPING_LIST + "/user-shopping-list-items",
+                                "/place",
                                 "/friends/{friendId}/declineFriend")
                         .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)
                         .requestMatchers(HttpMethod.GET,
