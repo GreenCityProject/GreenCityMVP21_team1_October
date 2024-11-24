@@ -1,8 +1,10 @@
 package greencity.service;
 
 import greencity.dto.place.PlaceInfoDto;
+import greencity.dto.place.PlaceUpdateDto;
 
 public interface PlaceService {
 
-    public PlaceInfoDto getPlaceInfo(Long id);
+    PlaceInfoDto getPlaceInfo(Long id);
+    PlaceUpdateDto getPlace(Long id);
 }

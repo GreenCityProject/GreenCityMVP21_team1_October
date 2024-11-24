@@ -2,6 +2,7 @@ package greencity.controller;
 
 import greencity.constant.HttpStatuses;
 import greencity.dto.place.PlaceInfoDto;
+import greencity.dto.place.PlaceUpdateDto;
 import greencity.service.PlaceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -32,5 +33,17 @@ public class PlaceController {
     @GetMapping("/info/{id}")
     public ResponseEntity<PlaceInfoDto> getPlaceInfo(@PathVariable Long id) {
         return ResponseEntity.ok(placeService.getPlaceInfo(id));
+    }
+
+    @Operation(summary = "Get place by id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "303", description = HttpStatuses.SEE_OTHER),
+            @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN),
+            @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    })
+    @GetMapping("/about/{id}")
+    public ResponseEntity<PlaceUpdateDto> getPlace(@PathVariable Long id) {
+        return ResponseEntity.ok(placeService.getPlace(id));
     }
 }
