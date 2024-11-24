@@ -29,7 +29,7 @@ public class BreakTime {
     @NotNull(message = "Break end time can't be null!")
     private Time endTime;
 
-    @ManyToOne
+    @OneToOne
     @NotNull
     @OnDelete(action = OnDeleteAction.CASCADE)
     private OpenHours openHours;

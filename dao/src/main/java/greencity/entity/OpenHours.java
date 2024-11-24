@@ -8,7 +8,6 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.sql.Time;
-import java.util.List;
 
 @Entity
 @Table(name = "open_hours_list")
@@ -17,7 +16,7 @@ import java.util.List;
 @Getter
 @Setter
 @EqualsAndHashCode
-@ToString
+@ToString(exclude = {"breakTime", "place"})
 @Builder
 public class OpenHours {
 
@@ -35,8 +34,8 @@ public class OpenHours {
     @NotNull(message = "Close time can't be null!")
     private Time closeTime;
 
-    @OneToMany(mappedBy = "openHours")
-    private List<BreakTime> breakTimes;
+    @OneToOne(mappedBy = "openHours")
+    private BreakTime breakTime;
 
     @ManyToOne
     @NotNull

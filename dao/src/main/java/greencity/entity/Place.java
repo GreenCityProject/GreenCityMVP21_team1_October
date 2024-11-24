@@ -9,6 +9,8 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.validator.constraints.Length;
 
+import java.util.List;
+
 @Entity
 @Table(name = "places")
 @NoArgsConstructor
@@ -51,4 +53,13 @@ public class Place {
     @NotNull(message = "Place author can't be null!")
     @OnDelete(action = OnDeleteAction.RESTRICT)
     private User author;
+
+    @OneToMany(mappedBy = "place")
+    private List<OpenHours> openHoursList;
+
+    @OneToMany(mappedBy = "place")
+    private List<Comment> comments;
+
+    @OneToMany(mappedBy = "place")
+    private List<DiscountValue> discountValues;
 }
