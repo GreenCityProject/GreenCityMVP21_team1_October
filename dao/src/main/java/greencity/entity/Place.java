@@ -1,5 +1,6 @@
 package greencity.entity;
 
+import greencity.enums.PlaceStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -31,7 +32,12 @@ public class Place {
     @Column(unique = true)
     private String name;
 
+    @NotNull
     private Double rate;
+
+    @NotNull
+    @Enumerated(EnumType.ORDINAL)
+    private PlaceStatus status;
 
     @ManyToOne
     @NotNull(message = "Place location can't be null!")
@@ -48,14 +54,12 @@ public class Place {
     @OnDelete(action = OnDeleteAction.RESTRICT)
     private User author;
 
-    // These three OneToMany properties below maybe should be moved to Dto in future
-
-    @OneToMany
+    @OneToMany(mappedBy = "place")
     private List<OpenHours> openHoursList;
 
-    @OneToMany
-    private List<DiscountValue> discountValues;
-
-    @OneToMany
+    @OneToMany(mappedBy = "place")
     private List<Comment> comments;
+
+    @OneToMany(mappedBy = "place")
+    private List<DiscountValue> discountValues;
 }
