@@ -35,6 +35,7 @@ public class EventServiceImpl implements EventService {
     private final FileService fileService;
     private final TagsService tagsService;
     private final UserRepo userRepo;
+    private final EventRepository eventRepository;
 //    private final NotificationService notificationService;
 
     /**
@@ -164,5 +165,21 @@ public class EventServiceImpl implements EventService {
         return userRepo.findById(userId)
                        .map(User::getRole)
                        .orElse(Role.ROLE_USER) == Role.ROLE_ADMIN;
+    }
+
+    @Override
+    public List<EventResponseDto> getCreatedEventsByUser(Long userId) {
+        List<Event> events = eventRepository.findAllByCreatorId(userId);
+        return events.stream()
+                .map(event -> modelMapper.map(event, EventResponseDto.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<EventResponseDto> getAttendingEventsByUser(Long userId) {
+        List<Event> attendingEvents = eventRepository.findAllByAttenderId(userId);
+        return attendingEvents.stream()
+                .map(event -> modelMapper.map(event, EventResponseDto.class))
+                .collect(Collectors.toList());
     }
 }

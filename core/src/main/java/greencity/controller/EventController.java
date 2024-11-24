@@ -5,6 +5,7 @@ import greencity.constant.ErrorMessage;
 import greencity.constant.HttpStatuses;
 import greencity.dto.event.EventDetailsUpdate;
 import greencity.dto.event.EventResponseDto;
+import greencity.dto.event.MyEventsResponseDto;
 import greencity.dto.user.UserVO;
 import greencity.exception.exceptions.WrongIdException;
 import greencity.service.EventService;
@@ -24,6 +25,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.security.Principal;
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/events")
@@ -97,4 +100,29 @@ public class EventController {
         eventService.deleteEvent(eventId, userId);
         return ResponseEntity.ok().build();
     }
+
+
+    /**
+     * Method for getting all events related to the authenticated user.
+     *
+     * @param principal the currently authenticated user.
+     * @return {@link ResponseEntity<MyEventsResponseDto>}
+     */
+    @Operation(summary = "Get all events related to the authenticated user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
+                    content = @Content(schema = @Schema(implementation = MyEventsResponseDto.class))),
+            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED,
+                    content = @Content(examples = @ExampleObject(HttpStatuses.UNAUTHORIZED)))
+    })
+    @GetMapping("/myEvents")
+    public ResponseEntity<MyEventsResponseDto> getMyEvents(@Parameter(hidden = true) Principal principal) {
+        UserVO currentUser = userService.findByEmail(principal.getName());
+        List<EventResponseDto> createdEvents = eventService.getCreatedEventsByUser(currentUser.getId());
+        List<EventResponseDto> attendingEvents = eventService.getAttendingEventsByUser(currentUser.getId());
+
+        MyEventsResponseDto response = new MyEventsResponseDto(createdEvents, attendingEvents);
+        return ResponseEntity.ok(response);
+    }
+
 }

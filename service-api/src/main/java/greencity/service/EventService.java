@@ -6,6 +6,8 @@ import greencity.dto.event.EventVO;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserHasNoPermissionToAccessException;
 import org.springframework.web.multipart.MultipartFile;
+import java.util.List;
+
 
 public interface EventService {
     /**
@@ -32,6 +34,22 @@ public interface EventService {
      * @throws NotFoundException if the event with the specified ID is not found.
      */
     void deleteEvent(Long eventId, Long userId);
+
+    /**
+     * Method for getting events created by a user.
+     *
+     * @param userId the ID of the user.
+     * @return list of {@link EventResponseDto}.
+     */
+    List<EventResponseDto> getCreatedEventsByUser(Long userId);
+
+    /**
+     * Method for getting events where a user is an attender.
+     *
+     * @param userId the ID of the user.
+     * @return list of {@link EventResponseDto}.
+     */
+    List<EventResponseDto> getAttendingEventsByUser(Long userId);
 
     EventVO findById(long eventId);
 }
