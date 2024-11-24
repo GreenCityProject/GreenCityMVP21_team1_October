@@ -1,15 +1,22 @@
 package greencity.service;
 
 import greencity.constant.ErrorMessage;
+import greencity.dto.PageableDto;
 import greencity.dto.place.PlaceInfoDto;
 import greencity.dto.place.PlaceUpdateDto;
+import greencity.entity.Place;
+import greencity.enums.PlaceStatus;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.mapping.PlaceInfoDtoMapper;
 import greencity.mapping.PlaceUpdateDtoMapper;
 import greencity.repository.PlaceRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Log4j2
 @Service
@@ -31,5 +38,15 @@ public class PlaceServiceImpl implements PlaceService {
     public PlaceUpdateDto getPlace(Long id) {
         return placeUpdateDtoMapper.convert(placeRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.PLACE_NOT_FOUND_BY_ID + id)));
+    }
+
+    @Override
+    public PageableDto<PlaceInfoDto> getPlaces(PlaceStatus status, Pageable page) {
+        Page<Place> placesPage = placeRepository.findPlacesByStatus(status, page);
+        List<PlaceInfoDto> placeInfoDtoList = placesPage.getContent().stream()
+                .map(e -> placeInfoDtoMapper.convert(e))
+                .toList();
+        return new PageableDto<>(placeInfoDtoList, placesPage.getTotalElements(),
+                placesPage.getNumber(), placesPage.getTotalPages());
     }
 }
