@@ -17,4 +17,5 @@ public interface PlaceService {
     PageableDto<PlaceInfoDto> getPlaces(PlaceStatus status, Pageable page);
     List<String> getStatuses();
     List<FilterPlaceCategory> getFilteredPlacesCategories();
+    Long bulkDeletePlaces(String ids);
 }
