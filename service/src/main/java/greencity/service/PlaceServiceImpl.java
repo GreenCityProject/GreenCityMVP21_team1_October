@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Log4j2
@@ -48,5 +49,12 @@ public class PlaceServiceImpl implements PlaceService {
                 .toList();
         return new PageableDto<>(placeInfoDtoList, placesPage.getTotalElements(),
                 placesPage.getNumber(), placesPage.getTotalPages());
+    }
+
+    @Override
+    public List<String> getStatuses() {
+        return Arrays.stream(PlaceStatus.values())
+                .map(Enum::name)
+                .toList();
     }
 }
