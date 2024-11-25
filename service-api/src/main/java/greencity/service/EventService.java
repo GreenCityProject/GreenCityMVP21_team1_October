@@ -3,6 +3,7 @@ package greencity.service;
 import greencity.dto.event.EventResponseDto;
 import greencity.dto.event.EventDetailsUpdate;
 import greencity.dto.event.EventVO;
+import greencity.enums.EventStatus;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserHasNoPermissionToAccessException;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,7 +42,7 @@ public interface EventService {
      * @param userId the ID of the user.
      * @return list of {@link EventResponseDto}.
      */
-    List<EventResponseDto> getCreatedEventsByUser(Long userId);
+    List<EventResponseDto> getCreatedEventsByUser(Long userId, EventStatus status);
 
     /**
      * Method for getting events where a user is an attender.
@@ -49,7 +50,7 @@ public interface EventService {
      * @param userId the ID of the user.
      * @return list of {@link EventResponseDto}.
      */
-    List<EventResponseDto> getAttendingEventsByUser(Long userId);
+    List<EventResponseDto> getAttendingEventsByUser(Long userId, EventStatus status);
 
     EventVO findById(long eventId);
 }

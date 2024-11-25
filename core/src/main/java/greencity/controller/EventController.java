@@ -7,6 +7,7 @@ import greencity.dto.event.EventDetailsUpdate;
 import greencity.dto.event.EventResponseDto;
 import greencity.dto.event.MyEventsResponseDto;
 import greencity.dto.user.UserVO;
+import greencity.enums.EventStatus;
 import greencity.exception.exceptions.WrongIdException;
 import greencity.service.EventService;
 import greencity.service.UserService;
@@ -21,6 +22,8 @@ import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -108,21 +111,43 @@ public class EventController {
      * @param principal the currently authenticated user.
      * @return {@link ResponseEntity<MyEventsResponseDto>}
      */
-    @Operation(summary = "Get all events related to the authenticated user")
+    @Operation(summary = "Get all events created by the authenticated user")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
                     content = @Content(schema = @Schema(implementation = MyEventsResponseDto.class))),
             @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED,
                     content = @Content(examples = @ExampleObject(HttpStatuses.UNAUTHORIZED)))
     })
-    @GetMapping("/myEvents")
-    public ResponseEntity<MyEventsResponseDto> getMyEvents(@Parameter(hidden = true) Principal principal) {
+
+    @GetMapping("/events/myEvents/createdEvents")
+    public ResponseEntity<MyEventsResponseDto> getCreatedEvents(
+            @Parameter(hidden = true) Principal principal,
+            @RequestParam EventStatus status) {
         UserVO currentUser = userService.findByEmail(principal.getName());
-        List<EventResponseDto> createdEvents = eventService.getCreatedEventsByUser(currentUser.getId());
-        List<EventResponseDto> attendingEvents = eventService.getAttendingEventsByUser(currentUser.getId());
+
+        List<EventResponseDto> createdEvents = eventService.getCreatedEventsByUser(currentUser.getId(), status);
+        List<EventResponseDto> attendingEvents = eventService.getAttendingEventsByUser(currentUser.getId(), status);
 
         MyEventsResponseDto response = new MyEventsResponseDto(createdEvents, attendingEvents);
+
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Get all related events for the user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
+                    content = @Content(schema = @Schema(implementation = EventResponseDto.class))),
+            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED,
+                    content = @Content(examples = @ExampleObject(HttpStatuses.UNAUTHORIZED)))
+    })
+
+    @GetMapping("/events/myEvents/relatedEvents")
+    public List<EventResponseDto> getUserRelatedEvents(
+            @RequestParam("status") EventStatus status,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        // Use the email/username to find the corresponding user in the database
+        UserVO currentUser = userService.findByEmail(userDetails.getUsername());
+        return eventService.getAttendingEventsByUser(currentUser.getId(), status);
     }
 
 }

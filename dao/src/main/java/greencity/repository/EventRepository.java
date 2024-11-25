@@ -18,7 +18,10 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query(value = "DELETE FROM event_days WHERE id = :id", nativeQuery = true)
     void deleteEventDayByEventId(Long id);
 
-    List<Event> findAllByCreatorId(Long creatorId);
+    List<Event> findAllByOrganizer_Id(Long organizerId);
 
-    List<Event> findAllByAttenderId(Long attenderId);
+
+    List<Event> findAllByAttendants_Id(Long attendeeId);
+
+
 }

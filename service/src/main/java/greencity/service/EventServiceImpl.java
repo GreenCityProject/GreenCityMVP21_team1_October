@@ -6,6 +6,7 @@ import greencity.dto.event.EventDetailsUpdate;
 import greencity.dto.event.EventResponseDto;
 import greencity.dto.event.EventVO;
 import greencity.entity.*;
+import greencity.enums.EventStatus;
 import greencity.enums.Role;
 import greencity.enums.TagType;
 import greencity.exception.exceptions.NotFoundException;
@@ -24,6 +25,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.time.LocalDate;
+
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +39,7 @@ public class EventServiceImpl implements EventService {
     private final TagsService tagsService;
     private final UserRepo userRepo;
     private final EventRepository eventRepository;
+
 //    private final NotificationService notificationService;
 
     /**
@@ -168,18 +172,42 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventResponseDto> getCreatedEventsByUser(Long userId) {
-        List<Event> events = eventRepository.findAllByCreatorId(userId);
+    public List<EventResponseDto> getCreatedEventsByUser(Long userId, EventStatus status) {
+        List<Event> events = eventRepository.findAllByOrganizer_Id(userId);
         return events.stream()
+                .filter(event -> determineStatus(event) == status)
                 .map(event -> modelMapper.map(event, EventResponseDto.class))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<EventResponseDto> getAttendingEventsByUser(Long userId) {
-        List<Event> attendingEvents = eventRepository.findAllByAttenderId(userId);
+    public List<EventResponseDto> getAttendingEventsByUser(Long userId, EventStatus status) {
+        List<Event> attendingEvents = eventRepository.findAllByAttendants_Id(userId);
         return attendingEvents.stream()
+                .filter(event -> determineStatus(event) == status)
                 .map(event -> modelMapper.map(event, EventResponseDto.class))
                 .collect(Collectors.toList());
     }
+
+    private EventStatus determineStatus(Event event) {
+        LocalDate now = LocalDate.now();
+        if (event.getEventDays().isEmpty()) {
+            return EventStatus.PLANNED;
+        }
+
+        LocalDate startDate = event.getEventDays().get(0).getEventDate();
+        LocalDate endDate = event.getEventDays().get(event.getEventDays().size() - 1).getEventDate();
+
+        if (startDate.isAfter(now)) {
+            return EventStatus.PLANNED;
+        } else if (endDate.isBefore(now)) {
+            return EventStatus.PASSED;
+        } else {
+            return EventStatus.ONGOING;
+        }
+    }
 }
+
+
+
+

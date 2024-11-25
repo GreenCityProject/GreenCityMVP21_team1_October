@@ -1,2 +1,7 @@
-package greencity.enums;public class EventStatus {
+package greencity.enums;
+
+public enum EventStatus {
+    PLANNED,
+    ONGOING,
+    PASSED
 }
