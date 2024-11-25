@@ -75,6 +75,19 @@ public class EventCommentServiceImpl implements EventCommentService {
     }
 
     @Override
+    public void delete(long commentId, UserVO user) {
+        EventComment eventComment = eventCommentRepo.findById(commentId)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.COMMENT_NOT_FOUND_EXCEPTION));
+        if (!eventComment.getUser().getId().equals(user.getId()) && !user.getRole().equals("ADMIN")) {
+            throw new BadRequestException(ErrorMessage.NOT_A_CURRENT_USER);
+        }
+        eventCommentRepo.delete(eventComment);
+        String accessToken = httpServletRequest.getHeader(AUTHORIZATION);
+        CompletableFuture.runAsync(
+                () -> ratingCalculation.ratingCalculation(RatingCalculationEnum.DELETE_COMMENT, user, accessToken));
+    }
+
+    @Override
     public EventCommentVO findById(long commentId) {
         return modelMapper.map(eventCommentRepo.findById(commentId).orElseThrow(
                 () -> new NotFoundException(ErrorMessage.COMMENT_NOT_FOUND_EXCEPTION)
