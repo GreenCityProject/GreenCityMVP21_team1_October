@@ -1,5 +1,6 @@
 package greencity.dto.eventcomment;
 
+import greencity.annotations.NoProfanity;
 import greencity.constant.ErrorMessage;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -15,6 +16,7 @@ import lombok.NoArgsConstructor;
 public class AddEventCommentDtoRequest {
     @NotBlank(message = ErrorMessage.STRING_IS_BLANK)
     @Size(min = 1, max = 8000, message = ErrorMessage.STRING_SIZE_IS_INVALID)
+    @NoProfanity
     private String comment;
     private Long parentCommentId;
 }

@@ -1,6 +1,7 @@
 package greencity.controller;
 
 import greencity.annotations.CurrentUser;
+import greencity.annotations.NoProfanity;
 import greencity.constant.HttpStatuses;
 import greencity.dto.eventcomment.AddEventCommentDtoRequest;
 import greencity.dto.eventcomment.AddEventCommentDtoResponse;
@@ -51,7 +52,7 @@ public class EventCommentController {
             @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
     @PatchMapping
-    public ResponseEntity<?> update(@RequestParam("id") Long id, @RequestParam("text") @NotBlank String text,
+    public ResponseEntity<?> update(@RequestParam("id") Long id, @RequestParam("text") @NotBlank @NoProfanity String text,
                        @Parameter(hidden = true) @CurrentUser UserVO user) {
         eventCommentService.update(text, id, user);
         return ResponseEntity.ok().build();
