@@ -2,12 +2,9 @@ package greencity.service;
 
 import greencity.constant.ErrorMessage;
 import greencity.dto.PageableDto;
-import greencity.dto.place.AddPlaceDto;
-import greencity.dto.place.PlaceInfoDto;
-import greencity.dto.place.PlaceUpdateDto;
+import greencity.dto.place.*;
 import greencity.entity.Place;
 import greencity.enums.PlaceStatus;
-import greencity.dto.place.PlaceResponseDto;
 import greencity.dto.user.UserVO;
 import greencity.entity.Location;
 import greencity.entity.OpenHours;
@@ -22,7 +19,10 @@ import greencity.repository.CategoryRepo;
 import greencity.repository.LocationRepository;
 import greencity.repository.PlaceRepository;
 import jakarta.transaction.Transactional;
+
+import java.util.ArrayList;
 import java.util.Optional;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -102,6 +102,21 @@ public class PlaceServiceImpl implements PlaceService {
     }
 
     @Override
+    public List<UpdatePlaceStatusDto> bulkUpdatePlaceStatus(BulkUpdatePlaceStatusDto dto) {
+        List<UpdatePlaceStatusDto> result = new ArrayList<>();
+        Place place;
+        for (Long id : dto.getIds()) {
+            place = placeRepository.findById(id).orElseThrow(() -> new NotFoundException(ErrorMessage.PLACE_NOT_FOUND_BY_ID + id));
+            if (place.getStatus() != dto.getStatus()) {
+                result.add(new UpdatePlaceStatusDto(id, place.getStatus()));
+                place.setStatus(dto.getStatus());
+                placeRepository.save(place);
+            }
+        }
+        return result;
+    }
+
+    @Override
     public PlaceResponseDto save(AddPlaceDto placeDto, UserVO userVO) {
         if (placeRepository.findPlaceByName(placeDto.getPlaceName()).isPresent()) {
             throw new BadPlaceRequestException(ErrorMessage.PLACE_ALREADY_EXISTS);
@@ -113,21 +128,21 @@ public class PlaceServiceImpl implements PlaceService {
         place.setAuthor(modelMapper.map(userVO, User.class));
         place.setStatus(PlaceStatus.PROPOSED);
         place.setOpenHoursList(
-            placeDto.getOpeningHoursList().stream().map(row -> modelMapper.map(row, OpenHours.class).setPlace(place))
-                .toList());
+                placeDto.getOpeningHoursList().stream().map(row -> modelMapper.map(row, OpenHours.class).setPlace(place))
+                        .toList());
 
         //todo: provide separate service for converting address to geo lat and lng
         Location location = locationRepository.save(Location
-            .builder()
-            .address(placeDto.getLocationName())
-            .lng(0D)
-            .lat(0D)
-            .build());
+                .builder()
+                .address(placeDto.getLocationName())
+                .lng(0D)
+                .lat(0D)
+                .build());
         place.setLocation(location);
         place.setRate(0D);
 
         return modelMapper.map(
-            placeRepository.save(place),
-            PlaceResponseDto.class);
+                placeRepository.save(place),
+                PlaceResponseDto.class);
     }
 }
