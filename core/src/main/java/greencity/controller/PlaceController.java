@@ -1,10 +1,14 @@
 package greencity.controller;
 
 import greencity.annotations.ApiPageable;
+import greencity.annotations.CurrentUser;
 import greencity.constant.HttpStatuses;
 import greencity.dto.PageableDto;
+import greencity.dto.place.AddPlaceDto;
 import greencity.dto.place.PlaceInfoDto;
+import greencity.dto.place.PlaceResponseDto;
 import greencity.dto.place.PlaceUpdateDto;
+import greencity.dto.user.UserVO;
 import greencity.enums.PlaceStatus;
 import greencity.filters.FilterPlaceCategory;
 import greencity.service.PlaceService;
@@ -19,21 +23,21 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.web.bind.annotation.*;
 
 @Validated
 @RestController
 @RequestMapping("/place")
 @AllArgsConstructor
 public class PlaceController {
-
     private PlaceService placeService;
 
     @Operation(summary = "Get info about place")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-            @ApiResponse(responseCode = "303", description = HttpStatuses.SEE_OTHER),
-            @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN),
-            @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "303", description = HttpStatuses.SEE_OTHER),
+        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN),
+        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
     @GetMapping("/info/{id}")
     public ResponseEntity<PlaceInfoDto> getPlaceInfo(@PathVariable Long id) {
@@ -98,5 +102,15 @@ public class PlaceController {
     @DeleteMapping
     public ResponseEntity<Long> bulkDeletePlaces(@Parameter(description = "Ids to delete separated by comma") @RequestParam String ids) {
         return ResponseEntity.ok(placeService.bulkDeletePlaces(ids));
+    }
+    @Operation(summary = "Create new place from UI")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
+    })
+    @PostMapping("/v2/save")
+    public ResponseEntity<PlaceResponseDto> saveEcoPlaceFromUiUsing(
+        @RequestBody AddPlaceDto placeDto, @CurrentUser UserVO userVO) {
+        return ResponseEntity.ok(placeService.save(placeDto, userVO));
     }
 }

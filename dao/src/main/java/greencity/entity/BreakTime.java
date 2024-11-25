@@ -2,11 +2,10 @@ package greencity.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import java.sql.Time;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-
-import java.sql.Time;
 
 @Entity
 @Table(name = "break_times")
@@ -18,7 +17,6 @@ import java.sql.Time;
 @ToString
 @Builder
 public class BreakTime {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
