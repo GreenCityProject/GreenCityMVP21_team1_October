@@ -3,11 +3,10 @@ package greencity.entity;
 import greencity.enums.WeekDay;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import java.sql.Time;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-
-import java.sql.Time;
 
 @Entity
 @Table(name = "open_hours_list")
@@ -34,7 +33,7 @@ public class OpenHours {
     @NotNull(message = "Close time can't be null!")
     private Time closeTime;
 
-    @OneToOne(mappedBy = "openHours")
+    @OneToOne(mappedBy = "openHours", cascade = CascadeType.ALL, orphanRemoval = true)
     private BreakTime breakTime;
 
     @ManyToOne

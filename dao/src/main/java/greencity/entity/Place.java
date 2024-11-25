@@ -4,12 +4,11 @@ import greencity.enums.PlaceStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.validator.constraints.Length;
-
-import java.util.List;
 
 @Entity
 @Table(name = "places")
@@ -21,7 +20,6 @@ import java.util.List;
 @ToString
 @Builder
 public class Place {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -54,7 +52,7 @@ public class Place {
     @OnDelete(action = OnDeleteAction.RESTRICT)
     private User author;
 
-    @OneToMany(mappedBy = "place")
+    @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OpenHours> openHoursList;
 
     @OneToMany(mappedBy = "place")

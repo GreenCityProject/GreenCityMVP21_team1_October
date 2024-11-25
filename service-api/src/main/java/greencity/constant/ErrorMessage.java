@@ -149,6 +149,7 @@ public final class ErrorMessage {
     public static final String SUBSCRIBER_ALREADY_EXISTS = "Subscriber with such email already exists!";
     public static final String STRING_IS_BLANK = "String could not be empty or blank!";
     public static final String STRING_SIZE_IS_INVALID = "String size must be in between 1 and 8000!";
+    public static final String PLACE_ALREADY_EXISTS = "Place by this name already exists.";
 
     private ErrorMessage() {
     }
