@@ -1,5 +1,6 @@
 package greencity.config;
 
+import greencity.constant.AppConstant;
 import greencity.security.filters.AccessTokenAuthenticationFilter;
 import greencity.security.jwt.JwtTool;
 import greencity.security.providers.JwtAuthenticationProvider;
@@ -44,7 +45,7 @@ public class SecurityConfig {
     private static final String USER_CUSTOM_SHOPPING_LIST_ITEMS = "/user/{userId}/custom-shopping-list-items";
     private static final String CUSTOM_SHOPPING_LIST = "/custom/shopping-list-items/{userId}";
     private static final String CUSTOM_SHOPPING_LIST_URL = "/custom/shopping-list-items/{userId}/"
-            + "custom-shopping-list-items";
+                                                           + "custom-shopping-list-items";
     private static final String CUSTOM_SHOPPING_LIST_ITEMS = "/{userId}/custom-shopping-list-items";
     private static final String HABIT_ASSIGN_ID = "/habit/assign/{habitId}";
     private static final String USER_SHOPPING_LIST = "/user/shopping-list-items";
@@ -222,7 +223,8 @@ public class SecurityConfig {
                                 USER_SHOPPING_LIST,
                                 "/user/{userId}/habit",
                                 "/habit/custom",
-                                "/custom/shopping-list-items/{userId}/{habitId}/custom-shopping-list-items")
+                                "/custom/shopping-list-items/{userId}/{habitId}/custom-shopping-list-items",
+                                EVENTS_COMMENTS + "/{eventId}")
                         .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)
                         .requestMatchers(HttpMethod.POST,
                                 "/newsSubscriber")
@@ -253,7 +255,8 @@ public class SecurityConfig {
                                 USER_SHOPPING_LIST + "/{userShoppingListItemId}",
                                 "/user/profilePicture",
                                 "/user/deleteProfilePicture",
-                                "/friends/{friendId}/acceptFriend")
+                                "/friends/{friendId}/acceptFriend",
+                                EVENTS_COMMENTS)
                         .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)
                         .requestMatchers(HttpMethod.DELETE,
                                 ECONEWS_COMMENTS,
@@ -266,6 +269,8 @@ public class SecurityConfig {
                                 USER_CUSTOM_SHOPPING_LIST_ITEMS,
                                 USER_SHOPPING_LIST + "/user-shopping-list-items",
                                 "/friends/{friendId}/declineFriend")
+                        .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)
+                        .requestMatchers(HttpMethod.DELETE, "/friends/{friendId}")
                         .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)
                         .requestMatchers(HttpMethod.GET,
                                 "/newsSubscriber",
@@ -295,7 +300,7 @@ public class SecurityConfig {
                         .hasAnyRole(ADMIN)
                         .requestMatchers(HttpMethod.DELETE,
                                 "/event/{eventId}")
-                        .hasAnyRole(ADMIN)
+                        .hasAnyRole(ADMIN, USER)
                         .requestMatchers(HttpMethod.DELETE,
                                 "/facts/{factId}",
                                 "/comments")
