@@ -1,7 +1,7 @@
 package greencity.validator;
 
 import greencity.annotations.EventValidation;
-import greencity.dto.event.EventDayDto;
+import greencity.dto.event.EventDayCreateRequestDto;
 import greencity.dto.event.EventRequestDto;
 import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.Payload;
@@ -36,11 +36,11 @@ public class EventValidatorTest {
         validEvent = new EventRequestDto();
         validEvent.setIsOpenEvent(true);
         validEvent.setTitle("Valid event title");
-        var eventDay1 = new EventDayDto();
+        var eventDay1 = new EventDayCreateRequestDto();
         eventDay1.setEventDate(LocalDate.now().plusDays(1));
         eventDay1.setEventStartTime(LocalTime.now());
         eventDay1.setEventEndTime(LocalTime.now().plusHours(2));
-        var eventDay2 = new EventDayDto();
+        var eventDay2 = new EventDayCreateRequestDto();
         eventDay2.setEventDate(LocalDate.now().plusDays(2));
         eventDay2.setEventStartTime(LocalTime.now());
         eventDay2.setEventEndTime(LocalTime.now().plusHours(4));

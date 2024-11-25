@@ -9,10 +9,7 @@ import greencity.dto.econewscomment.AddEcoNewsCommentDtoRequest;
 import greencity.dto.econewscomment.AddEcoNewsCommentDtoResponse;
 import greencity.dto.econewscomment.EcoNewsCommentAuthorDto;
 import greencity.dto.econewscomment.EcoNewsCommentDto;
-import greencity.dto.event.EventDayDto;
-import greencity.dto.event.EventDayResponseDto;
-import greencity.dto.event.EventRequestDto;
-import greencity.dto.event.EventResponseDto;
+import greencity.dto.event.*;
 import greencity.dto.habit.*;
 import greencity.dto.habitfact.*;
 import greencity.dto.habitstatistic.AddHabitStatisticDto;
@@ -433,7 +430,7 @@ public class ModelUtils {
         return EventRequestDto.builder()
                 .title("Lectures on garbage segregation")
                 .description("An event focused on promoting environmental awareness and sustainability practices within the community")
-                .eventDays(List.of(EventDayDto.builder()
+                .eventDays(List.of(EventDayCreateRequestDto.builder()
                         .eventDate(LocalDate.parse("2024-12-16"))
                         .eventStartTime(LocalTime.parse("09:00:00"))
                         .eventEndTime(LocalTime.parse("20:00:00"))
@@ -442,6 +439,25 @@ public class ModelUtils {
                         .isOnline(true)
                         .onlineLink("https://example.com/event-link")
                         .build()))
+                .build();
+    }
+    public static EventDetailsUpdate getEventDetailsUpdate() {
+        return EventDetailsUpdate.builder()
+                .id(1L)
+                .title("Lectures on garbage segregation")
+                .description("An event focused on promoting environmental awareness and sustainability practices within the community")
+                .eventDays(List.of(EventDayDto.builder()
+                        .id(1L)
+                        .eventDate(LocalDate.parse("2024-12-16"))
+                        .eventStartTime(LocalTime.parse("09:00:00"))
+                        .eventEndTime(LocalTime.parse("20:00:00"))
+                        .latitude(47.985)
+                        .longitude(-122.559)
+                        .isOnline(true)
+                        .onlineLink("https://example.com/event-link")
+                        .build()))
+                .additionalImages(Collections.emptyList())
+                .image(AppConstant.DEFAULT_EVENT_IMAGE)
                 .build();
     }
 

@@ -2,8 +2,8 @@ package greencity.service;
 
 import greencity.ModelUtils;
 import greencity.client.RestClient;
-import greencity.dto.event.EventDayDto;
-import greencity.dto.event.EventRequestDto;
+import greencity.dto.event.EventDayCreateRequestDto;
+import greencity.dto.event.EventDetailsUpdate;
 import greencity.dto.event.EventResponseDto;
 import greencity.dto.user.UserVO;
 import greencity.entity.Event;
@@ -37,7 +37,7 @@ class EventServiceImplUpdateTest {
     @Test
     void update() {
         Event eventToUpdate = ModelUtils.getEvent();
-        EventRequestDto eventRequestDto = ModelUtils.getEventDetailsUpdate();
+        EventDetailsUpdate eventDetailsUpdate = ModelUtils.getEventDetailsUpdate();
         EventResponseDto eventResponseDto = ModelUtils.getEventResponseDto();
         User user = ModelUtils.getUser();
         UserVO userVO = ModelUtils.getUserVO();
@@ -47,11 +47,11 @@ class EventServiceImplUpdateTest {
         when(restClient.findByEmail(anyString())).thenReturn(userVO);
         when(modelMapper.map(any(UserVO.class), eq(User.class))).thenReturn(user);
         when(eventRepo.save(any(Event.class))).thenReturn(eventToUpdate);
-        when(modelMapper.map(any(EventDayDto.class), eq(EventDay.class)))
+        when(modelMapper.map(any(EventDayCreateRequestDto.class), eq(EventDay.class)))
                 .thenReturn(eventDay);
         when(modelMapper.map(eventToUpdate, EventResponseDto.class)).thenReturn(eventResponseDto);
 
-        EventResponseDto updated = eventServiceImpl.update(1L,eventRequestDto, user.getEmail(), null);
+        EventResponseDto updated = eventServiceImpl.update(eventDetailsUpdate, user.getEmail(), null);
 
         assertEquals(eventResponseDto, updated);
         verify(eventRepo).save(eventToUpdate);

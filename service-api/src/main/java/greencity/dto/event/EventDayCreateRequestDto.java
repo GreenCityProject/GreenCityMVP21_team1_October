@@ -16,9 +16,7 @@ import java.time.LocalTime;
 @Setter
 @Builder
 @EqualsAndHashCode
-public class EventDayDto {
-    @Schema(example = "1", description = "Unique identifier for the event day")
-    private Long id;
+public class EventDayCreateRequestDto {
 
     @Schema(example = "2024-11-09", description = "Date of the event day")
     private LocalDate eventDate;

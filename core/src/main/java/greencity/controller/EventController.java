@@ -1,10 +1,13 @@
 package greencity.controller;
 
 import greencity.annotations.EventValidation;
+import greencity.constant.ErrorMessage;
 import greencity.constant.HttpStatuses;
+import greencity.dto.event.EventDetailsUpdate;
 import greencity.dto.event.EventRequestDto;
 import greencity.dto.event.EventResponseDto;
 import greencity.dto.user.UserVO;
+import greencity.exception.exceptions.WrongIdException;
 import greencity.service.EventService;
 import greencity.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -52,14 +55,20 @@ public class EventController {
             @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND,
                     content = @Content(examples = @ExampleObject(HttpStatuses.NOT_FOUND)))
     })
-    @PutMapping(value = "/{event_id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{eventId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<EventResponseDto> update(
-            @Parameter(required = true) @EventValidation @RequestPart EventRequestDto requestDto,
+            @Parameter(required = true) @EventValidation @RequestPart EventDetailsUpdate requestDto,
             @Parameter(hidden = true) Principal principal,
-            @PathVariable(name = "event_id") Long eventId,
+            @PathVariable Long eventId,
             @RequestPart(required = false) @Nullable MultipartFile[] file) {
-        return ResponseEntity.ok().body(eventService.update(eventId, requestDto, principal.getName(), file));
+
+        if (!eventId.equals(requestDto.getId())) {
+            throw new WrongIdException(ErrorMessage.EVENT_ID_IN_PATH_PARAM_AND_ENTITY_NOT_EQUAL);
+        }
+
+        return ResponseEntity.ok().body(eventService.update(requestDto, principal.getName(), file));
     }
+
 
     /**
      * Method for deleting an event.

@@ -4,9 +4,9 @@ import greencity.constant.AppConstant;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.econews.*;
 import greencity.dto.econewscomment.*;
-import greencity.dto.event.EventDayDto;
-import greencity.dto.event.EventDetailsUpdate;
-import greencity.dto.event.EventResponseDto;
+import greencity.dto.event.*;
+import greencity.dto.eventcomment.AddEventCommentDtoRequest;
+import greencity.dto.eventcomment.EventCommentVO;
 import greencity.dto.habit.*;
 import greencity.dto.habitfact.*;
 import greencity.dto.language.LanguageDTO;
@@ -688,7 +688,7 @@ public class ModelUtils {
                 .id(1L)
                 .title("Lectures on garbage segregation")
                 .description("An event focused on promoting environmental awareness and sustainability practices within the community")
-                .dayList(List.of(EventDayDto.builder()
+                .dayList(List.of(EventDayResponseDto.builder()
                         .id(1L)
                         .eventDate(LocalDate.parse("2024-12-16"))
                         .eventStartTime(LocalTime.parse("09:00:00"))
