@@ -1,12 +1,16 @@
 package greencity.service;
 
+import greencity.dto.PageableAdvancedDto;
 import greencity.dto.event.EventResponseDto;
 import greencity.dto.event.EventDetailsUpdate;
 import greencity.dto.event.EventVO;
 import greencity.enums.EventStatus;
+import greencity.enums.EventType;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserHasNoPermissionToAccessException;
 import org.springframework.web.multipart.MultipartFile;
+
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 
@@ -36,21 +40,17 @@ public interface EventService {
      */
     void deleteEvent(Long eventId, Long userId);
 
-    /**
-     * Method for getting events created by a user.
-     *
-     * @param userId the ID of the user.
-     * @return list of {@link EventResponseDto}.
-     */
+    PageableAdvancedDto<EventResponseDto> getUserEvents(Long userId, EventType eventType, Double userLatitude, Double userLongitude, Pageable pageable);
+
     List<EventResponseDto> getCreatedEventsByUser(Long userId, EventStatus status);
 
-    /**
-     * Method for getting events where a user is an attender.
-     *
-     * @param userId the ID of the user.
-     * @return list of {@link EventResponseDto}.
-     */
     List<EventResponseDto> getAttendingEventsByUser(Long userId, EventStatus status);
+
+    List<EventResponseDto> getUpcomingEventsByUser(Long userId);
+
+    List<EventResponseDto> getPastEventsByUser(Long userId);
+
+    List<EventResponseDto> getInLiveEventsByUser(Long userId);
 
     EventVO findById(long eventId);
 }

@@ -1,6 +1,7 @@
 package greencity.dto.event;
 
 import greencity.dto.tag.TagUaEnDto;
+import greencity.enums.EventStatus;
 import greencity.enums.EventType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,4 +25,5 @@ public class EventResponseDto {
     private List<EventDayDto> dayList;
     private List<String> additionalImages;
     private List<TagUaEnDto> tags;
+    private EventStatus status;
 }

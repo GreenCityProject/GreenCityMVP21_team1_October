@@ -2,25 +2,35 @@ package greencity.service;
 
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
+import greencity.dto.PageableAdvancedDto;
 import greencity.dto.event.EventDetailsUpdate;
 import greencity.dto.event.EventResponseDto;
 import greencity.dto.event.EventVO;
 import greencity.entity.*;
 import greencity.enums.EventStatus;
+import greencity.enums.EventType;
 import greencity.enums.Role;
 import greencity.enums.TagType;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserHasNoPermissionToAccessException;
+import greencity.mapping.event.EventResponseDtoMapper;
+import greencity.mapping.event.MyEventsMapper;
 import greencity.repository.EventImagesRepository;
 import greencity.repository.EventRepository;
 import greencity.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import org.springframework.data.domain.Pageable;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -39,6 +49,7 @@ public class EventServiceImpl implements EventService {
     private final TagsService tagsService;
     private final UserRepo userRepo;
     private final EventRepository eventRepository;
+    private final MyEventsMapper myEventsMapper;
 
 //    private final NotificationService notificationService;
 
@@ -171,43 +182,73 @@ public class EventServiceImpl implements EventService {
                        .orElse(Role.ROLE_USER) == Role.ROLE_ADMIN;
     }
 
-    @Override
-    public List<EventResponseDto> getCreatedEventsByUser(Long userId, EventStatus status) {
-        List<Event> events = eventRepository.findAllByOrganizer_Id(userId);
-        return events.stream()
-                .filter(event -> determineStatus(event) == status)
-                .map(event -> modelMapper.map(event, EventResponseDto.class))
-                .collect(Collectors.toList());
-    }
+
 
     @Override
-    public List<EventResponseDto> getAttendingEventsByUser(Long userId, EventStatus status) {
-        List<Event> attendingEvents = eventRepository.findAllByAttendants_Id(userId);
-        return attendingEvents.stream()
-                .filter(event -> determineStatus(event) == status)
-                .map(event -> modelMapper.map(event, EventResponseDto.class))
-                .collect(Collectors.toList());
-    }
-
-    private EventStatus determineStatus(Event event) {
-        LocalDate now = LocalDate.now();
-        if (event.getEventDays().isEmpty()) {
-            return EventStatus.PLANNED;
-        }
-
-        LocalDate startDate = event.getEventDays().get(0).getEventDate();
-        LocalDate endDate = event.getEventDays().get(event.getEventDays().size() - 1).getEventDate();
-
-        if (startDate.isAfter(now)) {
-            return EventStatus.PLANNED;
-        } else if (endDate.isBefore(now)) {
-            return EventStatus.PASSED;
+    @Transactional(readOnly = true)
+    public PageableAdvancedDto<EventResponseDto> getUserEvents(Long userId, EventType eventType, Double userLatitude, Double userLongitude, Pageable pageable) {
+        Page<Event> events;
+        if (eventType != null) {
+            events = (Page<Event>) eventRepository.findByUserIdAndEventType(userId, eventType, pageable);
         } else {
-            return EventStatus.ONGOING;
+            events = (Page<Event>) eventRepository.findByUserId(userId, pageable);
         }
+
+        List<EventResponseDto> eventDtos = events.stream()
+                .map(myEventsMapper::toEventResponseDto)
+                .collect(Collectors.toList());
+
+        return new PageableAdvancedDto<>(
+                eventDtos,
+                events.getTotalElements(),
+                pageable.getPageNumber(),
+                events.getTotalPages(),
+                pageable.getPageNumber(),
+                events.hasPrevious(),
+                events.hasNext(),
+                events.isFirst(),
+                events.isLast()
+        );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<EventResponseDto> getCreatedEventsByUser(Long userId, EventStatus status) {
+        List<Event> events = eventRepository.findByCreatorIdAndStatus(userId, status);
+        return events.stream().map(myEventsMapper::toEventResponseDto).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<EventResponseDto> getAttendingEventsByUser(Long userId, EventStatus status) {
+        List<Event> events = eventRepository.findByAttendeesUserIdAndStatus(userId, status);
+        return events.stream().map(myEventsMapper::toEventResponseDto).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<EventResponseDto> getUpcomingEventsByUser(Long userId) {
+        LocalDateTime now = LocalDateTime.now();
+        List<Event> events = eventRepository.findByUserIdAndStartTimeAfter(userId, now);
+        return events.stream().map(myEventsMapper::toEventResponseDto).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<EventResponseDto> getPastEventsByUser(Long userId) {
+        LocalDateTime now = LocalDateTime.now();
+        List<Event> events = eventRepository.findByUserIdAndEndTimeBefore(userId, now);
+        return events.stream().map(myEventsMapper::toEventResponseDto).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<EventResponseDto> getInLiveEventsByUser(Long userId) {
+        LocalDateTime now = LocalDateTime.now();
+        List<Event> events = eventRepository.findByUserIdAndStartTimeBeforeAndEndTimeAfter(userId, now);
+        return events.stream().map(myEventsMapper::toEventResponseDto).collect(Collectors.toList());
     }
 }
-
 
 
 

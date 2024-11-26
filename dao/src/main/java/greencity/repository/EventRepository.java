@@ -1,10 +1,18 @@
 package greencity.repository;
 
 import greencity.entity.Event;
+import greencity.enums.EventStatus;
+import greencity.enums.EventType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 import java.util.List;
+import java.time.LocalDateTime;
+
 
 
 public interface EventRepository extends JpaRepository<Event, Long> {
@@ -18,10 +26,26 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query(value = "DELETE FROM event_days WHERE id = :id", nativeQuery = true)
     void deleteEventDayByEventId(Long id);
 
-    List<Event> findAllByOrganizer_Id(Long organizerId);
 
+    @Query("SELECT e FROM Event e WHERE e.organizer.id = :organizerId")
+    Page<Event> findByUserId(@Param("organizerId") Long organizerId, Pageable pageable);
 
-    List<Event> findAllByAttendants_Id(Long attendeeId);
+    @Query("SELECT e FROM Event e WHERE e.organizer.id = :organizerId AND e.type = :type")
+    Page<Event> findByUserIdAndEventType(@Param("organizerId") Long organizerId, @Param("type") EventType type, Pageable pageable);
 
+    @Query("SELECT e FROM Event e WHERE e.organizer.id = :organizerId AND e.status = :status")
+    List<Event> findByCreatorIdAndStatus(@Param("organizerId") Long organizerId, @Param("status") EventStatus status);
 
+    @Query("SELECT e FROM Event e JOIN e.attendants a WHERE a.id = :userId AND e.status = :status")
+    List<Event> findByAttendeesUserIdAndStatus(@Param("userId") Long userId, @Param("status") EventStatus status);
+
+    @Query("SELECT e FROM Event e WHERE e.organizer.id = :organizerId AND e.startTime > :now")
+    List<Event> findByUserIdAndStartTimeAfter(@Param("organizerId") Long organizerId, @Param("now") LocalDateTime now);
+
+    @Query("SELECT e FROM Event e WHERE e.organizer.id = :organizerId AND e.endTime < :now")
+    List<Event> findByUserIdAndEndTimeBefore(@Param("organizerId") Long organizerId, @Param("now") LocalDateTime now);
+
+    @Query("SELECT e FROM Event e WHERE e.organizer.id = :organizerId AND e.startTime < :now AND e.endTime > :now")
+    List<Event> findByUserIdAndStartTimeBeforeAndEndTimeAfter(@Param("organizerId") Long organizerId, @Param("now") LocalDateTime now);
 }
+

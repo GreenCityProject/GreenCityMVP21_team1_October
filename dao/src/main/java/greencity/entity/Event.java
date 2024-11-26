@@ -1,5 +1,6 @@
 package greencity.entity;
 
+import greencity.enums.EventStatus;
 import greencity.enums.EventType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -10,6 +11,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashSet;
@@ -59,9 +62,19 @@ public class Event {
     @Enumerated(EnumType.STRING)
     private EventType type;
 
+    @Enumerated(EnumType.STRING)
+    private EventStatus status;
+
     @NotNull
     private String description;
 
     @Column(name = "is_open")
     private Boolean isOpen = true;
+
+    // Нові поля для зберігання початку та кінця події
+    @Column(name = "start_time")
+    private LocalDateTime startTime;
+
+    @Column(name = "end_time")
+    private LocalDateTime endTime;
 }

@@ -36,4 +36,5 @@ public class Tag {
 
     @ManyToMany(mappedBy = "tags")
     private Set<Event> events;
+
 }

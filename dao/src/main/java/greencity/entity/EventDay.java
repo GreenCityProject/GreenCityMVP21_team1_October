@@ -55,4 +55,5 @@ public class EventDay {
     @Enumerated(EnumType.STRING)
     private EventStatus eventStatus;
 
+
 }
