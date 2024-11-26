@@ -2,7 +2,7 @@ package greencity.validator;
 
 import greencity.annotations.NoProfanity;
 import greencity.constant.ErrorMessage;
-import greencity.exception.exceptions.InvalidCommentException;
+import greencity.exception.exceptions.CommentValidationException;
 import greencity.exception.exceptions.InvalidPathException;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 public class NoProfanityValidator implements ConstraintValidator<NoProfanity, String> {
     private static Set<String> bannedWords;
-    @Value("${slug.filter.file.en}")
+    @Value("${slug.filter.file}")
     private String pathToFile;
 
     @Override
@@ -37,7 +37,7 @@ public class NoProfanityValidator implements ConstraintValidator<NoProfanity, St
                 .noneMatch(string.toLowerCase()::contains);
         if (isValid) {
             return true;
-        } else throw new InvalidCommentException(ErrorMessage.COMMENT_CONTAINS_PROFANITY);
+        } else throw new CommentValidationException(ErrorMessage.COMMENT_CONTAINS_PROFANITY);
     }
 
     private Set<String> loadBannedWords() throws IOException {
