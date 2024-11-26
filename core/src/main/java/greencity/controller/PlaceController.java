@@ -4,10 +4,7 @@ import greencity.annotations.ApiPageable;
 import greencity.annotations.CurrentUser;
 import greencity.constant.HttpStatuses;
 import greencity.dto.PageableDto;
-import greencity.dto.place.AddPlaceDto;
-import greencity.dto.place.PlaceInfoDto;
-import greencity.dto.place.PlaceResponseDto;
-import greencity.dto.place.PlaceUpdateDto;
+import greencity.dto.place.*;
 import greencity.dto.user.UserVO;
 import greencity.enums.PlaceStatus;
 import greencity.filters.FilterPlaceCategory;
@@ -23,7 +20,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import org.springframework.web.bind.annotation.*;
 
 @Validated
 @RestController
@@ -97,12 +93,26 @@ public class PlaceController {
             @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
             @ApiResponse(responseCode = "303", description = HttpStatuses.SEE_OTHER),
             @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-            @ApiResponse(responseCode = "403", description = HttpStatuses.NOT_FOUND)
+            @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
     @DeleteMapping
     public ResponseEntity<Long> bulkDeletePlaces(@Parameter(description = "Ids to delete separated by comma") @RequestParam String ids) {
         return ResponseEntity.ok(placeService.bulkDeletePlaces(ids));
     }
+
+@Operation(summary = "Bulk update place status.")
+@ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "303", description = HttpStatuses.SEE_OTHER),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN),
+        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+})
+@PatchMapping("/statuses")
+public ResponseEntity<List<UpdatePlaceStatusDto>> bulkUpdatePlaceStatus(@RequestBody BulkUpdatePlaceStatusDto dto) {
+    return ResponseEntity.ok(placeService.bulkUpdatePlaceStatus(dto));
+}
+
     @Operation(summary = "Create new place from UI")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK),

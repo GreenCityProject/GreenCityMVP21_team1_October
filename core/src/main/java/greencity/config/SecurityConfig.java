@@ -260,6 +260,7 @@ public class SecurityConfig {
                                 USER_SHOPPING_LIST + "/{userShoppingListItemId}",
                                 "/user/profilePicture",
                                 "/user/deleteProfilePicture",
+                                "/place/statuses",
                                 "/friends/{friendId}/acceptFriend",
                                 EVENTS_COMMENTS)
                         .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)

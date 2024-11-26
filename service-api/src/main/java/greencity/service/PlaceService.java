@@ -1,16 +1,14 @@
 package greencity.service;
 
 import greencity.dto.PageableDto;
-import greencity.dto.place.AddPlaceDto;
-import greencity.dto.place.PlaceInfoDto;
-import greencity.dto.place.PlaceUpdateDto;
+import greencity.dto.place.*;
 import greencity.enums.PlaceStatus;
 
 import greencity.filters.FilterPlaceCategory;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
-import greencity.dto.place.PlaceResponseDto;
+
 import greencity.dto.user.UserVO;
 
 public interface PlaceService {
@@ -20,5 +18,6 @@ public interface PlaceService {
     List<String> getStatuses();
     List<FilterPlaceCategory> getFilteredPlacesCategories();
     Long bulkDeletePlaces(String ids);
+    List<UpdatePlaceStatusDto> bulkUpdatePlaceStatus(BulkUpdatePlaceStatusDto dto);
     PlaceResponseDto save(AddPlaceDto placeDto, UserVO userVO);
 }
