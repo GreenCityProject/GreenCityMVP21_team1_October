@@ -31,11 +31,11 @@ public class EventComment {
     private String comment;
 
     @CreatedDate
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_date", nullable = false, updatable = false)
     private LocalDateTime createdDate;
 
     @LastModifiedDate
-    @Column(nullable = false)
+    @Column(name = "modified_date", nullable = false)
     private LocalDateTime modifiedDate;
 
     @ManyToOne
@@ -50,7 +50,7 @@ public class EventComment {
     @ManyToOne
     private Event event;
 
-    @Column
+    @Column(name = "deleted")
     private boolean deleted;
 
     @Transient

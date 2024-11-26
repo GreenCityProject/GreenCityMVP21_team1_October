@@ -79,6 +79,20 @@ public class FriendsServiceImpl implements FriendsService {
         userRepo.deleteFriendRequest(friendId, userId);
     }
 
+    @Transactional
+    @Override
+    public void deleteFriend(Long userId, Long friendId) {
+        userRepo.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
+        userRepo.findById(friendId).orElseThrow(() -> new NotFoundException("Friend not found!"));
+
+        boolean isFriend = userRepo.isFriend(userId, friendId);
+        if (!isFriend) {
+            throw new NotFoundException("Friendship not found!");
+        }
+
+        userRepo.deleteFriend(userId, friendId);
+    }
+
     private PageableAdvancedDto<UserFriendDto> getPageableAdvancedDtoOfUserFriendDto(
         Long userId, Page<User> friendsPage) {
         List<UserFriendDto> friendsList = friendsPage.stream()

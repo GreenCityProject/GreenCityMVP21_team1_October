@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import greencity.ModelUtils;
 import greencity.dto.event.EventDetailsUpdate;
+import greencity.dto.event.EventRequestDto;
 import greencity.dto.event.EventResponseDto;
 import greencity.service.EventService;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,13 +40,16 @@ class EventControllerTest {
     private EventService eventService;
     @InjectMocks
     private EventController eventController;
-    private EventDetailsUpdate eventRequestDto;
+
+    private EventDetailsUpdate eventDetailsUpdate;
+    private EventRequestDto eventRequestDto;
     private EventResponseDto eventResponseDto;
 
     @BeforeEach
     void setUp() {
         eventRequestDto = ModelUtils.getEventRequestDto();
         eventResponseDto = ModelUtils.getEventResponseDto();
+        eventDetailsUpdate = ModelUtils.getEventDetailsUpdate();
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
@@ -62,7 +66,7 @@ class EventControllerTest {
     void update() throws Exception {
         MockMultipartFile jsonFile = getMockMultipartFile();
 
-        Mockito.when(eventService.update(eq(eventRequestDto), eq(principal.getName()), any()))
+        Mockito.when(eventService.update(eq(eventDetailsUpdate), eq(principal.getName()), any()))
                 .thenReturn(eventResponseDto);
 
         mockMvc.perform(multipart(BASE_LINK +"/{eventId}", 1L)
@@ -82,7 +86,7 @@ class EventControllerTest {
                 .andExpect(jsonPath("$.dayList[0].eventStartTime").value("09:00:00"))
                 .andExpect(jsonPath("$.dayList[0].eventEndTime").value("20:00:00"));
 
-        verify(eventService).update(eq(eventRequestDto), eq(principal.getName()), any());
+        verify(eventService).update(eq(eventDetailsUpdate), eq(principal.getName()), any());
     }
 
     private static MockMultipartFile getMockMultipartFile() {
@@ -109,5 +113,32 @@ class EventControllerTest {
 
         return new MockMultipartFile("requestDto", "",
                 "application/json", jsonRequest.getBytes(StandardCharsets.UTF_8));
+    }
+
+    @Test
+    void saveAndGetCreated() throws Exception {
+        MockMultipartFile jsonFile = getMockMultipartFile();
+
+        Mockito.when(eventService.save(eq(eventRequestDto), eq(principal.getName()), any()))
+                .thenReturn(eventResponseDto);
+
+        mockMvc.perform(multipart(BASE_LINK)
+                        .file(jsonFile)
+                        .principal(principal)
+                        .with(request -> {
+                            request.setMethod("POST");
+                            return request;
+                        })
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.title").value("Lectures on garbage segregation"))
+                .andExpect(jsonPath("$.dayList[0].id").value(1L))
+                .andExpect(jsonPath("$.dayList[0].eventDate").value("2024-12-16"))
+                .andExpect(jsonPath("$.dayList[0].eventStartTime").value("09:00:00"))
+                .andExpect(jsonPath("$.dayList[0].eventEndTime").value("20:00:00"));
+
+        verify(eventService).save(eq(eventRequestDto), eq(principal.getName()), any());
     }
 }
