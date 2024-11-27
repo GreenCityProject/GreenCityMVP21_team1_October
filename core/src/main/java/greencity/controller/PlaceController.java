@@ -101,13 +101,25 @@ public class PlaceController {
         return ResponseEntity.ok(placeService.bulkDeletePlaces(ids));
     }
 
+    @Operation(summary = "Delete place.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "303", description = HttpStatuses.SEE_OTHER),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+            @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Long> deletePlace(
+            @Parameter(description = "Place id to delete") @PathVariable Long id) {
+        return ResponseEntity.ok(placeService.deletePlace(id));
+    }
+
     @Operation(summary = "Bulk update place status.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
         @ApiResponse(responseCode = "303", description = HttpStatuses.SEE_OTHER),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN),
-        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
     @PatchMapping("/statuses")
     public ResponseEntity<List<UpdatePlaceStatusDto>> bulkUpdatePlaceStatus(@RequestBody BulkUpdatePlaceStatusDto dto) {

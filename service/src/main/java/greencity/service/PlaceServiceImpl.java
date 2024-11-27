@@ -11,6 +11,7 @@ import greencity.entity.Place;
 import greencity.entity.User;
 import greencity.enums.PlaceStatus;
 import greencity.exception.exceptions.BadPlaceRequestException;
+import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.WrongIdException;
 import greencity.filters.FilterPlaceCategory;
@@ -22,7 +23,7 @@ import greencity.repository.CategoryRepo;
 import greencity.repository.LocationRepository;
 import greencity.repository.PlaceRepository;
 import jakarta.transaction.Transactional;
-import java.util.ArrayList;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -108,6 +109,15 @@ public class PlaceServiceImpl implements PlaceService {
         return dto.getIds().stream()
                 .map(id -> new UpdatePlaceStatusDto(id, dto.getStatus()))
                 .toList();
+    }
+
+    @Override
+    public Long deletePlace(Long id) {
+        if (!placeRepository.existsById(id)) {
+            throw new BadRequestException(ErrorMessage.PLACE_NOT_FOUND_BY_ID + id);
+        }
+        placeRepository.deleteById(id);
+        return id;
     }
 
     @Override
