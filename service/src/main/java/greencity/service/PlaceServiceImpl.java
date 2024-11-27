@@ -20,7 +20,6 @@ import greencity.repository.LocationRepository;
 import greencity.repository.PlaceRepository;
 import jakarta.transaction.Transactional;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
 import lombok.AllArgsConstructor;
