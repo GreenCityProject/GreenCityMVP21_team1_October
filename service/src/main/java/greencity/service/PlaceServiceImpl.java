@@ -1,37 +1,37 @@
 package greencity.service;
 
 import greencity.constant.ErrorMessage;
+import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
 import greencity.dto.place.*;
-import greencity.entity.Place;
-import greencity.enums.PlaceStatus;
 import greencity.dto.user.UserVO;
 import greencity.entity.Location;
 import greencity.entity.OpenHours;
+import greencity.entity.Place;
 import greencity.entity.User;
+import greencity.enums.PlaceStatus;
 import greencity.exception.exceptions.BadPlaceRequestException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.WrongIdException;
 import greencity.filters.FilterPlaceCategory;
+import greencity.filters.PlaceSpecification;
+import greencity.filters.SearchCriteria;
 import greencity.mapping.PlaceInfoDtoMapper;
 import greencity.mapping.PlaceUpdateDtoMapper;
 import greencity.repository.CategoryRepo;
 import greencity.repository.LocationRepository;
 import greencity.repository.PlaceRepository;
 import jakarta.transaction.Transactional;
-
 import java.util.ArrayList;
-import java.util.Optional;
-
-import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j2;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.modelmapper.ModelMapper;
-import org.springframework.stereotype.Service;
-
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
 @Log4j2
 @Service
@@ -144,5 +144,26 @@ public class PlaceServiceImpl implements PlaceService {
         return modelMapper.map(
                 placeRepository.save(place),
                 PlaceResponseDto.class);
+    }
+
+    @Override
+    public List<FilterPlaceResponseDto> getFilteredPlaces(FilterPlaceDto filterPlaceDto, UserVO userVO) {
+        return placeRepository.findAll(getSpecification(filterPlaceDto)).stream()
+            .map(place -> modelMapper.map(place, FilterPlaceResponseDto.class)).toList();
+    }
+
+    @Override
+    public PageableAdvancedDto<FilterPlaceResponseDto> getFilteredPlaces(FilterPlaceDto filterPlaceDto, UserVO userVO,
+                                                                         Pageable page) {
+        //return placeRepository.findAll(getSpecification(filterPlaceDto), page);
+        return null;
+    }
+
+    PlaceSpecification getSpecification(FilterPlaceDto filterPlaceDto) {
+        return null;
+    }
+
+    List<SearchCriteria> buildSearchCriteria(FilterPlaceDto filterPlaceDto) {
+        return List.of();
     }
 }
