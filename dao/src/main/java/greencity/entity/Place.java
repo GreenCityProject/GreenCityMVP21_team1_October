@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Set;
+
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -60,4 +62,7 @@ public class Place {
 
     @OneToMany(mappedBy = "place")
     private List<DiscountValue> discountValues;
+
+    @ManyToMany(mappedBy = "favoritePlaces")
+    Set<User> addedToFavorite;
 }
