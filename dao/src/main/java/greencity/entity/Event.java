@@ -22,7 +22,6 @@ import java.util.Set;
 @Getter
 @Setter
 @Builder
-@EqualsAndHashCode
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,7 +34,7 @@ public class Event {
     @JoinColumn(name = "user_id", nullable = false)
     private User organizer;
 
-    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL , orphanRemoval = true, fetch = FetchType.EAGER)
     private List<EventDay> eventDays = new ArrayList<>();
 
     private String image;

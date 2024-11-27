@@ -51,7 +51,7 @@ class EventServiceImplUpdateTest {
                 .thenReturn(eventDay);
         when(modelMapper.map(eventToUpdate, EventResponseDto.class)).thenReturn(eventResponseDto);
 
-        EventResponseDto updated = eventServiceImpl.update(eventDetailsUpdate, user.getEmail(), null);
+        EventResponseDto updated = eventServiceImpl.update(eventDetailsUpdate, 1L,  user.getEmail(), null);
 
         assertEquals(eventResponseDto, updated);
         verify(eventRepo).save(eventToUpdate);

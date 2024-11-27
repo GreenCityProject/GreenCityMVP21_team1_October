@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table(name="locations")
 @NoArgsConstructor
@@ -34,4 +36,7 @@ public class Location {
     @Min(value = -180, message = "Latitude must be greater than or equal to -180")
     @Max(value = 180, message = "Latitude must be less than or equal to 180")
     private Double lng;
+
+    @OneToMany(mappedBy = "location")
+    private List<EventDay> eventDay;
 }

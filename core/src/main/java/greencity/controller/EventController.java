@@ -1,12 +1,10 @@
 package greencity.controller;
 
 import greencity.annotations.EventValidation;
-import greencity.constant.ErrorMessage;
 import greencity.constant.HttpStatuses;
 import greencity.dto.event.EventDetailsUpdate;
 import greencity.dto.event.EventResponseDto;
 import greencity.dto.user.UserVO;
-import greencity.exception.exceptions.WrongIdException;
 import greencity.service.EventService;
 import greencity.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,6 +15,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.annotation.Nullable;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -54,16 +53,12 @@ public class EventController {
     })
     @PutMapping(value = "/{eventId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<EventResponseDto> update(
-        @Parameter(required = true) @EventValidation @RequestPart EventDetailsUpdate requestDto,
+        @Parameter(required = true) @Valid @RequestPart EventDetailsUpdate requestDto,
         @Parameter(hidden = true) Principal principal,
         @PathVariable Long eventId,
         @RequestPart(required = false) @Nullable MultipartFile[] file) {
 
-        if (!eventId.equals(requestDto.getId())) {
-            throw new WrongIdException(ErrorMessage.EVENT_ID_IN_PATH_PARAM_AND_ENTITY_NOT_EQUAL);
-        }
-
-        return ResponseEntity.ok().body(eventService.update(requestDto, principal.getName(), file));
+        return ResponseEntity.ok().body(eventService.update(requestDto, eventId, principal.getName(), file));
     }
 
     /**

@@ -12,11 +12,12 @@ public interface EventService {
      * Method for updating user event {@link EventResponseDto}.
      *
      * @param requestDto - event update.
+     * @param eventId    - event id
      * @param email      - user that edits the event.
      * @param files      - new event images.
      * @return EventResponseDto.
      */
-    EventResponseDto update(EventDetailsUpdate requestDto, String email, MultipartFile[] files);
+    EventResponseDto update(EventDetailsUpdate requestDto, Long eventId, String email, MultipartFile[] files);
 
     /**
      * Method for deleting an event.

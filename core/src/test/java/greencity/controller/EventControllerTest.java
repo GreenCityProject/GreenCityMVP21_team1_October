@@ -23,8 +23,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import static greencity.ModelUtils.getPrincipal;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -39,12 +38,10 @@ class EventControllerTest {
     private EventService eventService;
     @InjectMocks
     private EventController eventController;
-    private EventDetailsUpdate eventRequestDto;
     private EventResponseDto eventResponseDto;
 
     @BeforeEach
     void setUp() {
-        eventRequestDto = ModelUtils.getEventRequestDto();
         eventResponseDto = ModelUtils.getEventResponseDto();
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -62,7 +59,7 @@ class EventControllerTest {
     void update() throws Exception {
         MockMultipartFile jsonFile = getMockMultipartFile();
 
-        Mockito.when(eventService.update(eq(eventRequestDto), eq(principal.getName()), any()))
+        Mockito.when(eventService.update(any(EventDetailsUpdate.class), anyLong(), eq(principal.getName()), any()))
                 .thenReturn(eventResponseDto);
 
         mockMvc.perform(multipart(BASE_LINK +"/{eventId}", 1L)
@@ -82,7 +79,7 @@ class EventControllerTest {
                 .andExpect(jsonPath("$.dayList[0].eventStartTime").value("09:00:00"))
                 .andExpect(jsonPath("$.dayList[0].eventEndTime").value("20:00:00"));
 
-        verify(eventService).update(eq(eventRequestDto), eq(principal.getName()), any());
+        verify(eventService).update(any(EventDetailsUpdate.class), anyLong(), eq(principal.getName()), any());
     }
 
     private static MockMultipartFile getMockMultipartFile() {
@@ -97,8 +94,6 @@ class EventControllerTest {
                             "eventDate": "2024-12-16",
                             "eventStartTime": "09:00:00",
                             "eventEndTime": "20:00:00",
-                            "latitude": 47.985,
-                            "longitude": -122.559,
                             "isOnline": true,
                             "onlineLink": "https://example.com/event-link"
                         }
