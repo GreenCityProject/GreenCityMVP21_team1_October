@@ -102,18 +102,12 @@ public class PlaceServiceImpl implements PlaceService {
     }
 
     @Override
+    @Transactional
     public List<UpdatePlaceStatusDto> bulkUpdatePlaceStatus(BulkUpdatePlaceStatusDto dto) {
-        List<UpdatePlaceStatusDto> result = new ArrayList<>();
-        Place place;
-        for (Long id : dto.getIds()) {
-            place = placeRepository.findById(id).orElseThrow(() -> new NotFoundException(ErrorMessage.PLACE_NOT_FOUND_BY_ID + id));
-            if (place.getStatus() != dto.getStatus()) {
-                result.add(new UpdatePlaceStatusDto(id, place.getStatus()));
-                place.setStatus(dto.getStatus());
-                placeRepository.save(place);
-            }
-        }
-        return result;
+        placeRepository.updatePlacesStatus(dto.getIds(), dto.getStatus());
+        return dto.getIds().stream()
+                .map(id -> new UpdatePlaceStatusDto(id, dto.getStatus()))
+                .toList();
     }
 
     @Override
