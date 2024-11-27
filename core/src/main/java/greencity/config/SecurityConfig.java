@@ -275,6 +275,7 @@ public class SecurityConfig {
                                 USER_CUSTOM_SHOPPING_LIST_ITEMS,
                                 USER_SHOPPING_LIST + "/user-shopping-list-items",
                                 "/place",
+                                "/place/{id}",
                                 "/friends/{friendId}/declineFriend")
                         .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)
                         .requestMatchers(HttpMethod.GET,

@@ -30,4 +30,6 @@ public interface PlaceService {
 
     PageableAdvancedDto<FilterPlaceResponseDto> getFilteredPlaces(FilterPlaceDto filterPlaceDto, UserVO userVO,
                                                                   Pageable page);
+
+    Long deletePlace(Long id);
 }
