@@ -13,35 +13,32 @@ import java.io.InputStreamReader;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class EventCommentsValidator implements ConstraintValidator<ValidAddEventCommentDtoRequest, AddEventCommentDtoRequest> {
-    private static Set<String> bannedWords;
-    @Value("${slug.filter.file.en}")
-    private String pathToFile;
 
-    @Override
-    public void initialize(ValidAddEventCommentDtoRequest constraintAnnotation) {
-        if (bannedWords == null) {
-            try {
-                bannedWords = loadBannedWords();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+public class EventCommentsValidator implements ConstraintValidator<ValidAddEventCommentDtoRequest, AddEventCommentDtoRequest> {
+    private final Set<String> bannedWords;
+
+    public EventCommentsValidator(@Value("${slug.filter.file.en}") String pathToFile) {
+        this.bannedWords = loadBannedWords(pathToFile);
     }
 
     @Override
     public boolean isValid(AddEventCommentDtoRequest addEventCommentDtoRequest, ConstraintValidatorContext constraintValidatorContext) {
         return bannedWords.stream()
-                .anyMatch(addEventCommentDtoRequest.getComment().toLowerCase()::contains);
+                .noneMatch(addEventCommentDtoRequest.getComment().toLowerCase()::contains);
     }
 
-    private Set<String> loadBannedWords() throws IOException {
-        ClassPathResource resource = new ClassPathResource(pathToFile);
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
-            return reader.lines()
-                    .map(String::trim)
-                    .filter(line -> !line.isEmpty())
-                    .collect(Collectors.toSet());
+    private Set<String> loadBannedWords(String pathToFile) {
+        try {
+            ClassPathResource resource = new ClassPathResource(pathToFile);
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
+                return reader.lines()
+                        .map(String::trim)
+                        .filter(line -> !line.isEmpty())
+                        .collect(Collectors.toSet());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load banned words from file: " + pathToFile, e);
         }
     }
 }
+

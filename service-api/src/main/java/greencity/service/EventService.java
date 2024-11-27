@@ -1,5 +1,6 @@
 package greencity.service;
 
+import greencity.dto.event.EventRequestDto;
 import greencity.dto.event.EventResponseDto;
 import greencity.dto.event.EventDetailsUpdate;
 import greencity.dto.event.EventVO;
@@ -35,4 +36,6 @@ public interface EventService {
     void deleteEvent(Long eventId, Long userId);
 
     EventVO findById(long eventId);
+
+    EventResponseDto save(EventRequestDto eventRequestDto, String email, MultipartFile[] files);
 }

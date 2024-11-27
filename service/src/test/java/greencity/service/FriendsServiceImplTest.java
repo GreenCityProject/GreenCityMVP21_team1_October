@@ -30,8 +30,7 @@ import static greencity.ModelUtils.getUserVO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -237,5 +236,56 @@ public class FriendsServiceImplTest {
         verify(userRepo).findById(2L);
         verify(userRepo).isFriendRequestSent(2L, 1L);
         verify(userRepo).deleteFriendRequest(2L, 1L);
+    }
+
+    @Test
+    void deleteFriendFailureNoUserTest() {
+        when(userRepo.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> friendsService.deleteFriend(1L, 2L));
+
+        verify(userRepo).findById(1L);
+        verify(userRepo, never()).findById(2L);
+        verify(userRepo, never()).isFriend(any(), any());
+        verify(userRepo, never()).deleteFriend(any(), any());
+    }
+
+    @Test
+    void deleteFriendFailureNoFriendTest() {
+        when(userRepo.findById(1L)).thenReturn(Optional.of(friend1));
+        when(userRepo.findById(2L)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> friendsService.deleteFriend(1L, 2L));
+        verify(userRepo).findById(1L);
+        verify(userRepo).findById(2L);
+        verify(userRepo, never()).isFriend(any(), any());
+        verify(userRepo, never()).deleteFriend(any(), any());
+    }
+
+    @Test
+    void deleteFriendFailureNoFriendshipTest() {
+        when(userRepo.findById(1L)).thenReturn(Optional.of(friend1));
+        when(userRepo.findById(2L)).thenReturn(Optional.of(friend1));
+        when(userRepo.isFriend(1L, 2L)).thenReturn(false);
+
+        assertThrows(NotFoundException.class, () -> friendsService.deleteFriend(1L, 2L));
+        verify(userRepo).findById(1L);
+        verify(userRepo).findById(2L);
+        verify(userRepo).isFriend(1L, 2L);
+        verify(userRepo, never()).deleteFriend(any(), any());
+    }
+
+    @Test
+    void deleteFriendSuccessTest() {
+        when(userRepo.findById(1L)).thenReturn(Optional.of(friend1));
+        when(userRepo.findById(2L)).thenReturn(Optional.of(friend1));
+        when(userRepo.isFriend(1L, 2L)).thenReturn(true);
+
+        friendsService.deleteFriend(1L, 2L);
+
+        verify(userRepo).findById(1L);
+        verify(userRepo).findById(2L);
+        verify(userRepo).isFriend(1L, 2L);
+        verify(userRepo).deleteFriend(1L, 2L);
     }
 }

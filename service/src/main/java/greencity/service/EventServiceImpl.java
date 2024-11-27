@@ -3,6 +3,8 @@ package greencity.service;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.dto.event.EventDayDto;
+import greencity.dto.event.EventDetailsUpdate;
+import greencity.dto.event.EventRequestDto;
 import greencity.dto.event.EventResponseDto;
 import greencity.dto.event.EventDetailsUpdate;
 import greencity.dto.event.EventVO;
@@ -28,6 +30,7 @@ import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -198,6 +201,32 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventVO findById(long eventId) {
         return null;
+    }
+
+    @Override
+    public EventResponseDto save(EventRequestDto eventRequestDto, String email, MultipartFile[] files) {
+        Event eventToSave = modelMapper.map(eventRequestDto, Event.class);
+        User organizer = modelMapper.map(restClient.findByEmail(email), User.class);
+        if (eventRequestDto.getTags() != null) {
+            eventToSave.setTags(modelMapper.map(tagsService.findTagsWithAllTranslationsByNamesAndType(
+                    eventRequestDto.getTags(), TagType.EVENT), new TypeToken<List<Tag>>() {
+            }.getType()));
+        }
+
+        var eventDaysRequest = eventRequestDto.getEventDays();
+        var eventDaysToSave = eventDaysRequest.stream()
+                .map(eventDayDto -> modelMapper.map(eventDayDto, EventDay.class))
+                .map(eventDay -> eventDay.setEvent(eventToSave)).toList();
+        eventToSave.setEventDays(eventDaysToSave);
+
+        eventToSave.setOrganizer(organizer);
+        if (files != null) {
+            eventToSave.setImage(fileService.upload(files[0]));
+            eventToSave.setAdditionalImages(Arrays.stream(files)
+                    .map(file -> EventImages.builder().event(eventToSave).link(fileService.upload(file)).build())
+                    .collect(Collectors.toList()));
+        }
+        return modelMapper.map(eventRepo.save(eventToSave), EventResponseDto.class);
     }
 
     private boolean isAdmin(Long userId) {

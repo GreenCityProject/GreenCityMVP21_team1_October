@@ -1,6 +1,6 @@
 package greencity.mapping.event;
 
-import greencity.dto.event.EventDayDto;
+import greencity.dto.event.EventDayCreateRequestDto;
 import greencity.entity.EventDay;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.AbstractConverter;

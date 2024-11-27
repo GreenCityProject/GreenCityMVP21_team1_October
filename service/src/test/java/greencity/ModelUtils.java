@@ -56,6 +56,7 @@ public class ModelUtils {
         return new Tag(1L, TagType.HABIT, getHabitTagTranslations(), Collections.emptyList(),
             Collections.emptySet(), Collections.emptySet());
     }
+
     public static List<TagTranslation> getTagTranslations() {
         return Arrays.asList(
             TagTranslation.builder().id(1L).name("Новини").language(Language.builder().id(2L).code("ua").build())
