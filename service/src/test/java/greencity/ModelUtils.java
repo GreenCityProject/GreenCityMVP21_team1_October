@@ -4,6 +4,9 @@ import greencity.constant.AppConstant;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.econews.*;
 import greencity.dto.econewscomment.*;
+import greencity.dto.event.*;
+import greencity.dto.eventcomment.AddEventCommentDtoRequest;
+import greencity.dto.eventcomment.EventCommentVO;
 import greencity.dto.habit.*;
 import greencity.dto.habitfact.*;
 import greencity.dto.language.LanguageDTO;
@@ -15,6 +18,7 @@ import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.search.SearchNewsDto;
 import greencity.dto.shoppinglistitem.CustomShoppingListItemResponseDto;
 import greencity.dto.shoppinglistitem.CustomShoppingListItemVO;
+import greencity.dto.subscriber.NewsSubscriberVO;
 import greencity.dto.tag.*;
 import greencity.dto.user.*;
 import greencity.dto.verifyemail.VerifyEmailVO;
@@ -79,12 +83,12 @@ public class ModelUtils {
     }
 
     public static Tag getTag() {
-        return new Tag(1L, TagType.ECO_NEWS, getTagTranslations(), Collections.emptyList(), Collections.emptySet());
+        return new Tag(1L, TagType.ECO_NEWS, getTagTranslations(), Collections.emptyList(), Collections.emptySet(), Collections.emptySet());
     }
 
     public static Tag getHabitTag() {
         return new Tag(1L, TagType.HABIT, getHabitTagTranslations(), Collections.emptyList(),
-            Collections.emptySet());
+            Collections.emptySet(), Collections.emptySet());
     }
 
     public static List<TagTranslation> getTagTranslations() {
@@ -102,6 +106,11 @@ public class ModelUtils {
                 .build(),
             TagTranslation.builder().id(2L).name("Reusable").language(Language.builder().id(1L).code("en").build())
                 .build());
+    }
+    public static NewsSubscriberVO getNewsSubscriberVO() {
+        return NewsSubscriberVO.builder().email("subscriber@gmail.com")
+                .unsubscribeToken(UUID.fromString("550e8400-e29b-41d4-a716-446655440000").toString())
+                .build();
     }
 
     public static List<TagTranslation> getEventTagTranslations() {
@@ -706,5 +715,121 @@ public class ModelUtils {
             .text("item")
             .status(ShoppingListItemStatus.INPROGRESS)
             .build();
+    }
+
+    public static EventResponseDto getEventResponseDto() {
+        return EventResponseDto.builder()
+                .id(1L)
+                .title("Lectures on garbage segregation")
+                .description("An event focused on promoting environmental awareness and sustainability practices within the community")
+                .dayList(List.of(EventDayResponseDto.builder()
+                        .id(1L)
+                        .eventDate(LocalDate.parse("2024-12-16"))
+                        .eventStartTime(LocalTime.parse("09:00:00"))
+                        .eventEndTime(LocalTime.parse("20:00:00"))
+                        .latitude(47.985)
+                        .longitude(-122.559)
+                        .isOnline(true)
+                        .onlineLink("https://example.com/event-link")
+                        .build()))
+                .additionalImages(Collections.emptyList())
+                .image(AppConstant.DEFAULT_EVENT_IMAGE)
+                .build();
+    }
+
+    public static EventDetailsUpdate getEventDetailsUpdate() {
+        return EventDetailsUpdate.builder()
+                .id(1L)
+                .title("Lectures on garbage segregation")
+                .description("An event focused on promoting environmental awareness and sustainability practices within the community")
+                .eventDays(List.of(EventDayDto.builder()
+                        .id(1L)
+                        .eventDate(LocalDate.parse("2024-12-16"))
+                        .eventStartTime(LocalTime.parse("09:00:00"))
+                        .eventEndTime(LocalTime.parse("20:00:00"))
+                        .latitude(47.985)
+                        .longitude(-122.559)
+                        .isOnline(true)
+                        .onlineLink("https://example.com/event-link")
+                        .build()))
+                .additionalImages(Collections.emptyList())
+                .image(AppConstant.DEFAULT_EVENT_IMAGE)
+                .build();
+    }
+
+    public static Event getEvent() {
+        return Event.builder()
+                .id(1L)
+                .title("Lectures on garbage segregation")
+                .description("An event focused on promoting environmental awareness and sustainability practices within the community")
+                .organizer(getUser())
+                .eventDays(List.of(EventDay.builder()
+                        .id(1L)
+                        .eventDate(LocalDate.parse("2024-12-16"))
+                        .eventStartTime(LocalTime.parse("09:00:00"))
+                        .eventEndTime(LocalTime.parse("20:00:00"))
+                        .latitude(47.985)
+                        .longitude(-122.559)
+                        .isOnline(true)
+                        .onlineLink("https://example.com/event-link")
+                        .build()))
+                .additionalImages(Collections.emptyList())
+                .image(AppConstant.DEFAULT_EVENT_IMAGE)
+                .build();
+    }
+
+    public static EventDay getEventDay() {
+        return EventDay.builder()
+                .id(1L)
+                .eventDate(LocalDate.parse("2024-12-16"))
+                .eventStartTime(LocalTime.parse("09:00:00"))
+                .eventEndTime(LocalTime.parse("20:00:00"))
+                .latitude(47.985)
+                .longitude(-122.559)
+                .isOnline(true)
+                .onlineLink("https://example.com/event-link")
+                .build();
+    }
+    public static AddEventCommentDtoRequest getEventCommentDtoRequest() {
+        return AddEventCommentDtoRequest.builder().comment("Test Comment").build();
+    }
+
+    public static EventCommentVO getEventCommentVO() {
+        return EventCommentVO.builder()
+                .event(getEventVO())
+                .comment("Example comment")
+                .deleted(false)
+                .id(1L)
+                .user(getUserVO())
+                .build();
+    }
+    public static EventComment getEventComment() {
+        return EventComment.builder()
+                .event(getEvent())
+                .comment("Example comment")
+                .deleted(false)
+                .id(1L)
+                .user(getUser())
+                .build();
+    }
+    public static EventVO getEventVO() {
+        return EventVO.builder()
+                .id(1L)
+                .title("Lectures on garbage segregation")
+                .description("An event focused on promoting environmental awareness and sustainability practices within the community")
+                .organizer(getUserVO())
+                .eventDays(List.of(EventDayVO.builder()
+                        .id(1L)
+                        .eventDate(LocalDate.parse("2024-12-16"))
+                        .eventStartTime(LocalTime.parse("09:00:00"))
+                        .eventEndTime(LocalTime.parse("20:00:00"))
+                        .latitude(47.985)
+                        .longitude(-122.559)
+                        .isOnline(true)
+                        .onlineLink("https://example.com/event-link")
+                        .build()))
+                .additionalImages(Collections.emptyList())
+                .image(AppConstant.DEFAULT_EVENT_IMAGE)
+                .build();
     }
 }

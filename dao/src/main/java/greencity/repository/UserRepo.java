@@ -252,4 +252,29 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     @Transactional
     @Query(nativeQuery = true, value = "INSERT INTO friend_requests (user_id, friend_id) VALUES (:userId, :friendId)")
     void saveFriendRequest(Long userId, Long friendId);
+
+    /**
+     * Check if two users are friends.
+     *
+     * @param userId   The ID of the first user.
+     * @param friendId The ID of the second user.
+     * @return {@code true} if the users are friends, {@code false} otherwise.
+     */
+    @Query(nativeQuery = true, value = "SELECT COUNT(*) > 0 FROM users_friends "
+            + "WHERE (user_id = :userId AND friend_id = :friendId) "
+            + "OR (user_id = :friendId AND friend_id = :userId)")
+    boolean isFriend(Long userId, Long friendId);
+
+    /**
+     * Delete friendship between two users.
+     *
+     * @param userId   The ID of the first user.
+     * @param friendId The ID of the second user.
+     */
+    @Modifying
+    @Transactional
+    @Query(nativeQuery = true, value = "DELETE FROM users_friends "
+            + "WHERE (user_id = :userId AND friend_id = :friendId) "
+            + "OR (user_id = :friendId AND friend_id = :userId)")
+    void deleteFriend(Long userId, Long friendId);
 }

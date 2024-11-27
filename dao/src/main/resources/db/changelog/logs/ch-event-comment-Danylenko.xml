@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="1732399010476-3" author="Andrii-Danylenko">
+        <createTable tableName="event_comments">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" deleteCascade="true"/>
+            </column>
+            <column name="comment" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="java.sql.types.timestamp_with_timezone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="modified_date" type="java.sql.Types.TIMESTAMP_WITH_TIMEZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_comment_id" type="BIGINT" />
+            <column name="user_id" type="BIGINT" />
+            <column name="event_id" type="BIGINT"/>
+            <column name="deleted" type="bool"/>
+        </createTable>
+        
+        <addForeignKeyConstraint baseTableName="event_comments"
+                                 baseColumnNames="user_id"
+                                 constraintName="fk_event_comment_user"
+                                 referencedTableName="users"
+                                 referencedColumnNames="id" />
+        <addForeignKeyConstraint baseTableName="event_comments"
+                                 baseColumnNames="event_id"
+                                 constraintName="fk_event_comment_event"
+                                 referencedTableName="events"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>

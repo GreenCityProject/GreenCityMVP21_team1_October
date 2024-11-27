@@ -98,7 +98,7 @@ public class FriendsController {
     })
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<UserManagementDto>> findUserFriendsByUserId(
-        @RequestParam() Long userId
+        @PathVariable() Long userId
     ) {
         return ResponseEntity.status(HttpStatus.OK).body(friendsService.findFriends(userId));
     }
@@ -130,6 +130,21 @@ public class FriendsController {
             @PathVariable(name = "friendId") Long friendId,
             @Parameter(hidden = true) @CurrentUser UserVO currentUser) {
         friendsService.declineFriendRequest(currentUser.getId(), friendId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @Operation(summary = "Delete a friend")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+            @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    })
+    @DeleteMapping("/{friendId}")
+    public ResponseEntity<?> deleteFriend(
+            @PathVariable(name = "friendId") Long friendId,
+            @Parameter(hidden = true) @CurrentUser UserVO currentUser) {
+        friendsService.deleteFriend(currentUser.getId(), friendId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
