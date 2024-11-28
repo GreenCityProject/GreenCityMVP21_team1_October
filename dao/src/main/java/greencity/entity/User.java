@@ -161,11 +161,4 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Filter> filters = new ArrayList<>();
-
-    @ManyToMany
-    @JoinTable(
-            name = "users_favorite_places",
-    joinColumns = @JoinColumn(name = "user_id"),
-    inverseJoinColumns = @JoinColumn(name = "place_id"))
-    Set<Place> favoritePlaces;
 }

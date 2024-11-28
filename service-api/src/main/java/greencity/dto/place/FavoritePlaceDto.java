@@ -10,5 +10,5 @@ import lombok.*;
 @EqualsAndHashCode
 public class FavoritePlaceDto {
     private String name;
-    private int placeId;
+    private long placeId;
 }
