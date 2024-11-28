@@ -60,4 +60,7 @@ public class Place {
 
     @OneToMany(mappedBy = "place")
     private List<DiscountValue> discountValues;
+
+    @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Photo> photos;
 }

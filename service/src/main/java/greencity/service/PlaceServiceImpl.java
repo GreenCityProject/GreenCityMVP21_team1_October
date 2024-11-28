@@ -5,10 +5,7 @@ import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
 import greencity.dto.place.*;
 import greencity.dto.user.UserVO;
-import greencity.entity.Location;
-import greencity.entity.OpenHours;
-import greencity.entity.Place;
-import greencity.entity.User;
+import greencity.entity.*;
 import greencity.enums.PlaceStatus;
 import greencity.exception.exceptions.BadPlaceRequestException;
 import greencity.exception.exceptions.BadRequestException;
@@ -27,6 +24,7 @@ import jakarta.transaction.Transactional;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -121,6 +119,46 @@ public class PlaceServiceImpl implements PlaceService {
     }
 
     @Override
+    @Transactional
+    public PlaceWithUserDto proposePlace(PlaceAddDto placeAddDto) {
+        if (placeRepository.findPlaceByName(placeAddDto.getName()).isPresent()) {
+            throw new BadPlaceRequestException(ErrorMessage.PLACE_ALREADY_EXISTS);
+        }
+        Place place = new Place();
+        place.setName(placeAddDto.getName());
+        place.setCategory(Optional.ofNullable(categoryRepo.findByName(placeAddDto.getCategory().getName()))
+                .orElseThrow(() -> new BadRequestException(ErrorMessage.CATEGORY_NOT_FOUND_BY_NAME)));
+        Location location = locationRepository.save(Location.builder()
+                .address(placeAddDto.getLocation().getAddress())
+                .lat(placeAddDto.getLocation().getLat())
+                .lng(placeAddDto.getLocation().getIng())
+                .build());
+        place.setLocation(location);
+        place.setOpenHoursList(
+                placeAddDto.getOpeningHoursList().stream()
+                        .map(row -> {
+                            OpenHours openHours = modelMapper.map(row, OpenHours.class);
+                            if (openHours == null) {
+                                throw new IllegalArgumentException("Failed to map OpeningHoursDto to OpenHours");
+                            }
+                            openHours.setPlace(place);
+                            return openHours;
+                        })
+                        .toList());
+        place.setPhotos(placeAddDto.getPhotos().stream()
+                .map(photoAddDto -> {
+                    Photo photo = new Photo();
+                    photo.setName(photoAddDto.getName());
+                    photo.setPlace(place);
+                    return photo;
+                })
+                .toList());
+        place.setStatus(PlaceStatus.PROPOSED);
+        Place savedPlace = placeRepository.save(place);
+        return modelMapper.map(savedPlace, PlaceWithUserDto.class);
+    }
+
+    @Override
     public PlaceResponseDto save(AddPlaceDto placeDto, UserVO userVO) {
         if (placeRepository.findPlaceByName(placeDto.getPlaceName()).isPresent()) {
             throw new BadPlaceRequestException(ErrorMessage.PLACE_ALREADY_EXISTS);
@@ -153,7 +191,7 @@ public class PlaceServiceImpl implements PlaceService {
     @Override
     public List<FilterPlaceResponseDto> getFilteredPlaces(FilterPlaceDto filterPlaceDto, UserVO userVO) {
         return placeRepository.findAll(getSpecification(filterPlaceDto)).stream()
-            .map(place -> modelMapper.map(place, FilterPlaceResponseDto.class)).toList();
+                .map(place -> modelMapper.map(place, FilterPlaceResponseDto.class)).toList();
     }
 
     @Override

@@ -167,4 +167,18 @@ public class PlaceController {
     ) {
         return ResponseEntity.ok(placeService.getFilteredPlaces(filterPlaceDto, userVO, page));
     }
+
+    @Operation(summary = "Propose a new place.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "201", description = HttpStatuses.CREATED),
+            @ApiResponse(responseCode = "303", description = HttpStatuses.SEE_OTHER),
+            @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
+    })
+    @PostMapping("/propose")
+    public ResponseEntity<PlaceWithUserDto> proposePlace(
+            @RequestBody PlaceAddDto placeAddDto
+    ) {
+        return ResponseEntity.ok(placeService.proposePlace(placeAddDto));
+    }
 }

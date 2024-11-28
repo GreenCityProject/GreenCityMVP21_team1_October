@@ -32,4 +32,6 @@ public interface PlaceService {
                                                                   Pageable page);
 
     Long deletePlace(Long id);
+
+    PlaceWithUserDto proposePlace(PlaceAddDto placeAddDto);
 }
