@@ -4,10 +4,11 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet id="1732811423508-1" author="Andrii-Danylenko">
+    <changeSet id="1732811423509-1" author="Andrii-Danylenko">
         <createTable tableName="users_favorite_places">
             <column name="user_id" type="BIGINT"/>
             <column name="place_id" type="BIGINT"/>
+            <column name="name" type="varchar"/>
         </createTable>
 
         <addPrimaryKey tableName="users_favorite_places"
