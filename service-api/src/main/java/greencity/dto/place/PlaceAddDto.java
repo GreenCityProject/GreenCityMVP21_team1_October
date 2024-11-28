@@ -9,6 +9,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode
 public class PlaceAddDto {
     private CategoryDto category;
     private List<DiscountValueDto> discountValue;

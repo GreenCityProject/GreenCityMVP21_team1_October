@@ -9,6 +9,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode
 public class BulkUpdatePlaceStatusDto {
     private List<Long> ids;
     private PlaceStatus status;
