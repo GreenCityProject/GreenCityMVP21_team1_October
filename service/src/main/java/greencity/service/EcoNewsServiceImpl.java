@@ -56,6 +56,7 @@ public class EcoNewsServiceImpl implements EcoNewsService {
     private final HttpServletRequest httpServletRequest;
     private final EcoNewsSearchRepo ecoNewsSearchRepo;
     private final List<String> languageCode = List.of("en", "ua");
+    private final NotificationService notificationService;
 
     /**
      * {@inheritDoc}
@@ -521,6 +522,7 @@ public class EcoNewsServiceImpl implements EcoNewsService {
             ecoNewsVO.getUsersLikedNews().removeIf(u -> u.getId().equals(userVO.getId()));
         } else {
             ecoNewsVO.getUsersLikedNews().add(userVO);
+            notificationService.sendEcoNewsLikedNotification(ecoNewsVO, userVO);
         }
         ecoNewsRepo.save(modelMapper.map(ecoNewsVO, EcoNews.class));
     }

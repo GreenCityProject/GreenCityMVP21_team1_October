@@ -3,6 +3,7 @@ package greencity.service;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.friends.UserFriendDto;
 import greencity.dto.user.UserManagementDto;
+import greencity.dto.user.UserVO;
 import greencity.entity.User;
 import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.NotFoundException;
@@ -21,6 +22,7 @@ import java.util.List;
 public class FriendsServiceImpl implements FriendsService {
     private final UserRepo userRepo;
     private final ModelMapper modelMapper;
+    private final NotificationService notificationService;
 
     @Override
     public PageableAdvancedDto<UserFriendDto> findFriends(String name, Long userId, Pageable page) {
@@ -47,8 +49,8 @@ public class FriendsServiceImpl implements FriendsService {
     @Transactional
     @Override
     public void acceptFriendRequest(Long userId, Long friendId) {
-        userRepo.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
-        userRepo.findById(friendId).orElseThrow(() -> new NotFoundException("Friend not found!"));
+        User user = userRepo.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
+        User friend = userRepo.findById(friendId).orElseThrow(() -> new NotFoundException("Friend not found!"));
         if (!userRepo.isFriendRequestSent(friendId, userId)) {
             throw new NotFoundException("Friend request not found!");
         }
@@ -57,26 +59,35 @@ public class FriendsServiceImpl implements FriendsService {
             userRepo.deleteFriendRequest(userId, friendId);
         }
         userRepo.addFriend(userId, friendId);
+        UserVO userVO = modelMapper.map(user, UserVO.class);
+        UserVO friendVO = modelMapper.map(friend, UserVO.class);
+        notificationService.sendFriendRequestAcceptedNotification(friendVO, userVO);
     }
 
     @Override
     public void sendFriendRequest(Long userId, Long friendId) {
-        userRepo.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
-        userRepo.findById(friendId).orElseThrow(() -> new NotFoundException("Friend not found!"));
+        User user = userRepo.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
+        User friend = userRepo.findById(friendId).orElseThrow(() -> new NotFoundException("Friend not found!"));
         if (userRepo.isFriendRequestSent(userId, friendId)) {
             throw new BadRequestException("Friend request already sent!");
         }
         userRepo.saveFriendRequest(userId, friendId);
+        UserVO userVO = modelMapper.map(user, UserVO.class);
+        UserVO friendVO = modelMapper.map(friend, UserVO.class);
+        notificationService.sendFriendRequestReceivedNotification(userVO, friendVO);
     }
 
     @Override
     public void declineFriendRequest(Long userId, Long friendId) {
-        userRepo.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
-        userRepo.findById(friendId).orElseThrow(() -> new NotFoundException("Friend not found!"));
+        User user = userRepo.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
+        User friend = userRepo.findById(friendId).orElseThrow(() -> new NotFoundException("Friend not found!"));
         if (!userRepo.isFriendRequestSent(friendId, userId)) {
             throw new NotFoundException("Friend request not found!");
         }
         userRepo.deleteFriendRequest(friendId, userId);
+        UserVO  userVO = modelMapper.map(user, UserVO.class);
+        UserVO friendVO = modelMapper.map(friend, UserVO.class);
+        notificationService.sendFriendRequestDeclinedNotification(friendVO, userVO);
     }
 
     @Transactional

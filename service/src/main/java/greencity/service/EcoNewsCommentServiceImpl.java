@@ -38,6 +38,7 @@ public class EcoNewsCommentServiceImpl implements EcoNewsCommentService {
     private final greencity.rating.RatingCalculation ratingCalculation;
     private final HttpServletRequest httpServletRequest;
     private final EcoNewsRepo ecoNewsRepo;
+    private final NotificationService notificationService;
 
     /**
      * Method to save {@link greencity.entity.EcoNewsComment}.
@@ -63,6 +64,8 @@ public class EcoNewsCommentServiceImpl implements EcoNewsCommentService {
                 ecoNewsCommentRepo.findById(addEcoNewsCommentDtoRequest.getParentCommentId()).orElseThrow(
                     () -> new BadRequestException(ErrorMessage.COMMENT_NOT_FOUND_EXCEPTION));
             if (parentComment.getParentComment() == null) {
+                EcoNewsCommentVO parentCommentVO = modelMapper.map(parentComment, EcoNewsCommentVO.class);
+                notificationService.sendEcoNewsCommentRepliedNotification(parentCommentVO, userVO);
                 ecoNewsComment.setParentComment(parentComment);
             } else {
                 throw new BadRequestException(ErrorMessage.CANNOT_REPLY_THE_REPLY);
@@ -71,6 +74,9 @@ public class EcoNewsCommentServiceImpl implements EcoNewsCommentService {
         String accessToken = httpServletRequest.getHeader(AUTHORIZATION);
         CompletableFuture.runAsync(
             () -> ratingCalculation.ratingCalculation(RatingCalculationEnum.ADD_COMMENT, userVO, accessToken));
+
+        notificationService.sendEcoNewsCommentedNotification(ecoNewsVO, userVO);
+
         return modelMapper.map(ecoNewsCommentRepo.save(ecoNewsComment), AddEcoNewsCommentDtoResponse.class);
     }
 
@@ -199,6 +205,7 @@ public class EcoNewsCommentServiceImpl implements EcoNewsCommentService {
             ecoNewsService.unlikeComment(userVO, ecoNewsCommentVO);
         } else {
             ecoNewsService.likeComment(userVO, ecoNewsCommentVO);
+            notificationService.sendEcoNewsCommentLikedNotification(ecoNewsCommentVO, userVO);
         }
         ecoNewsCommentRepo.save(modelMapper.map(ecoNewsCommentVO, EcoNewsComment.class));
     }
