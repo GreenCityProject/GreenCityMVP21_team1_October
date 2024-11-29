@@ -2,6 +2,7 @@ package greencity.service;
 
 import greencity.dto.place.FavoritePlaceDto;
 import greencity.dto.place.PlaceByBoundsDto;
+import greencity.dto.place.PlaceInfoDto;
 import greencity.dto.user.UserVO;
 
 import java.util.List;
@@ -18,4 +19,6 @@ public interface FavoritePlaceService {
     String getFavoritePlaceName(long placeId, UserVO userVO);
 
     void updateFavoritePlace(FavoritePlaceDto favoritePlaceDto, UserVO userVO);
+
+    PlaceInfoDto getFavoritePlaceInfoByUserAndPlaceId(UserVO userVO, long placeId);
 }
