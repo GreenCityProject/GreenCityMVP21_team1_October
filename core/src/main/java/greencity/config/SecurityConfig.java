@@ -49,6 +49,7 @@ public class SecurityConfig {
     private static final String CUSTOM_SHOPPING_LIST_ITEMS = "/{userId}/custom-shopping-list-items";
     private static final String HABIT_ASSIGN_ID = "/habit/assign/{habitId}";
     private static final String USER_SHOPPING_LIST = "/user/shopping-list-items";
+    private static final String FAVORITE_PLACES = "/favorite_place";
     private final JwtTool jwtTool;
     private final UserService userService;
     private final AuthenticationConfiguration authenticationConfiguration;
@@ -207,7 +208,9 @@ public class SecurityConfig {
                                 "/friends",
                                 "/friends/friendRequests",
                                 "/friends/not-friends-yet",
-                                "/friends/user/{userId}")
+                                "/friends/user/{userId}",
+                                FAVORITE_PLACES,
+                                FAVORITE_PLACES + "/favorite/{placeId}")
                         .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)
                         .requestMatchers(HttpMethod.POST,
                                 "/category",
@@ -245,7 +248,8 @@ public class SecurityConfig {
                                 "/user/profile",
                                 HABIT_ASSIGN_ID + "/update-habit-duration",
                                 "/habit/assign/{habitAssignId}/updateProgressNotificationHasDisplayed",
-                                HABIT_ASSIGN_ID + "/allUserAndCustomList")
+                                HABIT_ASSIGN_ID + "/allUserAndCustomList",
+                                FAVORITE_PLACES)
                         .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)
                         .requestMatchers(HttpMethod.PATCH,
                                 ECONEWS_COMMENTS,
@@ -276,7 +280,8 @@ public class SecurityConfig {
                                 USER_SHOPPING_LIST + "/user-shopping-list-items",
                                 "/place",
                                 "/place/{id}",
-                                "/friends/{friendId}/declineFriend")
+                                "/friends/{friendId}/declineFriend",
+                                FAVORITE_PLACES + "/{placeId}")
                         .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)
                         .requestMatchers(HttpMethod.GET,
                                 "/newsSubscriber",
