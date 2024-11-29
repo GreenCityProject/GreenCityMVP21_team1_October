@@ -10,6 +10,8 @@ import greencity.dto.user.UserVO;
 import greencity.entity.Event;
 import greencity.entity.EventComment;
 import greencity.entity.User;
+import greencity.enums.NotificationOrigin;
+import greencity.enums.NotificationType;
 import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.repository.EventCommentRepo;
@@ -18,7 +20,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-
 import java.util.concurrent.CompletableFuture;
 
 import static greencity.constant.AppConstant.AUTHORIZATION;
@@ -32,7 +33,8 @@ public class EventCommentServiceImpl implements EventCommentService {
     private HttpServletRequest httpServletRequest;
     private final greencity.rating.RatingCalculation ratingCalculation;
     private final EmailService emailService;
-
+    private final NotificationService notificationService;
+    private final NotificationContentFormatter notificationContentFormatter;
     @Override
     public AddEventCommentDtoResponse save(Long eventId, AddEventCommentDtoRequest addEventCommentDtoRequest, UserVO user) {
         EventVO eventVO = modelMapper.map(eventRepository.findById(eventId), EventVO.class);
@@ -60,6 +62,8 @@ public class EventCommentServiceImpl implements EventCommentService {
                             modelMapper.map(saved, EventCommentVO.class)
                     )
             );
+            String notificationContent = notificationContentFormatter.formatEventCommentNotification(user, eventVO, saved.getCreatedDate());
+            notificationService.save(user.getId(), NotificationOrigin.GREEN_CITY, NotificationType.EVENT_COMMENTED, notificationContent);
         }
         return modelMapper.map(eventComment, AddEventCommentDtoResponse.class);
     }
