@@ -1,6 +1,7 @@
 package greencity.controller;
 
 import greencity.annotations.CurrentUser;
+import greencity.annotations.NoProfanity;
 import greencity.constant.HttpStatuses;
 import greencity.dto.eventcomment.AddEventCommentDtoRequest;
 import greencity.dto.eventcomment.AddEventCommentDtoResponse;
@@ -51,9 +52,23 @@ public class EventCommentController {
             @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
     @PatchMapping
-    public ResponseEntity<?> update(@RequestParam("id") Long id, @RequestParam("text") @NotBlank String text,
+    public ResponseEntity<?> update(@RequestParam("id") Long id, @RequestParam("text") @NotBlank @NoProfanity String text,
                        @Parameter(hidden = true) @CurrentUser UserVO user) {
         eventCommentService.update(text, id, user);
+        return ResponseEntity.ok().build();
+    }
+    @Operation(summary = "Delete a comment")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+            @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteComment(
+            @PathVariable("id") long id,
+            @Parameter(hidden = true) @CurrentUser UserVO user) {
+        eventCommentService.delete(id, user);
         return ResponseEntity.ok().build();
     }
 }

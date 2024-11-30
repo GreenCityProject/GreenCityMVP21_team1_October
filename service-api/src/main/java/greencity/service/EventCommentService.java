@@ -31,5 +31,13 @@ public interface EventCommentService {
      */
     void update(String newText, long commentId, UserVO user);
 
+    /**
+     * Method to delete {@link EventCommentVO}.
+     *
+     * @param commentId id of the {@link EventCommentVO} to be deleted.
+     * @param user      {@link UserVO} who requests the deletion.
+     */
+    void delete(long commentId, UserVO user);
+
     EventCommentVO findById(long commentId);
 }

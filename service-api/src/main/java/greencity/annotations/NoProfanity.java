@@ -1,6 +1,6 @@
 package greencity.annotations;
 
-import greencity.validator.EventCommentsValidator;
+import greencity.validator.NoProfanityValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -11,10 +11,10 @@ import java.lang.annotation.Target;
 
 import static greencity.constant.ErrorMessage.COMMENT_CONTAINS_BANNED_WORDS;
 
-@Constraint(validatedBy = EventCommentsValidator.class)
+@Constraint(validatedBy = NoProfanityValidator.class)
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.PARAMETER)
-public @interface ValidAddEventCommentDtoRequest {
+@Target(value = {ElementType.FIELD, ElementType.PARAMETER})
+public @interface NoProfanity {
     /**
      * Defines the message that will be showed when the input data is not valid.
      *

@@ -1,17 +1,16 @@
 package greencity.mapping.event;
 
-import greencity.dto.event.EventDayDto;
+import greencity.dto.event.EventDayCreateRequestDto;
 import greencity.entity.EventDay;
 import org.modelmapper.AbstractConverter;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EventDayDtoMapper extends AbstractConverter<EventDayDto, EventDay> {
+public class EventDayDtoMapper extends AbstractConverter<EventDayCreateRequestDto, EventDay> {
 
     @Override
-    protected EventDay convert(EventDayDto source) {
+    protected EventDay convert(EventDayCreateRequestDto source) {
         return EventDay.builder()
-                .id(source.getId())
                 .eventDate(source.getEventDate())
                 .eventStartTime(source.getEventStartTime())
                 .eventEndTime(source.getEventEndTime())

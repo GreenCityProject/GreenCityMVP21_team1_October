@@ -80,6 +80,7 @@ public class ModelUtils {
         return new Tag(1L, TagType.HABIT, getHabitTagTranslations(), Collections.emptyList(),
             Collections.emptySet(), Collections.emptySet());
     }
+
     public static List<TagTranslation> getTagTranslations() {
         return Arrays.asList(
             TagTranslation.builder().id(1L).name("Новини").language(Language.builder().id(2L).code("ua").build())
@@ -711,7 +712,7 @@ public class ModelUtils {
                 .id(1L)
                 .title("Lectures on garbage segregation")
                 .description("An event focused on promoting environmental awareness and sustainability practices within the community")
-                .dayList(List.of(EventDayDto.builder()
+                .dayList(List.of(EventDayResponseDto.builder()
                         .id(1L)
                         .eventDate(LocalDate.parse("2024-12-16"))
                         .eventStartTime(LocalTime.parse("09:00:00"))
