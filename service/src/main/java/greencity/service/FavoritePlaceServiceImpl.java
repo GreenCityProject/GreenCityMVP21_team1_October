@@ -4,10 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.dto.location.LocationDto;
 import greencity.dto.place.FavoritePlaceDto;
 import greencity.dto.place.PlaceByBoundsDto;
+import greencity.dto.place.PlaceInfoDto;
 import greencity.dto.user.UserVO;
 import greencity.exception.exceptions.FavoritePlaceNotFoundException;
 import greencity.repository.FavoritePlaceRepository;
-import greencity.repository.LocationsRepository;
+import greencity.repository.LocationRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +20,8 @@ import java.util.List;
 @AllArgsConstructor
 public class FavoritePlaceServiceImpl implements FavoritePlaceService {
     private FavoritePlaceRepository favoritePlaceRepository;
-    private LocationsRepository locationsRepository;
+    private LocationRepository locationRepository;
+    private PlaceService placeService;
     private ObjectMapper objectMapper;
 
     @Transactional
@@ -81,12 +83,21 @@ public class FavoritePlaceServiceImpl implements FavoritePlaceService {
         }
     }
 
+    @Transactional
+    @Override
+    public PlaceInfoDto getFavoritePlaceInfoByUserAndPlaceId(UserVO userVO, long placeId) {
+        if (existsByEmailAndPlaceId(userVO.getEmail(), placeId)) {
+            return placeService.getPlaceInfo(placeId);
+        }
+        throw new RuntimeException("You aren't suppose to be here. How did you do this?");
+    }
+
     private PlaceByBoundsDto getFavoritePlace(long placeId, UserVO userVO) {
         PlaceByBoundsDto place = new PlaceByBoundsDto();
         place.setId(placeId);
         place.setName(getFavoritePlaceName(placeId, userVO));
         LocationDto location = objectMapper.convertValue(
-                locationsRepository.getLocationByUserEmailAndPlaceId(userVO.getEmail(), placeId),
+                locationRepository.getLocationByUserEmailAndPlaceId(userVO.getEmail(), placeId),
                 LocationDto.class
         );
         place.setLocationDto(location);
