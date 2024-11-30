@@ -3,7 +3,6 @@ package greencity.controller;
 import greencity.annotations.ApiPageable;
 import greencity.annotations.CurrentUser;
 import greencity.constant.HttpStatuses;
-import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
 import greencity.dto.place.*;
 import greencity.dto.user.UserVO;
@@ -149,8 +148,8 @@ public class PlaceController {
     })
     @PostMapping("/filter")
     public ResponseEntity<List<FilterPlaceResponseDto>> getFilteredPlacesUsing(
-            @RequestBody FilterPlaceDto filterPlaceDto,
-            @CurrentUser UserVO userVO
+        @RequestBody FilterPlaceDto filterPlaceDto,
+        @Parameter(hidden = true) @CurrentUser UserVO userVO
     ) {
         return ResponseEntity.ok(placeService.getFilteredPlaces(filterPlaceDto, userVO));
     }
@@ -163,10 +162,10 @@ public class PlaceController {
             @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
     @PostMapping("/filter/predicate")
-    public ResponseEntity<PageableAdvancedDto<FilterPlaceResponseDto>> filterPlaceBySearchPredicateUsing(
-            @RequestBody FilterPlaceDto filterPlaceDto,
-            @CurrentUser UserVO userVO,
-            @Parameter(hidden = true) Pageable page
+    public ResponseEntity<PageableDto<FilterPlaceResponseDto>> filterPlaceBySearchPredicateUsing(
+        @RequestBody FilterPlaceDto filterPlaceDto,
+        @Parameter(hidden = true) @CurrentUser UserVO userVO,
+        @Parameter(hidden = true) Pageable page
     ) {
         return ResponseEntity.ok(placeService.getFilteredPlaces(filterPlaceDto, userVO, page));
     }
