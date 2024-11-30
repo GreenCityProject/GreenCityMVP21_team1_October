@@ -4,6 +4,7 @@ import greencity.dto.event.EventVO;
 import greencity.dto.user.UserVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -31,4 +32,3 @@ public class NotificationContentFormatterImpl implements NotificationContentForm
         }
     }
 }
-
