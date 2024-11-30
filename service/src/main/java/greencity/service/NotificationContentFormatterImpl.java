@@ -18,15 +18,15 @@ public class NotificationContentFormatterImpl implements NotificationContentForm
             eventName = eventName.substring(0, 17) + "...";
         }
         String formattedDate = formatDate(commentDate);
-        return user.getName() + " коментував вашу подію " + eventName + ". " + formattedDate;
+        return user.getName() + " commented on your event" + eventName + ". " + formattedDate;
     }
 
     private String formatDate(LocalDateTime dateTime) {
         LocalDateTime now = LocalDateTime.now();
         if (dateTime.toLocalDate().isEqual(now.toLocalDate())) {
-            return "Сьогодні " + dateTime.format(DateTimeFormatter.ofPattern("hh:mm a"));
+            return "Today " + dateTime.format(DateTimeFormatter.ofPattern("hh:mm a"));
         } else if (dateTime.toLocalDate().isEqual(now.toLocalDate().minusDays(1))) {
-            return "Вчора " + dateTime.format(DateTimeFormatter.ofPattern("hh:mm a"));
+            return "Yesterday " + dateTime.format(DateTimeFormatter.ofPattern("hh:mm a"));
         } else {
             return dateTime.format(DateTimeFormatter.ofPattern("dd.MM.yyyy hh:mm a"));
         }
