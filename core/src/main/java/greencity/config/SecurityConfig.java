@@ -49,6 +49,7 @@ public class SecurityConfig {
     private static final String HABIT_ASSIGN_ID = "/habit/assign/{habitId}";
     private static final String USER_SHOPPING_LIST = "/user/shopping-list-items";
     private static final String FAVORITE_PLACES = "/favorite_place";
+    private static final String EVENTS_COMMENTS = "/events/comments";
     private final JwtTool jwtTool;
     private final UserService userService;
     private final AuthenticationConfiguration authenticationConfiguration;
