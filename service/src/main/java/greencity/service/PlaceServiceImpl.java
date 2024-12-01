@@ -121,6 +121,11 @@ public class PlaceServiceImpl implements PlaceService {
     }
 
     @Override
+    public List<PlaceByBoundsDto> getListPlaceLocationByMapsBounds(FilterPlaceDto dto) {
+        return List.of();
+    }
+
+    @Override
     public PlaceResponseDto save(AddPlaceDto placeDto, UserVO userVO) {
         if (placeRepository.findPlaceByName(placeDto.getPlaceName()).isPresent()) {
             throw new BadPlaceRequestException(ErrorMessage.PLACE_ALREADY_EXISTS);

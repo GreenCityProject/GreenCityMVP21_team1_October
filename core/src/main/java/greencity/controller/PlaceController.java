@@ -126,6 +126,18 @@ public class PlaceController {
         return ResponseEntity.ok(placeService.bulkUpdatePlaceStatus(dto));
     }
 
+    @Operation(summary = "Get list of places by Map Bounds.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "303", description = HttpStatuses.SEE_OTHER),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+            @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
+    })
+    @PostMapping("/getListPlaceLocationByMapsBounds")
+    public ResponseEntity<List<PlaceByBoundsDto>> getListPlaceLocationByMapsBounds(@RequestBody FilterPlaceDto dto) {
+        return ResponseEntity.ok(placeService.getListPlaceLocationByMapsBounds(dto));
+    }
+
     @Operation(summary = "Create new place from UI")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK),

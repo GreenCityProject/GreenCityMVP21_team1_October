@@ -158,7 +158,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,
                                 "/ownSecurity/signUp",
                                 "/ownSecurity/signIn",
-                                "/ownSecurity/changePassword")
+                                "/ownSecurity/changePassword",
+                                "/place/getListPlaceLocationByMapsBounds")
                         .permitAll()
                         .requestMatchers(HttpMethod.GET,
                                 "/achievements",
