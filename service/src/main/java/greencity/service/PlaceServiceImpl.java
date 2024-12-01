@@ -5,15 +5,13 @@ import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
 import greencity.dto.place.*;
 import greencity.dto.user.UserVO;
-import greencity.entity.Location;
-import greencity.entity.OpenHours;
-import greencity.entity.Place;
-import greencity.entity.User;
+import greencity.entity.*;
 import greencity.enums.PlaceStatus;
 import greencity.exception.exceptions.BadPlaceRequestException;
 import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.WrongIdException;
+import greencity.filters.FilterPlace;
 import greencity.filters.FilterPlaceCategory;
 import greencity.filters.PlaceSpecification;
 import greencity.filters.SearchCriteria;
@@ -23,7 +21,6 @@ import greencity.repository.CategoryRepo;
 import greencity.repository.LocationRepository;
 import greencity.repository.PlaceRepository;
 import jakarta.transaction.Transactional;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -126,6 +123,46 @@ public class PlaceServiceImpl implements PlaceService {
     }
 
     @Override
+    @Transactional
+    public PlaceWithUserDto proposePlace(PlaceAddDto placeAddDto) {
+        if (placeRepository.findPlaceByName(placeAddDto.getName()).isPresent()) {
+            throw new BadPlaceRequestException(ErrorMessage.PLACE_ALREADY_EXISTS);
+        }
+        Place place = new Place();
+        place.setName(placeAddDto.getName());
+        place.setCategory(Optional.ofNullable(categoryRepo.findByName(placeAddDto.getCategory().getName()))
+                .orElseThrow(() -> new BadRequestException(ErrorMessage.CATEGORY_NOT_FOUND_BY_NAME)));
+        Location location = locationRepository.save(Location.builder()
+                .address(placeAddDto.getLocation().getAddress())
+                .lat(placeAddDto.getLocation().getLat())
+                .lng(placeAddDto.getLocation().getIng())
+                .build());
+        place.setLocation(location);
+        place.setOpenHoursList(
+                placeAddDto.getOpeningHoursList().stream()
+                        .map(row -> {
+                            OpenHours openHours = modelMapper.map(row, OpenHours.class);
+                            if (openHours == null) {
+                                throw new IllegalArgumentException("Failed to map OpeningHoursDto to OpenHours");
+                            }
+                            openHours.setPlace(place);
+                            return openHours;
+                        })
+                        .toList());
+        place.setPhotos(placeAddDto.getPhotos().stream()
+                .map(photoAddDto -> {
+                    Photo photo = new Photo();
+                    photo.setName(photoAddDto.getName());
+                    photo.setPlace(place);
+                    return photo;
+                })
+                .toList());
+        place.setStatus(PlaceStatus.PROPOSED);
+        Place savedPlace = placeRepository.save(place);
+        return modelMapper.map(savedPlace, PlaceWithUserDto.class);
+    }
+
+    @Override
     public PlaceResponseDto save(AddPlaceDto placeDto, UserVO userVO) {
         if (placeRepository.findPlaceByName(placeDto.getPlaceName()).isPresent()) {
             throw new BadPlaceRequestException(ErrorMessage.PLACE_ALREADY_EXISTS);
@@ -135,10 +172,12 @@ public class PlaceServiceImpl implements PlaceService {
         place.setCategory(Optional.ofNullable(categoryRepo.findByName(placeDto.getCategoryName())).orElseThrow());
         place.setName(placeDto.getPlaceName());
         place.setAuthor(modelMapper.map(userVO, User.class));
-        place.setStatus(PlaceStatus.PROPOSED);
+        place.setStatus(PlaceStatus.APPROVED);
         place.setOpenHoursList(
-                placeDto.getOpeningHoursList().stream().map(row -> modelMapper.map(row, OpenHours.class).setPlace(place))
-                        .toList());
+            placeDto.getOpeningHoursList()
+                .stream()
+                .map(row -> modelMapper.map(row, OpenHours.class).setPlace(place))
+                .toList());
 
         //todo: provide separate service for converting address to geo lat and lng
         Location location = locationRepository.save(Location
@@ -162,17 +201,23 @@ public class PlaceServiceImpl implements PlaceService {
     }
 
     @Override
-    public PageableAdvancedDto<FilterPlaceResponseDto> getFilteredPlaces(FilterPlaceDto filterPlaceDto, UserVO userVO,
+    public PageableDto<FilterPlaceResponseDto> getFilteredPlaces(FilterPlaceDto filterPlaceDto, UserVO userVO,
                                                                          Pageable page) {
-        //return placeRepository.findAll(getSpecification(filterPlaceDto), page);
-        return null;
+        Page<Place> pageWithPlaces = placeRepository.findAll(getSpecification(filterPlaceDto), page);
+        return PageableDto.<FilterPlaceResponseDto>builder()
+            .currentPage(pageWithPlaces.getNumber())
+            .totalElements(pageWithPlaces.getTotalElements())
+            .totalPages(pageWithPlaces.getTotalPages())
+            .page(
+                pageWithPlaces
+                    .getContent()
+                    .stream()
+                    .map(place -> modelMapper.map(place, FilterPlaceResponseDto.class))
+                    .toList())
+            .build();
     }
 
     PlaceSpecification getSpecification(FilterPlaceDto filterPlaceDto) {
-        return null;
-    }
-
-    List<SearchCriteria> buildSearchCriteria(FilterPlaceDto filterPlaceDto) {
-        return List.of();
+        return new PlaceSpecification(modelMapper.map(filterPlaceDto, FilterPlace.class));
     }
 }

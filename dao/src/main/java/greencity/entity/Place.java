@@ -4,11 +4,12 @@ import greencity.enums.PlaceStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import java.util.List;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.validator.constraints.Length;
+
+import java.util.List;
 
 @Entity
 @Table(name = "places")
@@ -60,4 +61,7 @@ public class Place {
 
     @OneToMany(mappedBy = "place")
     private List<DiscountValue> discountValues;
+
+    @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Photo> photos;
 }

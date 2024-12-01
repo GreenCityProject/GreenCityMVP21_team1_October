@@ -28,10 +28,12 @@ public interface PlaceService {
 
     List<FilterPlaceResponseDto> getFilteredPlaces(FilterPlaceDto filterPlaceDto, UserVO userVO);
 
-    PageableAdvancedDto<FilterPlaceResponseDto> getFilteredPlaces(FilterPlaceDto filterPlaceDto, UserVO userVO,
+    PageableDto<FilterPlaceResponseDto> getFilteredPlaces(FilterPlaceDto filterPlaceDto, UserVO userVO,
                                                                   Pageable page);
 
     Long deletePlace(Long id);
 
     List<PlaceByBoundsDto> getListPlaceLocationByMapsBounds(FilterPlaceDto dto);
+
+    PlaceWithUserDto proposePlace(PlaceAddDto placeAddDto);
 }

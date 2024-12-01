@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="1732811423509-1" author="Andrii-Danylenko">
+        <createTable tableName="users_favorite_places">
+            <column name="user_id" type="BIGINT"/>
+            <column name="place_id" type="BIGINT"/>
+            <column name="name" type="varchar"/>
+        </createTable>
+
+        <addPrimaryKey tableName="users_favorite_places"
+                       columnNames="user_id, place_id"
+                       constraintName="fk_users_favorite_places"/>
+        <addForeignKeyConstraint
+                baseTableName="users_favorite_places"
+                baseColumnNames="user_id"
+                constraintName="fk_users_favorite_places_user"
+                referencedTableName="users"
+                referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="users_favorite_places"
+                                 baseColumnNames="place_id"
+                                 constraintName="fk_users_favorite_places_place"
+                                 referencedTableName="places"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>
