@@ -5,8 +5,10 @@ import greencity.dto.user.UserVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -30,5 +32,13 @@ public class NotificationContentFormatterImpl implements NotificationContentForm
         } else {
             return dateTime.format(DateTimeFormatter.ofPattern("dd.MM.yyyy hh:mm a"));
         }
+    }
+
+    public static String formatCancellationDateTime(Date cancellationDateTime) {
+        return new SimpleDateFormat("dd-MM-yyyy HH:mm").format(cancellationDateTime);
+    }
+
+    public static String truncateEventName(String eventName) {
+        return eventName.length() > 50 ? eventName.substring(0, 47) + "..." : eventName;
     }
 }

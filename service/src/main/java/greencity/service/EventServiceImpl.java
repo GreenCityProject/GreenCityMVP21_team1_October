@@ -6,6 +6,7 @@ import greencity.dto.event.EventDetailsUpdate;
 import greencity.dto.event.EventRequestDto;
 import greencity.dto.event.EventResponseDto;
 import greencity.dto.event.EventVO;
+import greencity.dto.user.UserVO;
 import greencity.entity.*;
 import greencity.enums.Role;
 import greencity.enums.TagType;
@@ -21,10 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,7 +35,7 @@ public class EventServiceImpl implements EventService {
     private final FileService fileService;
     private final TagsService tagsService;
     private final UserRepo userRepo;
-//    private final NotificationService notificationService;
+    private final NotificationService notificationService;
 
     /**
      * {@inheritDoc}
@@ -50,7 +48,7 @@ public class EventServiceImpl implements EventService {
         User organizer = modelMapper.map(restClient.findByEmail(email), User.class);
 
         if (!organizer.getId().equals(eventToUpdate.getOrganizer().getId())
-            && organizer.getRole() != Role.ROLE_ADMIN) {
+                && organizer.getRole() != Role.ROLE_ADMIN) {
             throw new UserHasNoPermissionToAccessException(ErrorMessage.USER_HAS_NO_PERMISSION);
         }
 
@@ -149,10 +147,19 @@ public class EventServiceImpl implements EventService {
             throw new UserHasNoPermissionToAccessException("You do not have permission to delete this event.");
         }
 
+        EventVO eventVO = modelMapper.map(event, EventVO.class);
+        List<Long> attendants = userRepo.findUsersByEventId(eventId);
+
+        for (Long attendantId : attendants) {
+            Optional<User> user = userRepo.findById(attendantId);
+            if (user.isPresent()) {
+                UserVO userVO = modelMapper.map(user, UserVO.class);
+                notificationService.sendCancellationNotification(eventVO, userVO);
+            }
+        }
+
         eventImagesRepo.deleteEventImagesByEvent_Id(eventId);
         eventRepo.deleteEventDayByEventId(eventId);
-
-//        notificationSrvice.notifyAttendees(event.getAttendants(), "The event has been deleted");
         eventRepo.delete(event);
     }
 
@@ -190,7 +197,7 @@ public class EventServiceImpl implements EventService {
 
     private boolean isAdmin(Long userId) {
         return userRepo.findById(userId)
-                       .map(User::getRole)
-                       .orElse(Role.ROLE_USER) == Role.ROLE_ADMIN;
+                .map(User::getRole)
+                .orElse(Role.ROLE_USER) == Role.ROLE_ADMIN;
     }
 }

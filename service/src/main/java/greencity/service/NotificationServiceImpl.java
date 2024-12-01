@@ -3,6 +3,7 @@ package greencity.service;
 import greencity.constant.ErrorMessage;
 import greencity.dto.econews.EcoNewsVO;
 import greencity.dto.econewscomment.EcoNewsCommentVO;
+import greencity.dto.event.EventVO;
 import greencity.dto.notification.NotificationDto;
 import greencity.dto.notification.NotificationPopUpDto;
 import greencity.dto.user.UserVO;
@@ -280,5 +281,19 @@ public class NotificationServiceImpl implements NotificationService {
                 .stream()
                 .map(notification -> modelMapper.map(notification, NotificationPopUpDto.class))
                 .toList();
+    }
+
+    @Override
+    public void sendCancellationNotification(EventVO event, UserVO user) {
+        String formattedDateTime = NotificationContentFormatterImpl.formatCancellationDateTime(new Date());
+        String truncatedEventName = NotificationContentFormatterImpl.truncateEventName(event.getTitle());
+        String content = "The event \"" + truncatedEventName + "\" scheduled for " + formattedDateTime + " was cancelled.";
+
+        save(
+                user.getId(),
+                NotificationOrigin.GREEN_CITY,
+                NotificationType.EVENT_CANCELLED,
+                content
+        );
     }
 }
