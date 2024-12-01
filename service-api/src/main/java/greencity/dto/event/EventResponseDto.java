@@ -21,7 +21,7 @@ public class EventResponseDto {
     private Boolean isOpen;
     private EventType type;
     private String image;
-    private List<EventDayResponseDto> dayList;
+    private List<EventDayDto> dayList;
     private List<String> additionalImages;
     private List<TagUaEnDto> tags;
 }

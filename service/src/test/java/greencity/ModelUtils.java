@@ -761,15 +761,15 @@ public class ModelUtils {
                 .user(getUserVO())
                 .build();
     }
-//    public static EventComment getEventComment() {
-//        return EventComment.builder()
-//                .event(getEvent())
-//                .comment("Example comment")
-//                .deleted(false)
-//                .id(1L)
-//                .user(getUser())
-//                .build();
-//    }
+    public static EventComment getEventComment() {
+        return EventComment.builder()
+                .event(getEvent())
+                .comment("Example comment")
+                .deleted(false)
+                .id(1L)
+                .user(getUser())
+                .build();
+    }
     public static EventVO getEventVO() {
         return EventVO.builder()
                 .id(1L)
