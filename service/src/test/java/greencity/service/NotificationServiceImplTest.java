@@ -3,6 +3,7 @@ package greencity.service;
 import greencity.ModelUtils;
 import greencity.dto.econews.EcoNewsVO;
 import greencity.dto.econewscomment.EcoNewsCommentVO;
+import greencity.dto.event.EventVO;
 import greencity.dto.notification.NotificationDto;
 import greencity.dto.notification.NotificationPopUpDto;
 import greencity.dto.user.UserVO;
@@ -14,9 +15,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -195,5 +198,32 @@ public class NotificationServiceImplTest {
         NotificationOrigin[] actual = notificationServiceImpl.getNotificationOrigins();
 
         assertArrayEquals(expected, actual);
+    }
+    @Test
+    void sendCancellationNotificationTest() {
+        EventVO eventVO = new EventVO();
+        eventVO.setTitle("Test Event");
+
+        UserVO userVO = new UserVO();
+        userVO.setId(1L);
+
+        notificationServiceImpl.sendCancellationNotification(eventVO, userVO);
+
+        verify(notificationRepo, times(1)).save(any());
+    }
+    @Test
+    void sendCancellationNotificationTest_VerifyContent() {
+        EventVO eventVO = new EventVO();
+        eventVO.setTitle("Test Event");
+
+        UserVO userVO = new UserVO();
+        userVO.setId(1L);
+
+        notificationServiceImpl.sendCancellationNotification(eventVO, userVO);
+
+        verify(notificationRepo, times(1)).save(Mockito.argThat(notification ->
+                notification.getContent().contains("The event \"Test Event\" scheduled for") &&
+                        notification.getContent().contains("was cancelled.")
+        ));
     }
 }
