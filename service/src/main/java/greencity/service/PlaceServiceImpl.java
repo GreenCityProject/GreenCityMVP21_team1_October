@@ -3,6 +3,7 @@ package greencity.service;
 import greencity.constant.ErrorMessage;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
+import greencity.dto.location.LocationDto;
 import greencity.dto.place.*;
 import greencity.dto.user.UserVO;
 import greencity.entity.*;
@@ -119,7 +120,22 @@ public class PlaceServiceImpl implements PlaceService {
 
     @Override
     public List<PlaceByBoundsDto> getListPlaceLocationByMapsBounds(FilterPlaceDto dto) {
-        return List.of();
+        log.info("N-E latitude : " + dto.getMapBoundsDto().getNorthEastLat());
+        log.info("N-E longitude : " + dto.getMapBoundsDto().getNorthEastLng());
+        log.info("S-W latitude : " + dto.getMapBoundsDto().getSouthWestLat());
+        log.info("S-W longitude : " + dto.getMapBoundsDto().getSouthWestLng());
+        Double testLat = ((dto.getMapBoundsDto().getNorthEastLat() + dto.getMapBoundsDto().getSouthWestLat()) / 2);
+        Double testLng = ((dto.getMapBoundsDto().getNorthEastLng() + dto.getMapBoundsDto().getSouthWestLng()) / 2);
+        return List.of(PlaceByBoundsDto.builder()
+                        .id(1L)
+                        .location(LocationDto.builder()
+                                .id(101L)
+                                .address("Location response address")
+                                .lat(testLat)
+                                .lng(testLng)
+                                .build())
+                        .name("Place response name")
+                .build());
     }
 
     @Override

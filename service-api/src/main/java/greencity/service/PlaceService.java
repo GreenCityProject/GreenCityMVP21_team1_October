@@ -1,6 +1,5 @@
 package greencity.service;
 
-import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
 import greencity.dto.place.*;
 import greencity.dto.user.UserVO;

@@ -100,7 +100,7 @@ public class FavoritePlaceServiceImpl implements FavoritePlaceService {
                 locationRepository.getLocationByUserEmailAndPlaceId(userVO.getEmail(), placeId),
                 LocationDto.class
         );
-        place.setLocationDto(location);
+        place.setLocation(location);
         return place;
     }
 }
