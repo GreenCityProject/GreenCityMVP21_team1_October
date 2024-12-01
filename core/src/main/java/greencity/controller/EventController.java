@@ -6,6 +6,7 @@ import greencity.constant.HttpStatuses;
 import greencity.dto.event.EventDetailsUpdate;
 import greencity.dto.event.EventRequestDto;
 import greencity.dto.event.EventResponseDto;
+import greencity.dto.event.PageableAdvancedDtoOfEventDto;
 import greencity.dto.user.UserVO;
 import greencity.exception.exceptions.WrongIdException;
 import greencity.service.EventService;
@@ -19,6 +20,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +38,36 @@ import java.security.Principal;
 public class EventController {
     private final EventService eventService;
     private final UserService userService;
+
+    /**
+     * Method for retrieving all events with pagination.
+     *
+     * @param page the page index (default is 0).
+     * @param size the number of records per page (default is 5).
+     * @return PageableAdvancedDtoOfEventDto.
+     */
+    @Operation(summary = "Get all events with pagination")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(schema = @Schema(implementation = PageableAdvancedDtoOfEventDto.class))),
+            @ApiResponse(responseCode = "400", description = "Bad Request",
+                    content = @Content(schema = @Schema(implementation = String.class)))
+    })
+    @GetMapping
+    public ResponseEntity<PageableAdvancedDtoOfEventDto> getAllEvents(
+            @Parameter(description = "Page index you want to retrieve [0..N]. If page index is less than 0, default value is used (0).")
+            @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Number of records per page [1..100]. If size is less than 1 or not specified, default value is used (5).")
+            @RequestParam(defaultValue = "5") int size) {
+
+        page = Math.max(page, 0);
+        size = Math.min(Math.max(size, 1), 100);
+
+        Pageable pageable = PageRequest.of(page, size);
+        PageableAdvancedDtoOfEventDto result = eventService.getAllEvents(pageable);
+
+        return ResponseEntity.ok(result);
+    }
 
     /**
      * Method for updating event

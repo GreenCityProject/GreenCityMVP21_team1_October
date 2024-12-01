@@ -2,10 +2,7 @@ package greencity.service;
 
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
-import greencity.dto.event.EventDetailsUpdate;
-import greencity.dto.event.EventRequestDto;
-import greencity.dto.event.EventResponseDto;
-import greencity.dto.event.EventVO;
+import greencity.dto.event.*;
 import greencity.entity.*;
 import greencity.enums.Role;
 import greencity.enums.TagType;
@@ -17,6 +14,8 @@ import greencity.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -160,6 +159,28 @@ public class EventServiceImpl implements EventService {
     public EventVO findById(long eventId) {
         return modelMapper.map(eventRepo.findById(eventId).orElseThrow(
                 () -> new NotFoundException("Event not found by this id")), EventVO.class);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageableAdvancedDtoOfEventDto getAllEvents(Pageable pageable) {
+        Page<Event> eventsPage = eventRepo.findAll(pageable);
+
+        List<EventDto> eventDtos = eventsPage.getContent().stream()
+                .map(event -> modelMapper.map(event, EventDto.class))
+                .toList();
+
+        return PageableAdvancedDtoOfEventDto.builder()
+                .currentPage(eventsPage.getNumber())
+                .first(eventsPage.isFirst())
+                .last(eventsPage.isLast())
+                .hasNext(eventsPage.hasNext())
+                .hasPrevious(eventsPage.hasPrevious())
+                .number(eventsPage.getNumber())
+                .page(eventDtos)
+                .totalElements(eventsPage.getTotalElements())
+                .totalPages(eventsPage.getTotalPages())
+                .build();
     }
 
     @Override
