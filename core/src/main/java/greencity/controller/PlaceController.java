@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -136,8 +137,8 @@ public class PlaceController {
             @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
     @PostMapping("/getListPlaceLocationByMapsBounds")
-    public ResponseEntity<List<PlaceByBoundsDto>> getListPlaceLocationByMapsBounds(@RequestBody FilterPlaceDto dto) {
-        return ResponseEntity.ok(placeService.getListPlaceLocationByMapsBounds(dto));
+    public ResponseEntity<List<PlaceByBoundsDto>> getPlacesByMapBounds(@RequestBody @Valid FilterPlaceDto dto) {
+        return ResponseEntity.ok(placeService.getPlacesByMapBounds(dto));
     }
 
     @Operation(summary = "Create new place from UI")

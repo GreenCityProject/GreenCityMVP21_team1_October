@@ -1,9 +1,7 @@
 package greencity.service;
 
 import greencity.constant.ErrorMessage;
-import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
-import greencity.dto.location.LocationDto;
 import greencity.dto.place.*;
 import greencity.dto.user.UserVO;
 import greencity.entity.*;
@@ -15,7 +13,6 @@ import greencity.exception.exceptions.WrongIdException;
 import greencity.filters.FilterPlace;
 import greencity.filters.FilterPlaceCategory;
 import greencity.filters.PlaceSpecification;
-import greencity.filters.SearchCriteria;
 import greencity.mapping.PlaceInfoDtoMapper;
 import greencity.mapping.PlaceUpdateDtoMapper;
 import greencity.repository.CategoryRepo;
@@ -23,9 +20,11 @@ import greencity.repository.FavoritePlaceRepository;
 import greencity.repository.LocationRepository;
 import greencity.repository.PlaceRepository;
 import jakarta.transaction.Transactional;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -121,23 +120,15 @@ public class PlaceServiceImpl implements PlaceService {
     }
 
     @Override
-    public List<PlaceByBoundsDto> getListPlaceLocationByMapsBounds(FilterPlaceDto dto) {
-        log.info("N-E latitude : " + dto.getMapBoundsDto().getNorthEastLat());
-        log.info("N-E longitude : " + dto.getMapBoundsDto().getNorthEastLng());
-        log.info("S-W latitude : " + dto.getMapBoundsDto().getSouthWestLat());
-        log.info("S-W longitude : " + dto.getMapBoundsDto().getSouthWestLng());
-        Double testLat = ((dto.getMapBoundsDto().getNorthEastLat() + dto.getMapBoundsDto().getSouthWestLat()) / 2);
-        Double testLng = ((dto.getMapBoundsDto().getNorthEastLng() + dto.getMapBoundsDto().getSouthWestLng()) / 2);
-        return List.of(PlaceByBoundsDto.builder()
-                        .id(1L)
-                        .location(LocationDto.builder()
-                                .id(101L)
-                                .address("Location response address")
-                                .lat(testLat)
-                                .lng(testLng)
-                                .build())
-                        .name("Place response name")
-                .build());
+    public List<PlaceByBoundsDto> getPlacesByMapBounds(FilterPlaceDto dto) {
+        return placeRepository.findPlacesByMapBounds(
+                        dto.getMapBoundsDto().getSouthWestLat(),
+                        dto.getMapBoundsDto().getNorthEastLat(),
+                        dto.getMapBoundsDto().getSouthWestLng(),
+                        dto.getMapBoundsDto().getNorthEastLng())
+                .stream()
+                .map(e -> modelMapper.map(e, PlaceByBoundsDto.class))
+                .toList();
     }
 
     @Override
@@ -192,10 +183,10 @@ public class PlaceServiceImpl implements PlaceService {
         place.setAuthor(modelMapper.map(userVO, User.class));
         place.setStatus(PlaceStatus.APPROVED);
         place.setOpenHoursList(
-            placeDto.getOpeningHoursList()
-                .stream()
-                .map(row -> modelMapper.map(row, OpenHours.class).setPlace(place))
-                .toList());
+                placeDto.getOpeningHoursList()
+                        .stream()
+                        .map(row -> modelMapper.map(row, OpenHours.class).setPlace(place))
+                        .toList());
 
         //todo: provide separate service for converting address to geo lat and lng
         Location location = locationRepository.save(Location
@@ -215,7 +206,7 @@ public class PlaceServiceImpl implements PlaceService {
     @Override
     public List<FilterPlaceResponseDto> getFilteredPlaces(FilterPlaceDto filterPlaceDto, UserVO userVO) {
         return placeRepository.findAll(getSpecification(filterPlaceDto)).stream()
-            .map(place -> modelMapper.map(place, FilterPlaceResponseDto.class)).toList();
+                .map(place -> modelMapper.map(place, FilterPlaceResponseDto.class)).toList();
     }
 
     @Override
@@ -230,19 +221,19 @@ public class PlaceServiceImpl implements PlaceService {
 
     @Override
     public PageableDto<FilterPlaceResponseDto> getFilteredPlaces(FilterPlaceDto filterPlaceDto, UserVO userVO,
-                                                                         Pageable page) {
+                                                                 Pageable page) {
         Page<Place> pageWithPlaces = placeRepository.findAll(getSpecification(filterPlaceDto), page);
         return PageableDto.<FilterPlaceResponseDto>builder()
-            .currentPage(pageWithPlaces.getNumber())
-            .totalElements(pageWithPlaces.getTotalElements())
-            .totalPages(pageWithPlaces.getTotalPages())
-            .page(
-                pageWithPlaces
-                    .getContent()
-                    .stream()
-                    .map(place -> modelMapper.map(place, FilterPlaceResponseDto.class))
-                    .toList())
-            .build();
+                .currentPage(pageWithPlaces.getNumber())
+                .totalElements(pageWithPlaces.getTotalElements())
+                .totalPages(pageWithPlaces.getTotalPages())
+                .page(
+                        pageWithPlaces
+                                .getContent()
+                                .stream()
+                                .map(place -> modelMapper.map(place, FilterPlaceResponseDto.class))
+                                .toList())
+                .build();
     }
 
     PlaceSpecification getSpecification(FilterPlaceDto filterPlaceDto) {

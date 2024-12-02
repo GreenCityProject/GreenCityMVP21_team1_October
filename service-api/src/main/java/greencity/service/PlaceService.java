@@ -32,7 +32,7 @@ public interface PlaceService {
 
     Long deletePlace(Long id);
 
-    List<PlaceByBoundsDto> getListPlaceLocationByMapsBounds(FilterPlaceDto dto);
+    List<PlaceByBoundsDto> getPlacesByMapBounds(FilterPlaceDto dto);
 
     PlaceWithUserDto proposePlace(PlaceAddDto placeAddDto);
 
