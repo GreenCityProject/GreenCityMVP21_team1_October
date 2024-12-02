@@ -14,7 +14,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class EventResponseDtoMapper extends AbstractConverter<Event, EventResponseDto> {
-    private final EventDayResponseDtoMapper mapper;
+    private final EventDayToDtoMapper mapper;
 
     @Override
     protected EventResponseDto convert(Event source) {

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.validator.constraints.Length;
 
 import java.util.List;
 
@@ -25,6 +26,8 @@ public class Location {
 
     @NotNull(message = "Address cannot be null")
     @NotEmpty(message = "Address cannot be empty")
+    @Length(min = 1, max = 30, message = "Address should be from 1 to 30 characters long")
+    @Column(unique = true)
     private String address;
 
     @NotNull(message = "Latitude cannot be null")
