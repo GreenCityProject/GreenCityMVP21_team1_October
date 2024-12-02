@@ -95,9 +95,9 @@ public class EmailServiceImpl implements EmailService {
         model.put("commentAdditionDate", comment.getCreatedDate().format(
                 DateTimeFormatter.ofPattern(DateParserPatterns.EVENT_COMMENT_EMAIL_NOTIFICATION_PATTERN, locale)));
         model.put("commentText", comment.getComment());
-        model.put("eventLink", serverLink + "/event/{eventId}");
+        model.put("eventLink", serverLink + "/event/" + comment.getEvent().getId() + "/comment/" + comment.getId());
         String template = createEmailTemplate(model, "event-comment-notification-page");
-        sendEmail(eventOwner.getEmail(), "event", template);
+        sendEmail(eventOwner.getEmail(), "new comment on an event!", template);
     }
 
     private String createEmailTemplate(Map<String, Object> vars, String templateName) {

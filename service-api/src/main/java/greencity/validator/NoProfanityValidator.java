@@ -1,7 +1,9 @@
 package greencity.validator;
 
-import greencity.annotations.ValidAddEventCommentDtoRequest;
-import greencity.dto.eventcomment.AddEventCommentDtoRequest;
+import greencity.annotations.NoProfanity;
+import greencity.constant.ErrorMessage;
+import greencity.exception.exceptions.CommentValidationException;
+import greencity.exception.exceptions.InvalidPathException;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,26 +15,29 @@ import java.io.InputStreamReader;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class EventCommentsValidator implements ConstraintValidator<ValidAddEventCommentDtoRequest, AddEventCommentDtoRequest> {
+public class NoProfanityValidator implements ConstraintValidator<NoProfanity, String> {
     private static Set<String> bannedWords;
-    @Value("${slug.filter.file.en}")
+    @Value("${slug.filter.file}")
     private String pathToFile;
 
     @Override
-    public void initialize(ValidAddEventCommentDtoRequest constraintAnnotation) {
+    public void initialize(NoProfanity constraintAnnotation) {
         if (bannedWords == null) {
             try {
                 bannedWords = loadBannedWords();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new InvalidPathException(ErrorMessage.INVALID_FILE_PATH);
             }
         }
     }
 
     @Override
-    public boolean isValid(AddEventCommentDtoRequest addEventCommentDtoRequest, ConstraintValidatorContext constraintValidatorContext) {
-        return bannedWords.stream()
-                .anyMatch(addEventCommentDtoRequest.getComment().toLowerCase()::contains);
+    public boolean isValid(String string, ConstraintValidatorContext constraintValidatorContext) {
+        boolean isValid = bannedWords.stream()
+                .noneMatch(string.toLowerCase()::contains);
+        if (isValid) {
+            return true;
+        } else throw new CommentValidationException(ErrorMessage.COMMENT_CONTAINS_PROFANITY);
     }
 
     private Set<String> loadBannedWords() throws IOException {

@@ -1,6 +1,6 @@
 package greencity.validator;
 
-import greencity.dto.event.EventDayDto;
+import greencity.dto.event.EventDayCreateRequestDto;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -9,10 +9,10 @@ import java.util.Objects;
 
 public class EventDaysValidator {
 
-     public boolean checkEventDays(List<EventDayDto> eventDays) {
-        var dates = eventDays.stream().map(EventDayDto::getEventDate).toList();
-        var startTimes = eventDays.stream().map(EventDayDto::getEventStartTime).toList();
-        var endTimes = eventDays.stream().map(EventDayDto::getEventEndTime).toList();
+     public boolean checkEventDays(List<EventDayCreateRequestDto> eventDays) {
+        var dates = eventDays.stream().map(EventDayCreateRequestDto::getEventDate).toList();
+        var startTimes = eventDays.stream().map(EventDayCreateRequestDto::getEventStartTime).toList();
+        var endTimes = eventDays.stream().map(EventDayCreateRequestDto::getEventEndTime).toList();
         if (haveEmptyDateFields(dates))
             return false;
         if (haveDateDuplicates(dates))

@@ -183,6 +183,8 @@
     <include file="db/changelog/logs/ch-add-user-friends-Porplenko.xml"/>
     <include file="db/changelog/logs/ch-add-friend-requests-Porplenko.xml"/>
     <include file="db/changelog/logs/ch-update-user-friends-Porplenko.xml"/>
+    <include file="/db/changelog/logs/ch-event-comment-Danylenko.xml"/>
+    <include file="/db/changelog/logs/ch-event-comment-users-liked.xml"/>
     <include file="db/changelog/logs/ch-add-table-locations-Zamorii.xml"/>
     <include file="db/changelog/logs/ch-add-users-favorite-places-Danylenko.xml"/>
 </databaseChangeLog>

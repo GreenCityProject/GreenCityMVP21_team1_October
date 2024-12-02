@@ -150,7 +150,8 @@ public final class ErrorMessage {
     public static final String STRING_IS_BLANK = "String could not be empty or blank!";
     public static final String STRING_SIZE_IS_INVALID = "String size must be in between 1 and 8000!";
     public static final String PLACE_ALREADY_EXISTS = "Place by this name already exists.";
-
+    public static final String COMMENT_CONTAINS_PROFANITY = "Provided comment contains profanity!";
+    public static final String INVALID_FILE_PATH = "Unable to load file from provided path!";
     private ErrorMessage() {
     }
 }
