@@ -35,4 +35,6 @@ public interface PlaceService {
     List<PlaceByBoundsDto> getListPlaceLocationByMapsBounds(FilterPlaceDto dto);
 
     PlaceWithUserDto proposePlace(PlaceAddDto placeAddDto);
+
+    FavoritePlaceDto saveAsFavoritePlace(FavoritePlaceDto favoritePlaceDto);
 }

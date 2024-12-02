@@ -196,6 +196,18 @@ public class PlaceController {
         return ResponseEntity.ok(placeService.proposePlace(placeAddDto));
     }
 
+    @Operation(summary = "Save place as favorite.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "303", description = HttpStatuses.SEE_OTHER),
+            @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN),
+            @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    })
+    @PostMapping("/save/favorite")
+    public ResponseEntity<FavoritePlaceDto> saveAsFavoritePlace(@RequestBody FavoritePlaceDto favoritePlaceDto) {
+        return ResponseEntity.ok(placeService.saveAsFavoritePlace(favoritePlaceDto));
+    }
+
     @Operation(summary = "Get info about favourite place.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = HttpStatuses.OK),

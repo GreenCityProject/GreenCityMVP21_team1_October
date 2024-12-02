@@ -64,4 +64,7 @@ public class Place {
 
     @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Photo> photos;
+
+    @Column(name = "is_favorite", nullable = false)
+    private boolean favorite;
 }
