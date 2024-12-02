@@ -688,7 +688,7 @@ public class ModelUtils {
                 .id(1L)
                 .title("Lectures on garbage segregation")
                 .description("An event focused on promoting environmental awareness and sustainability practices within the community")
-                .dayList(new ArrayList<>(List.of(EventDayDto.builder()
+                .dayList(new ArrayList<>(List.of(EventDayResponseDto.builder()
                         .id(1L)
                         .eventDate(LocalDate.parse("2024-12-16"))
                         .eventStartTime(LocalTime.parse("09:00:00"))
@@ -761,15 +761,15 @@ public class ModelUtils {
                 .user(getUserVO())
                 .build();
     }
-//    public static EventComment getEventComment() {
-//        return EventComment.builder()
-//                .event(getEvent())
-//                .comment("Example comment")
-//                .deleted(false)
-//                .id(1L)
-//                .user(getUser())
-//                .build();
-//    }
+    public static EventComment getEventComment() {
+        return EventComment.builder()
+                .event(getEvent())
+                .comment("Example comment")
+                .deleted(false)
+                .id(1L)
+                .user(getUser())
+                .build();
+    }
     public static EventVO getEventVO() {
         return EventVO.builder()
                 .id(1L)

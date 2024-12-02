@@ -1,5 +1,6 @@
 package greencity.controller;
 
+import greencity.annotations.CurrentUser;
 import greencity.annotations.EventValidation;
 import greencity.constant.HttpStatuses;
 import greencity.dto.event.EventDetailsUpdate;
@@ -24,8 +25,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.security.Principal;
 
 @RestController
 @RequestMapping("/events")
@@ -57,11 +56,11 @@ public class EventController {
     @PutMapping(value = "/{eventId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<EventResponseDto> update(
         @Parameter(required = true) @Valid @RequestPart EventDetailsUpdate requestDto,
-        @Parameter(hidden = true) Principal principal,
+        @Parameter(hidden = true) @CurrentUser UserVO userVO,
         @PathVariable Long eventId,
         @RequestPart(required = false) @Nullable MultipartFile[] file) {
 
-        return ResponseEntity.ok().body(eventService.update(requestDto, eventId, principal.getName(), file));
+        return ResponseEntity.ok().body(eventService.update(requestDto, eventId, userVO.getName(), file));
     }
 
 
@@ -70,7 +69,7 @@ public class EventController {
      * This endpoint allows an Admin or the Organizer of the event to delete it.
      *
      * @param eventId   ID of the event to be deleted.
-     * @param principal the currently authenticated user.
+     * @param userVO the currently authenticated user.
      * @return {@link ResponseEntity<Void>}
      * @author Belchuk Stanislav
      */
@@ -90,8 +89,8 @@ public class EventController {
     @DeleteMapping("/{eventId}")
     public ResponseEntity<Void> deleteEvent(
             @PathVariable Long eventId,
-            @Parameter(hidden = true) Principal principal) {
-        UserVO currentUser = userService.findByEmail(principal.getName());
+            @Parameter(hidden = true) @CurrentUser UserVO userVO) {
+        UserVO currentUser = userService.findByEmail(userVO.getName());
         Long userId = currentUser.getId();
         eventService.deleteEvent(eventId, userId);
         return ResponseEntity.ok().build();
@@ -111,10 +110,10 @@ public class EventController {
     @PostMapping
     public ResponseEntity<EventResponseDto> save(
             @Parameter(required = true) @EventValidation @RequestPart EventRequestDto eventRequestDto,
-                                                 @Parameter(hidden = true) Principal principal,
+                                                 @Parameter(hidden = true) @CurrentUser UserVO userVO,
                                                  @RequestPart(required = false) @Nullable MultipartFile[] files) {
         return ResponseEntity.status(HttpStatus.CREATED).body(eventService.save(eventRequestDto,
-                principal.getName(),
+                userVO.getName(),
                 files));
     }
 }

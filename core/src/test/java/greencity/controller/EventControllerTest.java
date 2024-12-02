@@ -15,14 +15,18 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
+
 import static greencity.ModelUtils.getPrincipal;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
@@ -41,11 +45,13 @@ class EventControllerTest {
     private EventController eventController;
     private EventDetailsUpdate eventDetailsUpdate;
     private EventResponseDto eventResponseDto;
+    private EventRequestDto eventRequestDto;
 
     @BeforeEach
     void setUp() {
         eventResponseDto = ModelUtils.getEventResponseDto();
         eventDetailsUpdate = ModelUtils.getEventDetailsUpdate();
+        eventRequestDto = ModelUtils.getEventRequestDto();
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
@@ -65,7 +71,7 @@ class EventControllerTest {
         Mockito.when(eventService.update(any(EventDetailsUpdate.class), anyLong(), eq(principal.getName()), any()))
                 .thenReturn(eventResponseDto);
 
-        mockMvc.perform(multipart(BASE_LINK +"/{eventId}", 1L)
+        mockMvc.perform(multipart(BASE_LINK + "/{eventId}", 1L)
                         .file(jsonFile)
                         .principal(principal)
                         .with(request -> {
