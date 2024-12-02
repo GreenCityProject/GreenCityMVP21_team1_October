@@ -226,22 +226,20 @@ public class PlaceControllerTest {
 
     @Test
     void saveAsFavoritePlace_shouldReturnFavoritePlaceDto() throws Exception {
-        // Arrange
         long placeId = 1L;
         FavoritePlaceDto favoritePlaceDto = new FavoritePlaceDto("My Favorite Place", placeId);
 
         when(placeService.saveAsFavoritePlace(any(FavoritePlaceDto.class))).thenReturn(favoritePlaceDto);
 
-        // Act & Assert
         mockMvc.perform(post("/place/save/favorite")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content("""
-                            {
-                                "name": "My Favorite Place",
-                                "placeId": 1
-                            }
-                            """))
+                                {
+                                    "name": "My Favorite Place",
+                                    "placeId": 1
+                                }
+                                """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("My Favorite Place"))
                 .andExpect(jsonPath("$.placeId").value(1));
@@ -251,13 +249,11 @@ public class PlaceControllerTest {
 
     @Test
     void saveAsFavoritePlace_shouldReturnNotFoundIfPlaceDoesNotExist() throws Exception {
-        // Arrange
         long placeId = 1L;
         FavoritePlaceDto favoritePlaceDto = new FavoritePlaceDto("My Favorite Place", placeId);
 
         when(placeService.saveAsFavoritePlace(any(FavoritePlaceDto.class))).thenThrow(new NotFoundException("Place not found with id: " + placeId));
 
-        // Act & Assert
         mockMvc.perform(post("/place/save/favorite")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""

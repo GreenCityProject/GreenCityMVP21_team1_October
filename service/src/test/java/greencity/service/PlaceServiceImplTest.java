@@ -305,7 +305,6 @@ class PlaceServiceImplTest {
 
     @Test
     void saveAsFavoritePlace_shouldSaveFavoritePlace() {
-        // Arrange
         long placeId = 1L;
         FavoritePlaceDto favoritePlaceDto = new FavoritePlaceDto("My Favorite Place", placeId);
         Place place = new Place();
@@ -316,10 +315,8 @@ class PlaceServiceImplTest {
         when(placeRepository.save(any(Place.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(modelMapper.map(place, FavoritePlaceDto.class)).thenReturn(favoritePlaceDto);
 
-        // Act
         FavoritePlaceDto result = placeService.saveAsFavoritePlace(favoritePlaceDto);
 
-        // Assert
         assertNotNull(result);
         assertTrue(place.isFavorite());
         assertEquals(favoritePlaceDto.getName(), result.getName());
@@ -332,13 +329,11 @@ class PlaceServiceImplTest {
 
     @Test
     void saveAsFavoritePlace_shouldThrowNotFoundExceptionIfPlaceNotFound() {
-        // Arrange
         long placeId = 1L;
         FavoritePlaceDto favoritePlaceDto = new FavoritePlaceDto("My Favorite Place", placeId);
 
         when(placeRepository.findById(placeId)).thenReturn(Optional.empty());
 
-        // Act & Assert
         assertThrows(NotFoundException.class, () -> placeService.saveAsFavoritePlace(favoritePlaceDto));
 
         verify(placeRepository, times(1)).findById(placeId);
