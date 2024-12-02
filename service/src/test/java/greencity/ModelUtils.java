@@ -13,6 +13,7 @@ import greencity.dto.language.LanguageDTO;
 import greencity.dto.language.LanguageTranslationDTO;
 import greencity.dto.language.LanguageVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
+import greencity.dto.place.*;
 import greencity.dto.search.SearchNewsDto;
 import greencity.dto.shoppinglistitem.CustomShoppingListItemResponseDto;
 import greencity.dto.shoppinglistitem.CustomShoppingListItemVO;
@@ -47,6 +48,29 @@ public class ModelUtils {
     public static String TEST_EMAIL_2 = "test2@mail.com";
     public static ZonedDateTime zonedDateTime = ZonedDateTime.now();
     public static LocalDateTime localDateTime = LocalDateTime.now();
+
+    public static AddPlaceDto getAddPlaceDto() {
+        return new AddPlaceDto("name", "name", List.of(), "name");
+    }
+
+    public static Place getPlace() {
+        return new Place(1L, "name", 0., PlaceStatus.APPROVED, new Location(), getCategory(), getUser(), List.of(), List.of(), List.of(), List.of());
+    }
+
+    public static Category getCategory() {
+        return new Category(1L, "name", "nameUa", new Category(), List.of());
+    }
+
+    public static PlaceAddDto getPlaceAddDto() {
+        return PlaceAddDto.builder()
+                .name("")
+                .category(new CategoryDto("name", "nameUa", 1L))
+                .location(new LocationAddressAndGeoDto("address", 0., 0.))
+                .discountValue(List.of())
+                .openingHoursList(List.of(new OpeningHoursDto(WeekDay.FRIDAY, LocalTime.now(), LocalTime.now(), BreakTimeDto.builder().build())))
+                .photos(List.of(new PhotoAddDto("name")))
+                .build();
+    }
 
     public static Tag getTag() {
         return new Tag(1L, TagType.ECO_NEWS, getTagTranslations(), Collections.emptyList(), Collections.emptySet(), Collections.emptySet());
@@ -688,7 +712,7 @@ public class ModelUtils {
                 .id(1L)
                 .title("Lectures on garbage segregation")
                 .description("An event focused on promoting environmental awareness and sustainability practices within the community")
-                .dayList(new ArrayList<>(List.of(EventDayDto.builder()
+                .dayList(new ArrayList<>(List.of(EventDayResponseDto.builder()
                         .id(1L)
                         .eventDate(LocalDate.parse("2024-12-16"))
                         .eventStartTime(LocalTime.parse("09:00:00"))
