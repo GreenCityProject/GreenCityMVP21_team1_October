@@ -137,7 +137,7 @@ public class PlaceController {
             @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
     @PostMapping("/getListPlaceLocationByMapsBounds")
-    public ResponseEntity<List<PlaceByBoundsDto>> getPlacesByMapBounds(@RequestBody @Valid FilterPlaceDto dto) {
+    public ResponseEntity<List<PlaceByBoundsDto>> getPlacesByMapBounds(@RequestBody FilterPlaceDto dto) {
         return ResponseEntity.ok(placeService.getPlacesByMapBounds(dto));
     }
 

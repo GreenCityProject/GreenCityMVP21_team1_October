@@ -24,7 +24,10 @@ import jakarta.transaction.Transactional;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -36,11 +39,12 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 public class PlaceServiceImpl implements PlaceService {
-    private final FavoritePlaceRepository favoritePlaceRepository;
+    private FavoritePlaceRepository favoritePlaceRepository;
     private PlaceRepository placeRepository;
     private CategoryRepo categoryRepo;
     private LocationRepository locationRepository;
     private ModelMapper modelMapper;
+    private Validator validator;
 
     private PlaceInfoDtoMapper placeInfoDtoMapper;
     private PlaceUpdateDtoMapper placeUpdateDtoMapper;
@@ -121,6 +125,12 @@ public class PlaceServiceImpl implements PlaceService {
 
     @Override
     public List<PlaceByBoundsDto> getPlacesByMapBounds(FilterPlaceDto dto) {
+        if (dto.getMapBoundsDto() == null) {
+            throw new BadRequestException(ErrorMessage.NULL_MAP_BOUNDS);
+        }
+        if (!validator.validate(dto.getMapBoundsDto()).isEmpty()) {
+            throw new BadRequestException(ErrorMessage.WRONG_MAP_BOUNDS);
+        }
         return placeRepository.findPlacesByMapBounds(
                         dto.getMapBoundsDto().getSouthWestLat(),
                         dto.getMapBoundsDto().getNorthEastLat(),

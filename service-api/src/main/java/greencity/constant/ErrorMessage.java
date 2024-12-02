@@ -1,6 +1,8 @@
 package greencity.constant;
 
 public final class ErrorMessage {
+    public static final String NULL_MAP_BOUNDS = "Map bounds can't be null!";
+    public static final String WRONG_MAP_BOUNDS = "Map bounds validation was failed!";
     public static final String WRONG_ID_LIST = "List of Id must be Long numbers, separated by comma!";
     public static final String PLACE_NOT_FOUND_BY_ID = "Place does not exist by this id : ";
     public static final String CUSTOM_SHOPPING_LIST_ITEM_NOT_FOUND_BY_ID =

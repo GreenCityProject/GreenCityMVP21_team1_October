@@ -156,6 +156,28 @@ public class PlaceControllerTest {
     }
 
     @Test
+    void getPlacesByMapBoundsTest() throws Exception {
+        FilterPlaceDto dto = new FilterPlaceDto();
+        String requestJson = objectMapper.writeValueAsString(dto);
+        List<PlaceByBoundsDto> responseList = List.of(PlaceByBoundsDto.builder()
+                        .id(101L)
+                        .build());
+
+        when(placeService.getPlacesByMapBounds(any(FilterPlaceDto.class))).thenReturn(responseList);
+
+        mockMvc.perform(post(placeLink + "/getListPlaceLocationByMapsBounds")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(objectMapper.writeValueAsString(responseList)));
+
+        verify(placeService, times(1)).getPlacesByMapBounds(any(FilterPlaceDto.class));
+    }
+
+
+    @Test
     void saveEcoPlaceFromUiUsingTest() throws Exception {
         AddPlaceDto addPlaceDto = new AddPlaceDto("name", "name", List.of(), "name");
         UserVO userVO = ModelUtils.getUserVO();
