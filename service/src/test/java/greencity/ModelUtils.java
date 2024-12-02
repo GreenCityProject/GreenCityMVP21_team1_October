@@ -787,6 +787,7 @@ public class ModelUtils {
     public static EventCommentVO getEventCommentVO() {
         return EventCommentVO.builder()
                 .event(getEventVO())
+                .modifiedDate(LocalDateTime.of(2024, 12, 30, 10, 0))
                 .comment("Example comment")
                 .deleted(false)
                 .id(1L)
