@@ -54,7 +54,15 @@ public class ModelUtils {
     }
 
     public static Place getPlace() {
-        return new Place(1L, "name", 0., PlaceStatus.APPROVED, new Location(), getCategory(), getUser(), List.of(), List.of(), List.of(), List.of());
+        Place place = new Place();
+        place.setId(1L);
+        place.setName("name");
+        place.setStatus(PlaceStatus.APPROVED);
+        place.setLocation(new Location());
+        place.setCategory(getCategory());
+//        place.setUser(getUser());
+        place.setPhotos(List.of());
+        return place;
     }
 
     public static Category getCategory() {

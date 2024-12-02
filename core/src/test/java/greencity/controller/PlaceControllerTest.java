@@ -3,12 +3,10 @@ package greencity.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.ModelUtils;
 import greencity.converters.UserArgumentResolver;
-import greencity.dto.place.AddPlaceDto;
-import greencity.dto.place.BulkUpdatePlaceStatusDto;
-import greencity.dto.place.FilterPlaceDto;
-import greencity.dto.place.PlaceAddDto;
+import greencity.dto.place.*;
 import greencity.dto.user.UserVO;
 import greencity.enums.PlaceStatus;
+import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.handler.CustomExceptionHandler;
 import greencity.service.PlaceService;
 import greencity.service.UserService;
@@ -30,9 +28,13 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -222,6 +224,46 @@ public class PlaceControllerTest {
         verify(placeService).proposePlace(placeAddDto);
     }
 
+    @Test
+    void saveAsFavoritePlace_shouldReturnFavoritePlaceDto() throws Exception {
+        long placeId = 1L;
+        FavoritePlaceDto favoritePlaceDto = new FavoritePlaceDto("My Favorite Place", placeId);
 
+        when(placeService.saveAsFavoritePlace(any(FavoritePlaceDto.class))).thenReturn(favoritePlaceDto);
 
+        mockMvc.perform(post("/place/save/favorite")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "name": "My Favorite Place",
+                                    "placeId": 1
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("My Favorite Place"))
+                .andExpect(jsonPath("$.placeId").value(1));
+
+        verify(placeService, times(1)).saveAsFavoritePlace(any(FavoritePlaceDto.class));
+    }
+
+    @Test
+    void saveAsFavoritePlace_shouldReturnNotFoundIfPlaceDoesNotExist() throws Exception {
+        long placeId = 1L;
+        FavoritePlaceDto favoritePlaceDto = new FavoritePlaceDto("My Favorite Place", placeId);
+
+        when(placeService.saveAsFavoritePlace(any(FavoritePlaceDto.class))).thenThrow(new NotFoundException("Place not found with id: " + placeId));
+
+        mockMvc.perform(post("/place/save/favorite")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "name": "My Favorite Place",
+                                    "placeId": 1
+                                }
+                                """))
+                .andExpect(status().isNotFound());
+
+        verify(placeService, times(1)).saveAsFavoritePlace(any(FavoritePlaceDto.class));
+    }
 }
