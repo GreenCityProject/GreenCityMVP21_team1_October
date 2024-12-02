@@ -51,12 +51,25 @@ public class EventServiceImpl implements EventService {
                 && organizer.getRole() != Role.ROLE_ADMIN) {
             throw new UserHasNoPermissionToAccessException(ErrorMessage.USER_HAS_NO_PERMISSION);
         }
+        Event oldEvent = new Event();
 
         updateEvent(requestDto, eventToUpdate);
         updateEventDay(requestDto, eventToUpdate);
         updateAdditionalImages(requestDto, files, eventToUpdate);
 
         Event saved = eventRepo.save(eventToUpdate);
+
+        List<Long> userIds = userRepo.findUsersByEventId(eventToUpdate.getId());
+        List<UserVO> users = userIds.stream()
+                .map(userId -> modelMapper.map(restClient.findById(userId), UserVO.class))
+                .toList();
+
+        notificationService.sendEventUpdateNotifications(
+                modelMapper.map(oldEvent, EventVO.class),
+                modelMapper.map(eventToUpdate, EventVO.class),
+                users
+        );
+
         return modelMapper.map(saved, EventResponseDto.class);
     }
 

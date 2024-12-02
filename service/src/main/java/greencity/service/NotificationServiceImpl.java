@@ -296,4 +296,39 @@ public class NotificationServiceImpl implements NotificationService {
                 content
         );
     }
+
+    @Override
+    public void sendEventUpdateNotifications(EventVO oldEvent, EventVO newEvent, List<UserVO> users) {
+        String content = null;
+
+        if (!oldEvent.getTitle().equals(newEvent.getTitle())) {
+            content = String.format(
+                    "Event \"%s\" was updated. New name is \"%s\". %s",
+                    oldEvent.getTitle(),
+                    newEvent.getTitle(),
+                    oldEvent.getEventDays()
+            );
+        }
+
+        if (!oldEvent.getEventDays().equals(newEvent.getEventDays())) {
+            content = String.format(
+                    "Date and time for event \"%s\" was updated. New date and time is %s. %s",
+                    oldEvent.getTitle(),
+                    NotificationContentFormatterImpl.formatDateTime(new Date()),
+                    newEvent.getEventDays()
+            );
+        }
+
+        if (content != null) {
+            String finalContent = content;
+            users.forEach(user -> {
+                save(
+                        user.getId(),
+                        NotificationOrigin.GREEN_CITY,
+                        NotificationType.EVENT_UPDATED,
+                        finalContent
+                );
+            });
+        }
+    }
 }

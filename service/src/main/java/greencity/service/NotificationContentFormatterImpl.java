@@ -41,4 +41,13 @@ public class NotificationContentFormatterImpl implements NotificationContentForm
     public static String truncateEventName(String eventName) {
         return eventName.length() > 50 ? eventName.substring(0, 47) + "..." : eventName;
     }
+
+    public static String formatDateTime(Date dateTime) {
+        return new SimpleDateFormat("MMM dd, yyyy hh:mm a").format(dateTime);
+    }
+
+    public String getCurrentDateTime() {
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date());
+    }
+
 }

@@ -154,4 +154,6 @@ public interface NotificationService {
      * @param user  the {@link UserVO} representing the user to notify.
      */
     void sendCancellationNotification(EventVO event, UserVO user);
+
+    void sendEventUpdateNotifications(EventVO oldEvent, EventVO newEvent, List<UserVO> users);
 }

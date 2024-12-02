@@ -11,6 +11,7 @@ public enum NotificationType {
     EVENT_CREATED("Your friend created an event"),
     EVENT_CANCELLED("Event was cancelled"),
     EVENT_JOINED("Someone joined your event"),
+    EVENT_UPDATED("Your event has been updated"),
     EVENT_COMMENTED("Your event received a comment"),
     FRIEND_REQUEST_RECEIVED("You received a new friend request"),
     FRIEND_REQUEST_ACCEPTED("Your friend request was accepted"),
