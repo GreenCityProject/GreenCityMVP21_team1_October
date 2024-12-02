@@ -712,7 +712,7 @@ public class ModelUtils {
                 .id(1L)
                 .title("Lectures on garbage segregation")
                 .description("An event focused on promoting environmental awareness and sustainability practices within the community")
-                .dayList(new ArrayList<>(List.of(EventDayResponseDto.builder()
+                .dayList(new ArrayList<>(List.of(EventDayDto.builder()
                         .id(1L)
                         .eventDate(LocalDate.parse("2024-12-16"))
                         .eventStartTime(LocalTime.parse("09:00:00"))
