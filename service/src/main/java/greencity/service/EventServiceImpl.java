@@ -184,6 +184,36 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public PageableAdvancedDtoOfEventDto getFilteredEvents(Pageable pageable, String eventTime) {
+        Page<Event> eventsPage;
+
+        if ("UPCOMING".equalsIgnoreCase(eventTime)) {
+            eventsPage = eventRepo.findUpcomingEvents(pageable);
+        } else if ("PASSED".equalsIgnoreCase(eventTime)) {
+            eventsPage = eventRepo.findPassedEvents(pageable);
+        } else {
+            throw new IllegalArgumentException("Invalid eventTime parameter. Allowed values: UPCOMING, PASSED.");
+        }
+
+        List<EventDto> eventDtos = eventsPage.getContent().stream()
+                .map(event -> modelMapper.map(event, EventDto.class))
+                .toList();
+
+        return PageableAdvancedDtoOfEventDto.builder()
+                .currentPage(eventsPage.getNumber())
+                .first(eventsPage.isFirst())
+                .last(eventsPage.isLast())
+                .hasNext(eventsPage.hasNext())
+                .hasPrevious(eventsPage.hasPrevious())
+                .number(eventsPage.getNumber())
+                .page(eventDtos)
+                .totalElements(eventsPage.getTotalElements())
+                .totalPages(eventsPage.getTotalPages())
+                .build();
+    }
+
+    @Override
     public EventResponseDto save(EventRequestDto eventRequestDto, String email, MultipartFile[] files) {
         Event eventToSave = modelMapper.map(eventRequestDto, Event.class);
         User organizer = modelMapper.map(restClient.findByEmail(email), User.class);

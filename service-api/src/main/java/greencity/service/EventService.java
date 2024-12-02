@@ -55,5 +55,7 @@ public interface EventService {
      */
     PageableAdvancedDtoOfEventDto getAllEvents(Pageable pageable);
 
+    PageableAdvancedDtoOfEventDto getFilteredEvents(Pageable pageable, String eventTime);
+
     EventResponseDto save(EventRequestDto eventRequestDto, String email, MultipartFile[] files);
 }

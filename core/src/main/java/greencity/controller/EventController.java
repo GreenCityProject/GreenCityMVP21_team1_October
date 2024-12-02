@@ -58,13 +58,21 @@ public class EventController {
             @Parameter(description = "Page index you want to retrieve [0..N]. If page index is less than 0, default value is used (0).")
             @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Number of records per page [1..100]. If size is less than 1 or not specified, default value is used (5).")
-            @RequestParam(defaultValue = "5") int size) {
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(required = false) String eventTime) {
 
         page = Math.max(page, 0);
         size = Math.min(Math.max(size, 1), 100);
 
         Pageable pageable = PageRequest.of(page, size);
-        PageableAdvancedDtoOfEventDto result = eventService.getAllEvents(pageable);
+
+        PageableAdvancedDtoOfEventDto result;
+
+        if (eventTime != null) {
+            result = eventService.getFilteredEvents(pageable, eventTime);
+        } else {
+            result = eventService.getAllEvents(pageable);
+        }
 
         return ResponseEntity.ok(result);
     }
