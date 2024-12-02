@@ -34,4 +34,6 @@ public interface PlaceService {
     Long deletePlace(Long id);
 
     PlaceWithUserDto proposePlace(PlaceAddDto placeAddDto);
+
+    FavoritePlaceDto saveAsFavoritePlace(FavoritePlaceDto favoritePlaceDto);
 }

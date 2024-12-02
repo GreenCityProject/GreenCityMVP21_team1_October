@@ -302,5 +302,47 @@ class PlaceServiceImplTest {
 
         assertThrows(BadPlaceRequestException.class, () -> placeService.save(addPlaceDto, userVO));
     }
+
+    @Test
+    void saveAsFavoritePlace_shouldSaveFavoritePlace() {
+        // Arrange
+        long placeId = 1L;
+        FavoritePlaceDto favoritePlaceDto = new FavoritePlaceDto("My Favorite Place", placeId);
+        Place place = new Place();
+        place.setId(placeId);
+        place.setFavorite(false);
+
+        when(placeRepository.findById(placeId)).thenReturn(Optional.of(place));
+        when(placeRepository.save(any(Place.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(modelMapper.map(place, FavoritePlaceDto.class)).thenReturn(favoritePlaceDto);
+
+        // Act
+        FavoritePlaceDto result = placeService.saveAsFavoritePlace(favoritePlaceDto);
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(place.isFavorite());
+        assertEquals(favoritePlaceDto.getName(), result.getName());
+        assertEquals(favoritePlaceDto.getPlaceId(), result.getPlaceId());
+
+        verify(placeRepository, times(1)).findById(placeId);
+        verify(placeRepository, times(1)).save(place);
+        verify(modelMapper, times(1)).map(place, FavoritePlaceDto.class);
+    }
+
+    @Test
+    void saveAsFavoritePlace_shouldThrowNotFoundExceptionIfPlaceNotFound() {
+        // Arrange
+        long placeId = 1L;
+        FavoritePlaceDto favoritePlaceDto = new FavoritePlaceDto("My Favorite Place", placeId);
+
+        when(placeRepository.findById(placeId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(NotFoundException.class, () -> placeService.saveAsFavoritePlace(favoritePlaceDto));
+
+        verify(placeRepository, times(1)).findById(placeId);
+        verify(placeRepository, never()).save(any(Place.class));
+    }
 }
 
