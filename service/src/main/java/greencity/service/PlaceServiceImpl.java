@@ -77,12 +77,8 @@ public class PlaceServiceImpl implements PlaceService {
 
     @Override
     public List<FilterPlaceCategory> getFilteredPlacesCategories() {
-        return placeRepository.findAll().stream()
-                .map(e -> FilterPlaceCategory.builder()
-                        .id(e.getId())
-                        .name(e.getCategory().getName())
-                        .nameUa(e.getCategory().getNameUa())
-                        .build())
+        return categoryRepo.findAll().stream()
+                .map(e -> modelMapper.map(e, FilterPlaceCategory.class))
                 .toList();
     }
 
