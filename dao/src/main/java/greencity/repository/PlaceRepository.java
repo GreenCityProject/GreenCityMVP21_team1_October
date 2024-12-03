@@ -23,6 +23,9 @@ public interface PlaceRepository extends JpaRepository<Place, Long>, JpaSpecific
                                     @Length(min = 1, max = 30, message = "Place name should be from 1 to 30 characters long")
                                     String name);
 
+    @Query("SELECT p FROM Place p WHERE p.id = :id")
+    Optional<Place> findById(@NotNull Long id);
+
     @Transactional
     @Modifying
     @Query("UPDATE Place p SET p.status = :status WHERE p.id IN :ids")

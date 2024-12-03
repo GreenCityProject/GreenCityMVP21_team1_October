@@ -16,6 +16,7 @@ import greencity.filters.PlaceSpecification;
 import greencity.mapping.PlaceInfoDtoMapper;
 import greencity.mapping.PlaceUpdateDtoMapper;
 import greencity.repository.CategoryRepo;
+import greencity.repository.FavoritePlaceRepository;
 import greencity.repository.LocationRepository;
 import greencity.repository.PlaceRepository;
 import jakarta.transaction.Transactional;
@@ -33,6 +34,7 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 public class PlaceServiceImpl implements PlaceService {
+    private final FavoritePlaceRepository favoritePlaceRepository;
     private PlaceRepository placeRepository;
     private CategoryRepo categoryRepo;
     private LocationRepository locationRepository;
@@ -191,6 +193,16 @@ public class PlaceServiceImpl implements PlaceService {
     public List<FilterPlaceResponseDto> getFilteredPlaces(FilterPlaceDto filterPlaceDto, UserVO userVO) {
         return placeRepository.findAll(getSpecification(filterPlaceDto)).stream()
             .map(place -> modelMapper.map(place, FilterPlaceResponseDto.class)).toList();
+    }
+
+    @Override
+    @Transactional
+    public FavoritePlaceDto saveAsFavoritePlace(FavoritePlaceDto favoritePlaceDto) {
+        Place place = placeRepository.findById(favoritePlaceDto.getPlaceId())
+                .orElseThrow(() -> new NotFoundException("Place not found with id: " + favoritePlaceDto.getPlaceId()));
+        place.setFavorite(true);
+        placeRepository.save(place);
+        return modelMapper.map(place, FavoritePlaceDto.class);
     }
 
     @Override
