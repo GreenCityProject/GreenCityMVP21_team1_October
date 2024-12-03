@@ -1,17 +1,12 @@
 package greencity.dto.event;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
 import java.util.ArrayList;
 import java.util.List;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 @Builder
 @NoArgsConstructor
@@ -46,9 +41,8 @@ public class EventDetailsUpdate {
     private String image;
 
     @Schema(hidden = true)
-    @NotNull
     @Size(max = 4)
-    private List<String> additionalImages;
+    private List<String> additionalImages = new ArrayList<>();
 
     @Schema(example = "Environmental")
     private List<String> tags;
