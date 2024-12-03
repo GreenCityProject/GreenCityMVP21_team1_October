@@ -1,6 +1,5 @@
 package greencity.service;
 
-import ch.qos.logback.core.model.ModelUtil;
 import greencity.constant.ErrorMessage;
 import greencity.dto.econews.EcoNewsVO;
 import greencity.dto.econewscomment.EcoNewsCommentVO;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Service;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -28,31 +26,6 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepo notificationRepo;
     private final ModelMapper modelMapper;
-
-
-    @Scheduled(cron = "0 0 0 */7 * *")
-    public void scheduledDeleteOfReadNotifications() {
-        //TODO
-        List<Notification> notifications = notificationRepo.findAll();
-        notifications.forEach(notification -> {
-            Date createdAt = notification.getCreatedAt();
-            Date now = new Date();
-
-            Calendar createdAtCalendar = Calendar.getInstance();
-            createdAtCalendar.setTime(createdAt);
-
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(now);
-
-            if(!notification.isMarkedAsRead()) {
-                return;
-            }
-
-            if(calendar.getWeekYear() > createdAtCalendar.getWeekYear()) {
-                notificationRepo.delete(notification);
-            }
-        });
-    }
 
     /**
      * {@inheritDoc}
@@ -297,6 +270,30 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public NotificationOrigin[] getNotificationOrigins() {
         return NotificationOrigin.values();
+    }
+
+    @Scheduled(cron = "0 0 0 */7 * *")
+    public void scheduleDeleteMarkedAsReadNotifications() {
+        List<Notification> notifications = notificationRepo.findAll();
+
+        notifications.stream()
+                .filter(Notification::isMarkedAsRead)
+                .forEach(notification -> {
+                    Date createdAt = notification.getCreatedAt();
+                    Date now = new Date();
+
+                    Calendar createdAtCalendar = Calendar.getInstance();
+                    createdAtCalendar.setTime(createdAt);
+
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(now);
+
+                    long monthBetween = calendar.get(Calendar.MONTH) - createdAtCalendar.get(Calendar.MONTH);
+
+                    if(monthBetween > 1) {
+                        notificationRepo.delete(notification);
+                    }
+                });
     }
 
     private List<NotificationDto> getNotificationDtoList(List<Notification> notifications) {

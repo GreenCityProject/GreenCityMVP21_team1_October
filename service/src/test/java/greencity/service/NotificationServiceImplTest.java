@@ -9,6 +9,7 @@ import greencity.dto.user.UserVO;
 import greencity.entity.Notification;
 import greencity.enums.NotificationOrigin;
 import greencity.enums.NotificationType;
+import greencity.exception.exceptions.NotFoundException;
 import greencity.repository.NotificationRepo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -100,9 +101,23 @@ public class NotificationServiceImplTest {
 
     @Test
     void deleteTest() {
-        Long notificationId = 1L;
+        Notification notification = ModelUtils.getNotification();
+        Long notificationId = notification.getId();
+
+        when(notificationRepo.findById(notificationId)).thenReturn(Optional.of(notification));
+
         notificationServiceImpl.delete(notificationId);
-        verify(notificationRepo, times(1)).deleteById(notificationId);
+        verify(notificationRepo, times(1)).delete(notification);
+    }
+
+    @Test
+    void deleteTestThrowsNotFoundException() {
+        Notification notification = ModelUtils.getNotification();
+        Long notificationId = notification.getId();
+
+        when(notificationRepo.findById(notificationId)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> notificationServiceImpl.delete(notificationId));
     }
 
     @Test
@@ -118,6 +133,15 @@ public class NotificationServiceImplTest {
     }
 
     @Test
+    void markAsReadTestThrowsNotFoundException() {
+        Long notificationId = 1L;
+
+        when(notificationRepo.findById(notificationId)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> notificationServiceImpl.markAsRead(notificationId));
+    }
+
+    @Test
     void markAsUnreadTest() {
         Notification notification = ModelUtils.getNotification();
         Long notificationId = 1L;
@@ -127,6 +151,15 @@ public class NotificationServiceImplTest {
         notificationServiceImpl.markAsUnread(notificationId);
 
         assertFalse(notification.isMarkedAsRead());
+    }
+
+    @Test
+    void markAsUnreadTestThrowsNotFoundException() {
+        Long notificationId = 1L;
+
+        when(notificationRepo.findById(notificationId)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> notificationServiceImpl.markAsUnread(notificationId));
     }
 
     @Test
@@ -169,6 +202,33 @@ public class NotificationServiceImplTest {
     }
 
     @Test
+    void sendFriendRequestReceivedNotificationTest() {
+        UserVO sender = ModelUtils.getUserVO();
+        UserVO recepient = ModelUtils.getUserVO();
+
+        notificationServiceImpl.sendFriendRequestReceivedNotification(sender, recepient);
+        verify(notificationRepo, times(1)).save(any());
+    }
+
+    @Test
+    void sendFriendRequestAcceptedNotificationTest() {
+        UserVO sender = ModelUtils.getUserVO();
+        UserVO recepient = ModelUtils.getUserVO();
+
+        notificationServiceImpl.sendFriendRequestAcceptedNotification(sender, recepient);
+        verify(notificationRepo, times(1)).save(any());
+    }
+
+    @Test
+    void sendFriendRequestDeclinedNotificationTest() {
+        UserVO sender = ModelUtils.getUserVO();
+        UserVO recepient = ModelUtils.getUserVO();
+
+        notificationServiceImpl.sendFriendRequestDeclinedNotification(sender, recepient);
+        verify(notificationRepo, times(1)).save(any());
+    }
+
+    @Test
     void saveTest() {
         Notification notification = ModelUtils.getNotification();
         notificationServiceImpl.save(
@@ -195,5 +255,17 @@ public class NotificationServiceImplTest {
         NotificationOrigin[] actual = notificationServiceImpl.getNotificationOrigins();
 
         assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    void scheduleDeleteMarkedAsReadNotificationsTest() {
+        List<Notification> notifications = List.of(ModelUtils.getNotificationReadyForScheduledDeletion(), ModelUtils.getNotification());
+        int expectedAmountOfDeletedNotifications = 1;
+
+        when(notificationRepo.findAll()).thenReturn(notifications);
+
+        notificationServiceImpl.scheduleDeleteMarkedAsReadNotifications();
+
+        verify(notificationRepo, times(expectedAmountOfDeletedNotifications)).delete(any());
     }
 }

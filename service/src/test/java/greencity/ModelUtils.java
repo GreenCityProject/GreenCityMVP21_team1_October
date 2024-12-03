@@ -69,6 +69,21 @@ public class ModelUtils {
         );
     }
 
+    public static Notification getNotificationReadyForScheduledDeletion() {
+        Date date = new Date();
+        date.setMonth(Calendar.SEPTEMBER);
+
+        return new Notification(
+                1L,
+                date,
+                NotificationOrigin.GREEN_CITY,
+                NotificationType.ECO_NEWS_LIKE,
+                "description1",
+                "content1",
+                true
+        );
+    }
+
     public static NotificationPopUpDto getNotificationPopUpDto() {
         return new NotificationPopUpDto(
                 1L,
