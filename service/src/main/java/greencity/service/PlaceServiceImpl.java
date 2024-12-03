@@ -121,6 +121,11 @@ public class PlaceServiceImpl implements PlaceService {
     }
 
     @Override
+    public List<PlaceByBoundsDto> getPlacesByMapBounds(FilterPlaceDto dto) {
+        return List.of();
+    }
+
+    @Override
     @Transactional
     public PlaceWithUserDto proposePlace(PlaceAddDto placeAddDto) {
         if (placeRepository.findPlaceByName(placeAddDto.getName()).isPresent()) {

@@ -32,6 +32,8 @@ public interface PlaceService {
 
     Long deletePlace(Long id);
 
+    List<PlaceByBoundsDto> getPlacesByMapBounds(FilterPlaceDto dto);
+
     PlaceWithUserDto proposePlace(PlaceAddDto placeAddDto);
 
     FavoritePlaceDto saveAsFavoritePlace(FavoritePlaceDto favoritePlaceDto);

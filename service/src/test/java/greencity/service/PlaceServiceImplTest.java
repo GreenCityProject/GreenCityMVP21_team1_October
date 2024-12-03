@@ -1,6 +1,7 @@
 package greencity.service;
 
 import greencity.ModelUtils;
+import greencity.constant.ErrorMessage;
 import greencity.dto.PageableDto;
 import greencity.dto.category.CategoryDto;
 import greencity.dto.location.LocationDto;
@@ -20,6 +21,8 @@ import greencity.mapping.PlaceUpdateDtoMapper;
 import greencity.repository.CategoryRepo;
 import greencity.repository.LocationRepository;
 import greencity.repository.PlaceRepository;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,9 +37,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.sql.Time;
 import java.time.LocalTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -64,6 +65,9 @@ class PlaceServiceImplTest {
 
     @Mock
     private PlaceUpdateDtoMapper placeUpdateDtoMapper;
+
+    @Mock
+    private Validator validator;
 
     @Test
     void getPlaceInfoTest() {
@@ -368,8 +372,8 @@ class PlaceServiceImplTest {
                 ))
                 .discountValues(List.of(
                         DiscountValueDto.builder()
-                                .value(10) // Обязательное поле
-                                .specification(new SpecificationNameDto("Discount Spec")) // Заполнено как пример
+                                .value(10)
+                                .specification(new SpecificationNameDto("Discount Spec"))
                                 .build()
                 ))
                 .locationAddressAndGeoForUpdate(new LocationAddressAndGeoForUpdateDto(
@@ -379,8 +383,17 @@ class PlaceServiceImplTest {
         Place place = Place.builder()
                 .id(1L)
                 .name("Old Place Name")
-                .location(new Location(1L, "Old Address", 40.45, 20.52))
-                .category(new Category(1L, "Old Category", "Стара Категорія", null, null))
+                .location(Location.builder()
+                        .id(1L)
+                        .address("Old Address")
+                        .lat(40.45)
+                        .lng(20.52)
+                        .build())
+                .category(Category.builder()
+                        .id(1L)
+                        .name("Old Category")
+                        .nameUa("Стара Категорія")
+                        .build())
                 .openHoursList(List.of(
                         new OpenHours(1L, WeekDay.MONDAY, Time.valueOf("09:00:00"), Time.valueOf("17:00:00"), null, null)
                 ))
@@ -392,8 +405,17 @@ class PlaceServiceImplTest {
         Place updatedPlace = Place.builder()
                 .id(1L)
                 .name("Updated Place Name")
-                .location(new Location(1L, "New Address", 50.45, 30.52))
-                .category(new Category(1L, "Updated Category", "Оновлена Категорія", null, null))
+                .location(Location.builder()
+                        .id(1L)
+                        .address("New Address")
+                        .lat(50.45)
+                        .lng(30.52)
+                        .build())
+                .category(Category.builder()
+                        .id(1L)
+                        .name("Updated Category")
+                        .nameUa("Оновлена Категорія")
+                        .build())
                 .openHoursList(List.of(
                         new OpenHours(1L, WeekDay.MONDAY, Time.valueOf("08:00:00"), Time.valueOf("18:00:00"), null, null)
                 ))
@@ -411,7 +433,50 @@ class PlaceServiceImplTest {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(updateDto.getId(), result.getId());
         Assertions.assertEquals(updateDto.getName(), result.getName());
+        Assertions.assertEquals(updateDto.getLocation().getAddress(), result.getLocation().getAddress());
+        Assertions.assertEquals(updateDto.getCategory().getName(), result.getCategory().getName());
         Mockito.verify(placeRepository).save(place);
+    }
+
+    @Test
+    void getPlacesByMapBounds_ValidInput_ShouldReturnPlaces() {
+        List<Place> places = List.of(new Place());
+        List<PlaceByBoundsDto> placeByBoundsDtos = List.of(new PlaceByBoundsDto());
+        FilterPlaceDto validDto = FilterPlaceDto.builder()
+                .mapBoundsDto(MapBoundsDto.builder()
+                        .southWestLat(90.0)
+                        .southWestLng(90.0)
+                        .northEastLat(180.0)
+                        .northEastLng(180.0)
+                        .build())
+                .build();
+
+        when(validator.validate(any(MapBoundsDto.class))).thenReturn(Set.of());
+        when(placeRepository.findPlacesByMapBounds(anyDouble(), anyDouble(), anyDouble(), anyDouble())).thenReturn(places);
+        when(modelMapper.map(any(Place.class), eq(PlaceByBoundsDto.class))).thenReturn(placeByBoundsDtos.get(0));
+        List<PlaceByBoundsDto> result = placeService.getPlacesByMapBounds(validDto);
+        assertEquals(1, result.size());
+        assertEquals(placeByBoundsDtos, result);
+    }
+
+    @Test
+    void getPlacesByMapBounds_NullMapBounds_ShouldThrowException() {
+        FilterPlaceDto dtoWithNull = new FilterPlaceDto();
+
+        BadRequestException exception = assertThrows(BadRequestException.class, () -> placeService.getPlacesByMapBounds(dtoWithNull));
+        assertEquals(ErrorMessage.NULL_MAP_BOUNDS, exception.getMessage());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void getPlacesByMapBounds_InvalidMapBounds_ShouldThrowException() {
+        FilterPlaceDto dto = new FilterPlaceDto();
+        dto.setMapBoundsDto(new MapBoundsDto());
+
+        when(validator.validate(any(MapBoundsDto.class))).thenReturn(Set.of(mock(ConstraintViolation.class)));
+
+        BadRequestException exception = assertThrows(BadRequestException.class, () -> placeService.getPlacesByMapBounds(dto));
+        assertEquals(ErrorMessage.WRONG_MAP_BOUNDS, exception.getMessage());
     }
 }
 
