@@ -33,7 +33,6 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Scheduled(cron = "0 0 0 */7 * *")
     public void scheduledDeleteOfReadNotifications() {
-        //TODO
         List<Notification> notifications = notificationRepo.findAll();
         notifications.forEach(notification -> {
             Date createdAt = notification.getCreatedAt();
