@@ -1,6 +1,7 @@
 package greencity.controller;
 
 import greencity.annotations.CurrentUser;
+import greencity.annotations.NoProfanity;
 import greencity.constant.HttpStatuses;
 import greencity.dto.eventcomment.AddEventCommentDtoRequest;
 import greencity.dto.eventcomment.AddEventCommentDtoResponse;
@@ -43,6 +44,7 @@ public class EventCommentController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(eventCommentService.save(eventId, addEventCommentDtoRequest, currentUser));
     }
+
     @Operation(summary = "Update comment")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
@@ -51,11 +53,12 @@ public class EventCommentController {
             @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
     @PatchMapping
-    public ResponseEntity<?> update(@RequestParam("id") Long id, @RequestParam("text") @NotBlank String text,
-                       @Parameter(hidden = true) @CurrentUser UserVO user) {
+    public ResponseEntity<?> update(@RequestParam("id") Long id, @RequestParam("text") @NotBlank @NoProfanity String text,
+                                    @Parameter(hidden = true) @CurrentUser UserVO user) {
         eventCommentService.update(text, id, user);
         return ResponseEntity.ok().build();
     }
+
     @Operation(summary = "Delete a comment")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
@@ -69,5 +72,19 @@ public class EventCommentController {
             @Parameter(hidden = true) @CurrentUser UserVO user) {
         eventCommentService.delete(id, user);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "Like/dislike comment.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+            @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    })
+    @PostMapping("/like")
+    public ResponseEntity<AddEventCommentDtoResponse> likeUsingPOST2(
+            @RequestParam(name = "commentId") Long commentId,
+            @Parameter(hidden = true) @CurrentUser UserVO currentUser) {
+        return ResponseEntity.ok(eventCommentService.likeEventComment(commentId, currentUser));
     }
 }

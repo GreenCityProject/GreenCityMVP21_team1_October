@@ -1,11 +1,14 @@
 package greencity.dto.event;
 
+import greencity.dto.location.LocationDto;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -29,15 +32,13 @@ public class EventDayDto {
     @Schema(example = "18:00:00", description = "End time for the event")
     private LocalTime eventEndTime;
 
-    @Schema(example = "37.7749", description = "Latitude for the event location")
-    private Double latitude;
-
-    @Schema(example = "-122.4194", description = "Longitude for the event location")
-    private Double longitude;
-
     @Schema(description = "Whether the event is online", example = "false")
+    @NonNull
     private Boolean isOnline;
 
     @Schema(example = "https://example.com/event-link", description = "Online link for virtual events")
     private String onlineLink;
+
+    private LocationDto location;
 }
+

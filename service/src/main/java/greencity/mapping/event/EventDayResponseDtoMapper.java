@@ -2,12 +2,10 @@ package greencity.mapping.event;
 
 import greencity.dto.event.EventDayResponseDto;
 import greencity.entity.EventDay;
-import lombok.RequiredArgsConstructor;
 import org.modelmapper.AbstractConverter;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class EventDayResponseDtoMapper extends AbstractConverter<EventDay, EventDayResponseDto> {
     @Override
     protected EventDayResponseDto convert(EventDay eventDay) {
@@ -18,8 +16,6 @@ public class EventDayResponseDtoMapper extends AbstractConverter<EventDay, Event
                 .eventEndTime(eventDay.getEventEndTime())
                 .isOnline(eventDay.getIsOnline())
                 .onlineLink(eventDay.getOnlineLink())
-                .longitude(eventDay.getLongitude())
-                .latitude(eventDay.getLatitude())
                 .build();
     }
 }
