@@ -37,4 +37,6 @@ public interface PlaceService {
     PlaceWithUserDto proposePlace(PlaceAddDto placeAddDto);
 
     FavoritePlaceDto saveAsFavoritePlace(FavoritePlaceDto favoritePlaceDto);
+
+    PlaceUpdateDto updatePlace(PlaceUpdateDto placeUpdateDto);
 }
