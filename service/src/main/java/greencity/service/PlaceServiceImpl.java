@@ -25,22 +25,23 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import jakarta.validation.Validator;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
+@Log4j2
 @Service
 @AllArgsConstructor
 public class PlaceServiceImpl implements PlaceService {
-    private FavoritePlaceRepository favoritePlaceRepository;
+    private final FavoritePlaceRepository favoritePlaceRepository;
     private PlaceRepository placeRepository;
     private CategoryRepo categoryRepo;
     private LocationRepository locationRepository;
     private ModelMapper modelMapper;
-    private Validator validator;
 
     private PlaceInfoDtoMapper placeInfoDtoMapper;
     private PlaceUpdateDtoMapper placeUpdateDtoMapper;
@@ -76,12 +77,8 @@ public class PlaceServiceImpl implements PlaceService {
 
     @Override
     public List<FilterPlaceCategory> getFilteredPlacesCategories() {
-        return placeRepository.findAll().stream()
-                .map(e -> FilterPlaceCategory.builder()
-                        .id(e.getId())
-                        .name(e.getCategory().getName())
-                        .nameUa(e.getCategory().getNameUa())
-                        .build())
+        return categoryRepo.findAll().stream()
+                .map(e -> modelMapper.map(e, FilterPlaceCategory.class))
                 .toList();
     }
 
@@ -121,20 +118,7 @@ public class PlaceServiceImpl implements PlaceService {
 
     @Override
     public List<PlaceByBoundsDto> getPlacesByMapBounds(FilterPlaceDto dto) {
-        if (dto.getMapBoundsDto() == null) {
-            throw new BadRequestException(ErrorMessage.NULL_MAP_BOUNDS);
-        }
-        if (!validator.validate(dto.getMapBoundsDto()).isEmpty()) {
-            throw new BadRequestException(ErrorMessage.WRONG_MAP_BOUNDS);
-        }
-        return placeRepository.findPlacesByMapBounds(
-                        dto.getMapBoundsDto().getSouthWestLat(),
-                        dto.getMapBoundsDto().getNorthEastLat(),
-                        dto.getMapBoundsDto().getSouthWestLng(),
-                        dto.getMapBoundsDto().getNorthEastLng())
-                .stream()
-                .map(e -> modelMapper.map(e, PlaceByBoundsDto.class))
-                .toList();
+        return List.of();
     }
 
     @Override
@@ -244,5 +228,53 @@ public class PlaceServiceImpl implements PlaceService {
 
     PlaceSpecification getSpecification(FilterPlaceDto filterPlaceDto) {
         return new PlaceSpecification(modelMapper.map(filterPlaceDto, FilterPlace.class));
+    }
+
+    @Override
+    @Transactional
+    public PlaceUpdateDto updatePlace(PlaceUpdateDto placeUpdateDto) {
+        Place place = placeRepository.findById(placeUpdateDto.getId())
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.PLACE_NOT_FOUND_BY_ID + placeUpdateDto.getId()));
+
+        log.info("Updating place with ID {}", place.getId());
+
+        place.setName(placeUpdateDto.getName());
+        place.setCategory(modelMapper.map(placeUpdateDto.getCategory(), Category.class));
+        place.setLocation(modelMapper.map(placeUpdateDto.getLocation(), Location.class));
+
+        updateCollections(place, placeUpdateDto);
+
+        if (placeUpdateDto.getLocationAddressAndGeoForUpdate() != null) {
+            updateGeoData(place, placeUpdateDto.getLocationAddressAndGeoForUpdate());
+        }
+
+        Place updatedPlace = placeRepository.save(place);
+        log.info("Place with ID {} successfully updated", updatedPlace.getId());
+        return placeUpdateDtoMapper.convert(updatedPlace);
+    }
+
+    private void updateCollections(Place place, PlaceUpdateDto dto) {
+        if (dto.getOpeningHoursList() != null) {
+            List<OpenHours> openHoursList = dto.getOpeningHoursList().stream()
+                    .map(openingHoursDto -> modelMapper.map(openingHoursDto, OpenHours.class))
+                    .toList();
+            place.setOpenHoursList(openHoursList);
+        }
+
+        if (dto.getDiscountValues() != null) {
+            List<DiscountValue> discountValues = dto.getDiscountValues().stream()
+                    .map(discountValueDto -> modelMapper.map(discountValueDto, DiscountValue.class))
+                    .toList();
+            place.setDiscountValues(discountValues);
+        }
+    }
+
+    private void updateGeoData(Place place, LocationAddressAndGeoForUpdateDto geoDto) {
+        if (place.getLocation() == null) {
+            place.setLocation(new Location());
+        }
+        place.getLocation().setAddress(geoDto.getAddress());
+        place.getLocation().setLat(geoDto.getLat());
+        place.getLocation().setLng(geoDto.getLng());
     }
 }

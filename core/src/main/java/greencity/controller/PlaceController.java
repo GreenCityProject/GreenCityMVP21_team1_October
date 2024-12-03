@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -221,5 +222,18 @@ public class PlaceController {
             @PathVariable("placeId") Long placeId
     ) {
         return ResponseEntity.ok(favoritePlaceService.getFavoritePlaceInfoByUserAndPlaceId(userVO, placeId));
+    }
+
+    @Operation(summary = "Update place by id.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND),
+            @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
+    })
+    @PutMapping("/update")
+    public ResponseEntity<PlaceUpdateDto> updatePlace(
+            @Valid @RequestBody PlaceUpdateDto placeUpdateDto) {
+        return ResponseEntity.ok(placeService.updatePlace(placeUpdateDto));
     }
 }

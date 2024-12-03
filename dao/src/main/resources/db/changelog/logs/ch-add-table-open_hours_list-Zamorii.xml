@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.15.xsd">
+
+    <changeSet id="create-table-open_hours_list" author="Serhii Zamorii">
+        <createTable tableName="open_hours_list">
+            <column name="id" type="bigserial">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="close_time" type="time(6)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="open_time" type="time(6)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="week_day" type="int2">
+                <constraints nullable="false" checkConstraint="CHECK (week_day &gt;= 0 AND week_day &lt;= 6)"/>
+            </column>
+            <column name="place_id" type="int8">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="open_hours_list" baseColumnNames="place_id"
+                                 constraintName="fkpvr31ndmire4cdewepr21h8ho" referencedTableName="places"
+                                 referencedColumnNames="id" onDelete="CASCADE"/>
+    </changeSet>
+</databaseChangeLog>

@@ -60,7 +60,7 @@ public class EventController {
         @PathVariable Long eventId,
         @RequestPart(required = false) @Nullable MultipartFile[] file) {
 
-        return ResponseEntity.ok().body(eventService.update(requestDto, eventId, userVO.getName(), file));
+        return ResponseEntity.ok().body(eventService.update(requestDto, eventId, userVO.getEmail(), file));
     }
 
 
@@ -90,7 +90,7 @@ public class EventController {
     public ResponseEntity<Void> deleteEvent(
             @PathVariable Long eventId,
             @Parameter(hidden = true) @CurrentUser UserVO userVO) {
-        UserVO currentUser = userService.findByEmail(userVO.getName());
+        UserVO currentUser = userService.findByEmail(userVO.getEmail());
         Long userId = currentUser.getId();
         eventService.deleteEvent(eventId, userId);
         return ResponseEntity.ok().build();
@@ -107,13 +107,13 @@ public class EventController {
             @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN,
                     content = @Content(examples = @ExampleObject(HttpStatuses.FORBIDDEN)))
     })
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<EventResponseDto> save(
             @Parameter(required = true) @EventValidation @RequestPart EventRequestDto eventRequestDto,
                                                  @Parameter(hidden = true) @CurrentUser UserVO userVO,
                                                  @RequestPart(required = false) @Nullable MultipartFile[] files) {
         return ResponseEntity.status(HttpStatus.CREATED).body(eventService.save(eventRequestDto,
-                userVO.getName(),
+                userVO.getEmail(),
                 files));
     }
 }
