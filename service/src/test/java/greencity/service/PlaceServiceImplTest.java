@@ -1,6 +1,7 @@
 package greencity.service;
 
 import greencity.ModelUtils;
+import greencity.constant.ErrorMessage;
 import greencity.dto.PageableDto;
 import greencity.dto.place.*;
 import greencity.dto.user.UserVO;
@@ -17,6 +18,8 @@ import greencity.mapping.PlaceUpdateDtoMapper;
 import greencity.repository.CategoryRepo;
 import greencity.repository.LocationRepository;
 import greencity.repository.PlaceRepository;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -30,9 +33,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.sql.Time;
 import java.time.LocalTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -60,6 +61,9 @@ class PlaceServiceImplTest {
 
     @Mock
     private PlaceUpdateDtoMapper placeUpdateDtoMapper;
+
+    @Mock
+    private Validator validator;
 
     @Test
     void getPlaceInfoTest() {
@@ -338,6 +342,47 @@ class PlaceServiceImplTest {
 
         verify(placeRepository, times(1)).findById(placeId);
         verify(placeRepository, never()).save(any(Place.class));
+    }
+
+    @Test
+    void getPlacesByMapBounds_ValidInput_ShouldReturnPlaces() {
+        List<Place> places = List.of(new Place());
+        List<PlaceByBoundsDto> placeByBoundsDtos = List.of(new PlaceByBoundsDto());
+        FilterPlaceDto validDto = FilterPlaceDto.builder()
+                .mapBoundsDto(MapBoundsDto.builder()
+                        .southWestLat(90.0)
+                        .southWestLng(90.0)
+                        .northEastLat(180.0)
+                        .northEastLng(180.0)
+                        .build())
+                .build();
+
+        when(validator.validate(any(MapBoundsDto.class))).thenReturn(Set.of());
+        when(placeRepository.findPlacesByMapBounds(anyDouble(), anyDouble(), anyDouble(), anyDouble())).thenReturn(places);
+        when(modelMapper.map(any(Place.class), eq(PlaceByBoundsDto.class))).thenReturn(placeByBoundsDtos.get(0));
+        List<PlaceByBoundsDto> result = placeService.getPlacesByMapBounds(validDto);
+        assertEquals(1, result.size());
+        assertEquals(placeByBoundsDtos, result);
+    }
+
+    @Test
+    void getPlacesByMapBounds_NullMapBounds_ShouldThrowException() {
+        FilterPlaceDto dtoWithNull = new FilterPlaceDto();
+
+        BadRequestException exception = assertThrows(BadRequestException.class, () -> placeService.getPlacesByMapBounds(dtoWithNull));
+        assertEquals(ErrorMessage.NULL_MAP_BOUNDS, exception.getMessage());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void getPlacesByMapBounds_InvalidMapBounds_ShouldThrowException() {
+        FilterPlaceDto dto = new FilterPlaceDto();
+        dto.setMapBoundsDto(new MapBoundsDto());
+
+        when(validator.validate(any(MapBoundsDto.class))).thenReturn(Set.of(mock(ConstraintViolation.class)));
+
+        BadRequestException exception = assertThrows(BadRequestException.class, () -> placeService.getPlacesByMapBounds(dto));
+        assertEquals(ErrorMessage.WRONG_MAP_BOUNDS, exception.getMessage());
     }
 }
 

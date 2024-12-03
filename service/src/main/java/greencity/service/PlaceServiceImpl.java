@@ -20,25 +20,27 @@ import greencity.repository.FavoritePlaceRepository;
 import greencity.repository.LocationRepository;
 import greencity.repository.PlaceRepository;
 import jakarta.transaction.Transactional;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import jakarta.validation.Validator;
 import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-@Log4j2
 @Service
 @AllArgsConstructor
 public class PlaceServiceImpl implements PlaceService {
-    private final FavoritePlaceRepository favoritePlaceRepository;
+    private FavoritePlaceRepository favoritePlaceRepository;
     private PlaceRepository placeRepository;
     private CategoryRepo categoryRepo;
     private LocationRepository locationRepository;
     private ModelMapper modelMapper;
+    private Validator validator;
 
     private PlaceInfoDtoMapper placeInfoDtoMapper;
     private PlaceUpdateDtoMapper placeUpdateDtoMapper;
@@ -118,6 +120,24 @@ public class PlaceServiceImpl implements PlaceService {
     }
 
     @Override
+    public List<PlaceByBoundsDto> getPlacesByMapBounds(FilterPlaceDto dto) {
+        if (dto.getMapBoundsDto() == null) {
+            throw new BadRequestException(ErrorMessage.NULL_MAP_BOUNDS);
+        }
+        if (!validator.validate(dto.getMapBoundsDto()).isEmpty()) {
+            throw new BadRequestException(ErrorMessage.WRONG_MAP_BOUNDS);
+        }
+        return placeRepository.findPlacesByMapBounds(
+                        dto.getMapBoundsDto().getSouthWestLat(),
+                        dto.getMapBoundsDto().getNorthEastLat(),
+                        dto.getMapBoundsDto().getSouthWestLng(),
+                        dto.getMapBoundsDto().getNorthEastLng())
+                .stream()
+                .map(e -> modelMapper.map(e, PlaceByBoundsDto.class))
+                .toList();
+    }
+
+    @Override
     @Transactional
     public PlaceWithUserDto proposePlace(PlaceAddDto placeAddDto) {
         if (placeRepository.findPlaceByName(placeAddDto.getName()).isPresent()) {
@@ -169,10 +189,10 @@ public class PlaceServiceImpl implements PlaceService {
         place.setAuthor(modelMapper.map(userVO, User.class));
         place.setStatus(PlaceStatus.APPROVED);
         place.setOpenHoursList(
-            placeDto.getOpeningHoursList()
-                .stream()
-                .map(row -> modelMapper.map(row, OpenHours.class).setPlace(place))
-                .toList());
+                placeDto.getOpeningHoursList()
+                        .stream()
+                        .map(row -> modelMapper.map(row, OpenHours.class).setPlace(place))
+                        .toList());
 
         //todo: provide separate service for converting address to geo lat and lng
         Location location = locationRepository.save(Location
@@ -192,7 +212,7 @@ public class PlaceServiceImpl implements PlaceService {
     @Override
     public List<FilterPlaceResponseDto> getFilteredPlaces(FilterPlaceDto filterPlaceDto, UserVO userVO) {
         return placeRepository.findAll(getSpecification(filterPlaceDto)).stream()
-            .map(place -> modelMapper.map(place, FilterPlaceResponseDto.class)).toList();
+                .map(place -> modelMapper.map(place, FilterPlaceResponseDto.class)).toList();
     }
 
     @Override
@@ -207,19 +227,19 @@ public class PlaceServiceImpl implements PlaceService {
 
     @Override
     public PageableDto<FilterPlaceResponseDto> getFilteredPlaces(FilterPlaceDto filterPlaceDto, UserVO userVO,
-                                                                         Pageable page) {
+                                                                 Pageable page) {
         Page<Place> pageWithPlaces = placeRepository.findAll(getSpecification(filterPlaceDto), page);
         return PageableDto.<FilterPlaceResponseDto>builder()
-            .currentPage(pageWithPlaces.getNumber())
-            .totalElements(pageWithPlaces.getTotalElements())
-            .totalPages(pageWithPlaces.getTotalPages())
-            .page(
-                pageWithPlaces
-                    .getContent()
-                    .stream()
-                    .map(place -> modelMapper.map(place, FilterPlaceResponseDto.class))
-                    .toList())
-            .build();
+                .currentPage(pageWithPlaces.getNumber())
+                .totalElements(pageWithPlaces.getTotalElements())
+                .totalPages(pageWithPlaces.getTotalPages())
+                .page(
+                        pageWithPlaces
+                                .getContent()
+                                .stream()
+                                .map(place -> modelMapper.map(place, FilterPlaceResponseDto.class))
+                                .toList())
+                .build();
     }
 
     PlaceSpecification getSpecification(FilterPlaceDto filterPlaceDto) {
