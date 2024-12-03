@@ -199,6 +199,7 @@ public class NotificationServiceImplTest {
 
         assertArrayEquals(expected, actual);
     }
+
     @Test
     void sendCancellationNotificationTest() {
         EventVO eventVO = new EventVO();
@@ -211,6 +212,7 @@ public class NotificationServiceImplTest {
 
         verify(notificationRepo, times(1)).save(any());
     }
+
     @Test
     void sendCancellationNotificationTest_VerifyContent() {
         EventVO eventVO = new EventVO();
@@ -225,5 +227,54 @@ public class NotificationServiceImplTest {
                 notification.getContent().contains("The event \"Test Event\" scheduled for") &&
                         notification.getContent().contains("was cancelled.")
         ));
+    }
+
+    @Test
+    void sendEventUpdateNotificationsTest_TitleChanged() {
+        EventVO oldEventVO = new EventVO();
+        oldEventVO.setTitle("Old Event");
+        EventVO newEventVO = new EventVO();
+        newEventVO.setTitle("New Event");
+        UserVO user1 = new UserVO();
+        user1.setId(1L);
+        UserVO user2 = new UserVO();
+        user2.setId(2L);
+
+        List<UserVO> users = List.of(user1, user2);
+        notificationServiceImpl.sendEventUpdateNotifications(oldEventVO, newEventVO, users);
+        verify(notificationRepo, times(2)).save(any());
+    }
+
+    @Test
+    void sendEventUpdateNotificationsTest_VerifyContent() {
+        EventVO oldEventVO = new EventVO();
+        oldEventVO.setTitle("Old Event");
+        EventVO newEventVO = new EventVO();
+        newEventVO.setTitle("New Event");
+        UserVO user1 = new UserVO();
+        user1.setId(1L);
+        UserVO user2 = new UserVO();
+        user2.setId(2L);
+
+        List<UserVO> users = List.of(user1, user2);
+        notificationServiceImpl.sendEventUpdateNotifications(oldEventVO, newEventVO, users);
+        verify(notificationRepo, times(2)).save(Mockito.argThat(notification ->
+                notification.getContent().contains("Event \"Old Event\" was updated.") &&
+                        notification.getContent().contains("New name is New Event.")
+        ));
+    }
+
+    @Test
+    void sendEventUpdateNotificationsTest_NoUpdate() {
+        EventVO oldEventVO = new EventVO();
+        oldEventVO.setTitle("Same Event");
+        EventVO newEventVO = new EventVO();
+        newEventVO.setTitle("Same Event");
+        UserVO user = new UserVO();
+        user.setId(1L);
+
+        List<UserVO> users = List.of(user);
+        notificationServiceImpl.sendEventUpdateNotifications(oldEventVO, newEventVO, users);
+        verify(notificationRepo, times(0)).save(any());
     }
 }

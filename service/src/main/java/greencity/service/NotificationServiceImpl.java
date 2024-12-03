@@ -299,21 +299,21 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void sendEventUpdateNotifications(EventVO oldEvent, EventVO newEvent, List<UserVO> users) {
-
-        String content;
+        String content = null;
         String formattedDateTime = NotificationContentFormatterImpl.formatCancellationDateTime(new Date());
 
         if (!oldEvent.getTitle().equals(newEvent.getTitle())) {
             content = "Event \"" + oldEvent.getTitle() + "\" was updated. New name is " + newEvent.getTitle() + ". " + formattedDateTime;
-        }else {content = "zero";}
+        }
 
         if (content != null && !content.isEmpty()) {
+            String finalContent = content;
             users.forEach(user -> {
                 save(
                         user.getId(),
                         NotificationOrigin.GREEN_CITY,
                         NotificationType.EVENT_UPDATED,
-                        content
+                        finalContent
                 );
             });
         }
