@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.15.xsd">
+
+    <changeSet id="create-table-places" author="Serhii Zamorii">
+        <createTable tableName="places">
+            <column name="id" type="bigserial">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(30)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="rate" type="float8">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="int2">
+                <constraints nullable="false" checkConstraint="CHECK (status &gt;= 0 AND status &lt;= 3)"/>
+            </column>
+            <column name="author_id" type="int8">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category_id" type="int8">
+                <constraints nullable="false"/>
+            </column>
+            <column name="location_id" type="int8">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_favorite" type="boolean" defaultValue="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint columnNames="name" tableName="places" constraintName="uk_i75c5u2dcpm62wu3biuxvo3ab"/>
+        <addForeignKeyConstraint baseTableName="places" baseColumnNames="location_id" referencedTableName="locations"
+                                 referencedColumnNames="id" constraintName="fk4srnnx3hx6w5bdwgt69nr6aa6"
+                                 onDelete="RESTRICT"/>
+        <addForeignKeyConstraint baseTableName="places" baseColumnNames="category_id" referencedTableName="categories"
+                                 referencedColumnNames="id" constraintName="fkca17w9kt9f18v0lr91ssmivx5"
+                                 onDelete="RESTRICT"/>
+        <addForeignKeyConstraint baseTableName="places" baseColumnNames="author_id" referencedTableName="users"
+                                 referencedColumnNames="id" constraintName="fkepxmhjyl0uydr0qj45bhoxytw"
+                                 onDelete="RESTRICT"/>
+    </changeSet>
+</databaseChangeLog>
