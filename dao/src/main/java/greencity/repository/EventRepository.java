@@ -14,5 +14,5 @@ public interface EventRepository extends JpaRepository<Event, Long> {
      */
     @Modifying
     @Query(value = "DELETE FROM event_days WHERE id = :id", nativeQuery = true)
-    void deleteEventDayByEventId(Long id);
+    void deleteEventDayById(Long id);
 }

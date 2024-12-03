@@ -6,18 +6,23 @@ import greencity.dto.event.EventDetailsUpdate;
 import greencity.dto.event.EventVO;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserHasNoPermissionToAccessException;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface EventService {
+    @Transactional
+    EventResponseDto update(EventDetailsUpdate requestDto, String email, MultipartFile[] files);
+
     /**
      * Method for updating user event {@link EventResponseDto}.
      *
      * @param requestDto - event update.
+     * @param eventId    - event id
      * @param email      - user that edits the event.
      * @param files      - new event images.
      * @return EventResponseDto.
      */
-    EventResponseDto update(EventDetailsUpdate requestDto, String email, MultipartFile[] files);
+    EventResponseDto update(EventDetailsUpdate requestDto, Long eventId, String email, MultipartFile[] files);
 
     /**
      * Method for deleting an event.

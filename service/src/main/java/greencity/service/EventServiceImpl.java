@@ -107,7 +107,7 @@ public class EventServiceImpl implements EventService {
                     .filter(day -> daysToUpdate.stream()
                             .noneMatch(newDay -> newDay.getId().equals(day.getId())))
                     .toList();
-            toRemove.forEach(day -> eventRepo.deleteEventDayByEventId(day.getId()));
+            toRemove.forEach(day -> eventRepo.deleteEventDayById(day.getId()));
 
             eventToUpdate.setEventDays(daysToUpdate);
         }
@@ -153,6 +153,25 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional
+    public EventResponseDto update(EventDetailsUpdate requestDto, Long eventId, String email, MultipartFile[] files) {
+        Event eventToUpdate = eventRepo.findById(eventId)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.EVENT_NOT_FOUND));
+        User organizer = modelMapper.map(restClient.findByEmail(email), User.class);
+
+        if (!organizer.getId().equals(eventToUpdate.getOrganizer().getId())
+                && organizer.getRole() != Role.ROLE_ADMIN) {
+            throw new UserHasNoPermissionToAccessException(ErrorMessage.USER_HAS_NO_PERMISSION);
+        }
+
+        updateEvent(requestDto, eventToUpdate);
+        updateEventDay(requestDto, eventToUpdate);
+        updateAdditionalImages(requestDto, files, eventToUpdate);
+
+        Event saved = eventRepo.save(eventToUpdate);
+        return modelMapper.map(saved, EventResponseDto.class);
+    }
+    @Override
+    @Transactional
     public void deleteEvent(Long eventId, Long userId) {
         Event event = eventRepo.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event not found with ID: " + eventId));
@@ -172,7 +191,7 @@ public class EventServiceImpl implements EventService {
         }
 
         eventImagesRepo.deleteEventImagesByEvent_Id(eventId);
-        eventRepo.deleteEventDayByEventId(eventId);
+        eventRepo.deleteEventDayById(eventId);
         eventRepo.delete(event);
     }
 

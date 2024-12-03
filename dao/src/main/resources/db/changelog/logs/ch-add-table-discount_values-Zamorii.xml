@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.15.xsd">
+
+    <changeSet id="create-table-discount_values" author="Serhii Zamorii">
+        <createTable tableName="discount_values">
+            <column name="id" type="bigserial">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="value" type="int4">
+                <constraints nullable="false" checkConstraint="CHECK (value &gt;= 0 AND value &lt;= 100)"/>
+            </column>
+            <column name="place_id" type="int8">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="discount_values" baseColumnNames="place_id"
+                                 constraintName="fk933o465l1vm9louyi2y37ripr" referencedTableName="places"
+                                 referencedColumnNames="id" onDelete="CASCADE"/>
+    </changeSet>
+</databaseChangeLog>
