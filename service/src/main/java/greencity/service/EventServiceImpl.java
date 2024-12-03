@@ -2,17 +2,27 @@ package greencity.service;
 
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
+import greencity.dto.event.EventDayDto;
 import greencity.dto.event.EventDetailsUpdate;
 import greencity.dto.event.EventRequestDto;
 import greencity.dto.event.EventResponseDto;
+import greencity.dto.event.EventDetailsUpdate;
 import greencity.dto.event.EventVO;
-import greencity.entity.*;
+import greencity.dto.location.LocationDto;
+import greencity.entity.Event;
+import greencity.entity.EventDay;
+import greencity.entity.EventImages;
+import greencity.entity.Location;
+import greencity.entity.Tag;
+import greencity.entity.User;
 import greencity.enums.Role;
 import greencity.enums.TagType;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserHasNoPermissionToAccessException;
+import greencity.repository.EventDayRepository;
 import greencity.repository.EventImagesRepository;
 import greencity.repository.EventRepository;
+import greencity.repository.LocationRepository;
 import greencity.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -20,7 +30,6 @@ import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -37,20 +46,21 @@ public class EventServiceImpl implements EventService {
     private final FileService fileService;
     private final TagsService tagsService;
     private final UserRepo userRepo;
-//    private final NotificationService notificationService;
+    private final LocationRepository locationRepo;
+    private final EventDayRepository eventDayRepo;
 
     /**
      * {@inheritDoc}
      */
     @Override
     @Transactional
-    public EventResponseDto update(EventDetailsUpdate requestDto, String email, MultipartFile[] files) {
-        Event eventToUpdate = eventRepo.findById(requestDto.getId())
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.EVENT_NOT_FOUND));
+    public EventResponseDto update(EventDetailsUpdate requestDto, Long eventId, String email, MultipartFile[] files) {
+        Event eventToUpdate = eventRepo.findById(eventId)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.EVENT_NOT_FOUND));
         User organizer = modelMapper.map(restClient.findByEmail(email), User.class);
 
         if (!organizer.getId().equals(eventToUpdate.getOrganizer().getId())
-            && organizer.getRole() != Role.ROLE_ADMIN) {
+                && organizer.getRole() != Role.ROLE_ADMIN) {
             throw new UserHasNoPermissionToAccessException(ErrorMessage.USER_HAS_NO_PERMISSION);
         }
 
@@ -77,8 +87,7 @@ public class EventServiceImpl implements EventService {
 
         if (requestDto.getTags() != null) {
             eventToUpdate.setTags(modelMapper.map(tagsService.findTagsWithAllTranslationsByNamesAndType(
-                    requestDto.getTags(), TagType.EVENT), new TypeToken<List<Tag>>() {
-            }.getType()));
+                    requestDto.getTags(), TagType.EVENT), new TypeToken<List<Tag>>(){}.getType()));
         }
     }
 
@@ -88,18 +97,52 @@ public class EventServiceImpl implements EventService {
                     .map(eventDayDto -> {
                         EventDay eventDay = modelMapper.map(eventDayDto, EventDay.class);
                         eventDay.setEvent(eventToUpdate);
+                        updateLocation(eventDayDto, eventDay);
                         return eventDay;
                     })
-                    .collect(Collectors.toList());
-
-            List<EventDay> toRemove = eventToUpdate.getEventDays().stream()
-                    .filter(day -> daysToUpdate.stream()
-                            .noneMatch(newDay -> newDay.getId().equals(day.getId())))
                     .toList();
-            toRemove.forEach(day -> eventRepo.deleteEventDayByEventId(day.getId()));
 
-            eventToUpdate.setEventDays(daysToUpdate);
+            removeEventDays(requestDto, eventToUpdate);
+
+            eventToUpdate.getEventDays().clear();
+            eventToUpdate.getEventDays().addAll(daysToUpdate);
         }
+    }
+
+    private void updateLocation(EventDayDto eventDayDto, EventDay eventDay) {
+        if (!eventDayDto.getIsOnline()) {
+            Location location = findOrCreateLocation(eventDayDto.getLocation());
+            eventDay.setLocation(location);
+        } else {
+            eventDay.setLocation(null);
+        }
+    }
+
+    private void removeEventDays(EventDetailsUpdate requestDto, Event eventToUpdate) {
+        Set<Long> eventDayIdsInRequest = requestDto.getEventDays().stream()
+                .filter(eventDayDto -> eventDayDto.getId() != null)
+                .map(EventDayDto::getId)
+                .collect(Collectors.toSet());
+
+        List<EventDay> toRemove = eventToUpdate.getEventDays().stream()
+                .filter(day -> !eventDayIdsInRequest.contains(day.getId()))
+                .toList();
+        toRemove.forEach(day -> {
+            eventToUpdate.getEventDays().remove(day);
+            eventDayRepo.deleteById(day.getId());
+        });
+    }
+
+    private Location findOrCreateLocation(LocationDto address) {
+        return locationRepo.findByAddress(address.getAddress())
+                .orElseGet(() -> {
+                    Location newLocation = Location.builder()
+                            .address(address.getAddress())
+                            .lat(address.getLat())
+                            .lng(address.getLng())
+                            .build();
+                    return locationRepo.save(newLocation);
+                });
     }
 
     private void updateAdditionalImages(EventDetailsUpdate requestDto, MultipartFile[] files, Event eventToUpdate) {
@@ -108,7 +151,7 @@ public class EventServiceImpl implements EventService {
 
         List<EventImages> imagesToDelete = imagesFromDb.stream()
                 .filter(image -> !requestLinks.contains(image.getLink()))
-                .collect(Collectors.toList());
+                .toList();
         imagesToDelete.forEach(image -> fileService.delete(image.getLink()));
 
         if (!imagesToDelete.isEmpty()) {
@@ -118,7 +161,6 @@ public class EventServiceImpl implements EventService {
         List<EventImages> imagesToKeep = imagesFromDb.stream()
                 .filter(image -> requestLinks.contains(image.getLink()))
                 .collect(Collectors.toList());
-
         eventToUpdate.setAdditionalImages(imagesToKeep);
         uploadFilesAndCreatingLinks(requestDto, files, eventToUpdate);
     }
@@ -145,12 +187,12 @@ public class EventServiceImpl implements EventService {
     public void deleteEvent(Long eventId, Long userId) {
         Event event = eventRepo.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event not found with ID: " + eventId));
-        if (!event.getOrganizer().getId().equals(userId) && !isAdmin(userId)) {
+        if(!event.getOrganizer().getId().equals(userId) && !isAdmin(userId)) {
             throw new UserHasNoPermissionToAccessException("You do not have permission to delete this event.");
         }
 
         eventImagesRepo.deleteEventImagesByEvent_Id(eventId);
-        eventRepo.deleteEventDayByEventId(eventId);
+        eventRepo.deleteEventDayById(eventId);
 
 //        notificationSrvice.notifyAttendees(event.getAttendants(), "The event has been deleted");
         eventRepo.delete(event);
@@ -158,8 +200,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventVO findById(long eventId) {
-        return modelMapper.map(eventRepo.findById(eventId).orElseThrow(
-                () -> new NotFoundException("Event not found by this id")), EventVO.class);
+        return null;
     }
 
     @Override
@@ -190,7 +231,7 @@ public class EventServiceImpl implements EventService {
 
     private boolean isAdmin(Long userId) {
         return userRepo.findById(userId)
-                       .map(User::getRole)
-                       .orElse(Role.ROLE_USER) == Role.ROLE_ADMIN;
+                .map(User::getRole)
+                .orElse(Role.ROLE_USER) == Role.ROLE_ADMIN;
     }
 }

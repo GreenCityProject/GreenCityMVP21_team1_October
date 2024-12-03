@@ -1,13 +1,12 @@
 package greencity.controller;
 
+import greencity.annotations.CurrentUser;
 import greencity.annotations.EventValidation;
-import greencity.constant.ErrorMessage;
 import greencity.constant.HttpStatuses;
 import greencity.dto.event.EventDetailsUpdate;
 import greencity.dto.event.EventRequestDto;
 import greencity.dto.event.EventResponseDto;
 import greencity.dto.user.UserVO;
-import greencity.exception.exceptions.WrongIdException;
 import greencity.service.EventService;
 import greencity.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,6 +17,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.annotation.Nullable;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,8 +25,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.security.Principal;
 
 @RestController
 @RequestMapping("/events")
@@ -57,16 +55,12 @@ public class EventController {
     })
     @PutMapping(value = "/{eventId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<EventResponseDto> update(
-            @Parameter(required = true) @EventValidation @RequestPart EventDetailsUpdate requestDto,
-            @Parameter(hidden = true) Principal principal,
-            @PathVariable Long eventId,
-            @RequestPart(required = false) @Nullable MultipartFile[] file) {
+        @Parameter(required = true) @Valid @RequestPart EventDetailsUpdate requestDto,
+        @Parameter(hidden = true) @CurrentUser UserVO userVO,
+        @PathVariable Long eventId,
+        @RequestPart(required = false) @Nullable MultipartFile[] file) {
 
-        if (!eventId.equals(requestDto.getId())) {
-            throw new WrongIdException(ErrorMessage.EVENT_ID_IN_PATH_PARAM_AND_ENTITY_NOT_EQUAL);
-        }
-
-        return ResponseEntity.ok().body(eventService.update(requestDto, principal.getName(), file));
+        return ResponseEntity.ok().body(eventService.update(requestDto, eventId, userVO.getName(), file));
     }
 
 
@@ -75,7 +69,7 @@ public class EventController {
      * This endpoint allows an Admin or the Organizer of the event to delete it.
      *
      * @param eventId   ID of the event to be deleted.
-     * @param principal the currently authenticated user.
+     * @param userVO the currently authenticated user.
      * @return {@link ResponseEntity<Void>}
      * @author Belchuk Stanislav
      */
@@ -95,8 +89,8 @@ public class EventController {
     @DeleteMapping("/{eventId}")
     public ResponseEntity<Void> deleteEvent(
             @PathVariable Long eventId,
-            @Parameter(hidden = true) Principal principal) {
-        UserVO currentUser = userService.findByEmail(principal.getName());
+            @Parameter(hidden = true) @CurrentUser UserVO userVO) {
+        UserVO currentUser = userService.findByEmail(userVO.getName());
         Long userId = currentUser.getId();
         eventService.deleteEvent(eventId, userId);
         return ResponseEntity.ok().build();
@@ -116,10 +110,10 @@ public class EventController {
     @PostMapping
     public ResponseEntity<EventResponseDto> save(
             @Parameter(required = true) @EventValidation @RequestPart EventRequestDto eventRequestDto,
-                                                 @Parameter(hidden = true) Principal principal,
+                                                 @Parameter(hidden = true) @CurrentUser UserVO userVO,
                                                  @RequestPart(required = false) @Nullable MultipartFile[] files) {
         return ResponseEntity.status(HttpStatus.CREATED).body(eventService.save(eventRequestDto,
-                principal.getName(),
+                userVO.getName(),
                 files));
     }
 }
