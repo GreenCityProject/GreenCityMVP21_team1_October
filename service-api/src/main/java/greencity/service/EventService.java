@@ -1,10 +1,13 @@
 package greencity.service;
 
 import greencity.dto.event.*;
+import greencity.dto.user.UserVO;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserHasNoPermissionToAccessException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 public interface EventService {
     /**
@@ -55,7 +58,7 @@ public interface EventService {
      */
     PageableAdvancedDtoOfEventDto getAllEvents(Pageable pageable);
 
-    PageableAdvancedDtoOfEventDto getFilteredEvents(Pageable pageable, String eventTime);
+    PageableAdvancedDtoOfEventDto getFilteredEvents(Pageable pageable, String eventTime, String location, List<String> tags, String status, UserVO currentUser);
 
     EventResponseDto save(EventRequestDto eventRequestDto, String email, MultipartFile[] files);
 }

@@ -1,5 +1,6 @@
 package greencity.controller;
 
+import greencity.annotations.CurrentUser;
 import greencity.annotations.EventValidation;
 import greencity.constant.ErrorMessage;
 import greencity.constant.HttpStatuses;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/events")
@@ -59,20 +61,21 @@ public class EventController {
             @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Number of records per page [1..100]. If size is less than 1 or not specified, default value is used (5).")
             @RequestParam(defaultValue = "5") int size,
-            @RequestParam(required = false) String eventTime) {
+            @RequestParam(required = false) String eventTime,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) List<String> tags,
+            @RequestParam(required = false) String status,
+            @Parameter(hidden = true) @CurrentUser UserVO currentUser) {
 
-        page = Math.max(page, 0);
-        size = Math.min(Math.max(size, 1), 100);
+        if (currentUser == null && status != null &&
+                !status.equalsIgnoreCase("Open") && !status.equalsIgnoreCase("Closed")) {
+            throw new IllegalArgumentException("Only 'Open' and 'Closed' statuses are allowed for unauthenticated users.");
+        }
 
         Pageable pageable = PageRequest.of(page, size);
 
-        PageableAdvancedDtoOfEventDto result;
-
-        if (eventTime != null) {
-            result = eventService.getFilteredEvents(pageable, eventTime);
-        } else {
-            result = eventService.getAllEvents(pageable);
-        }
+        PageableAdvancedDtoOfEventDto result = eventService.getFilteredEvents(
+                pageable, eventTime, location, tags, status, currentUser);
 
         return ResponseEntity.ok(result);
     }

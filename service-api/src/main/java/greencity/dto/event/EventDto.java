@@ -16,9 +16,9 @@ public class EventDto {
     private Long id;
     private String title;
     private String description;
-    private Boolean isFavorite;
-    private Boolean isSubscribed;
-    private Boolean open;
+//    private Boolean isFavorite;
+//    private Boolean isSubscribed;
+    private Boolean isOpen;
     private List<TagUaEnDto> tags;
     private String titleImage;
     private List<String> additionalImages;
