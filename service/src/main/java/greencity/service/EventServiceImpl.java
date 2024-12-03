@@ -52,6 +52,7 @@ public class EventServiceImpl implements EventService {
             throw new UserHasNoPermissionToAccessException(ErrorMessage.USER_HAS_NO_PERMISSION);
         }
         Event oldEvent = new Event();
+        modelMapper.map(eventToUpdate, oldEvent);
 
         updateEvent(requestDto, eventToUpdate);
         updateEventDay(requestDto, eventToUpdate);
@@ -72,7 +73,6 @@ public class EventServiceImpl implements EventService {
 
         return modelMapper.map(saved, EventResponseDto.class);
     }
-
     private void updateEvent(EventDetailsUpdate requestDto, Event eventToUpdate) {
         if (requestDto.getTitle() != null) {
             eventToUpdate.setTitle(requestDto.getTitle());

@@ -57,7 +57,7 @@ public class EventController {
     })
     @PutMapping(value = "/{eventId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<EventResponseDto> update(
-            @Parameter(required = true) @EventValidation @RequestPart EventDetailsUpdate requestDto,
+            @Parameter(required = true) @RequestPart EventDetailsUpdate requestDto,
             @Parameter(hidden = true) Principal principal,
             @PathVariable Long eventId,
             @RequestPart(required = false) @Nullable MultipartFile[] file) {
@@ -116,10 +116,11 @@ public class EventController {
     @PostMapping
     public ResponseEntity<EventResponseDto> save(
             @Parameter(required = true) @EventValidation @RequestPart EventRequestDto eventRequestDto,
-                                                 @Parameter(hidden = true) Principal principal,
-                                                 @RequestPart(required = false) @Nullable MultipartFile[] files) {
+            @Parameter(hidden = true) Principal principal,
+            @RequestPart(required = false) @Nullable MultipartFile[] files) {
         return ResponseEntity.status(HttpStatus.CREATED).body(eventService.save(eventRequestDto,
                 principal.getName(),
                 files));
     }
 }
+
