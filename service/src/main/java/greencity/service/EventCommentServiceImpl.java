@@ -5,12 +5,14 @@ import greencity.constant.ErrorMessage;
 import greencity.dto.event.EventVO;
 import greencity.dto.eventcomment.AddEventCommentDtoRequest;
 import greencity.dto.eventcomment.AddEventCommentDtoResponse;
+import greencity.dto.eventcomment.EventCommentAuthorDto;
 import greencity.dto.eventcomment.EventCommentVO;
 import greencity.dto.user.UserVO;
 import greencity.entity.Event;
 import greencity.entity.EventComment;
 import greencity.entity.User;
 import greencity.exception.exceptions.BadRequestException;
+import greencity.exception.exceptions.CannotLikeYourOwnCommentException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.repository.EventCommentRepo;
 import greencity.repository.EventRepository;
@@ -18,6 +20,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -61,7 +64,13 @@ public class EventCommentServiceImpl implements EventCommentService {
                     )
             );
         }
-        return modelMapper.map(eventComment, AddEventCommentDtoResponse.class);
+        AddEventCommentDtoResponse addEventCommentDtoResponse = modelMapper.map(eventComment, AddEventCommentDtoResponse.class);
+        addEventCommentDtoResponse.setAuthor(EventCommentAuthorDto.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .userProfilePicturePath(user.getProfilePicturePath())
+                .build());
+        return addEventCommentDtoResponse;
     }
 
     @Override
@@ -92,5 +101,23 @@ public class EventCommentServiceImpl implements EventCommentService {
         return modelMapper.map(eventCommentRepo.findById(commentId).orElseThrow(
                 () -> new NotFoundException(ErrorMessage.COMMENT_NOT_FOUND_EXCEPTION)
         ), EventCommentVO.class);
+    }
+
+    @Transactional
+    @Override
+    public AddEventCommentDtoResponse likeEventComment(Long commentId, UserVO user) {
+        EventCommentVO eventCommentVO = findById(commentId);
+        if (user.getId().equals(eventCommentVO.getUser().getId())) {
+            throw new CannotLikeYourOwnCommentException(
+                    ErrorMessage.YOU_CANNOT_LIKE_YOU_OWN_COMMENT.formatted(commentId, user.getId()));
+        }
+        eventCommentRepo.likeComment(commentId, user.getId());
+        AddEventCommentDtoResponse response = modelMapper.map(eventCommentVO, AddEventCommentDtoResponse.class);
+        response.setAuthor(EventCommentAuthorDto.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .userProfilePicturePath(user.getProfilePicturePath())
+                .build());
+        return response;
     }
 }

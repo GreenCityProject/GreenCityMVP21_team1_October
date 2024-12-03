@@ -29,6 +29,9 @@ public class Comment {
     private User user;
 
     @ManyToOne
+    private Place place;
+
+    @ManyToOne
     private Comment parentComment;
 
     @OneToMany(mappedBy = "parentComment", cascade = {CascadeType.ALL})

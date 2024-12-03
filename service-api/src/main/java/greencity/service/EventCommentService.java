@@ -24,10 +24,10 @@ public interface EventCommentService {
     /**
      * Method to update {@link EcoNewsCommentVO}.
      *
-     * @param newText updated text of {@link EventCommentVO} to which we update
-     *                comment.
+     * @param newText   updated text of {@link EventCommentVO} to which we update
+     *                  comment.
      * @param commentId id of eventId {@link EventCommentVO}
-     * @param user    {@link UserVO} that saves the comment.
+     * @param user      {@link UserVO} that saves the comment.
      */
     void update(String newText, long commentId, UserVO user);
 
@@ -39,5 +39,20 @@ public interface EventCommentService {
      */
     void delete(long commentId, UserVO user);
 
+    /**
+     * Method to find {@link EventCommentVO} by ID.
+     *
+     * @param commentId id of the {@link EventCommentVO} to be found.
+     * @return {@link EventCommentVO} found EventVO.
+     */
     EventCommentVO findById(long commentId);
+
+    /**
+     * Method to delete {@link EventCommentVO}.
+     *
+     * @param eventId id of the {@link EventCommentVO} to be liked.
+     * @param user      {@link UserVO} who requests the comment like.
+     * @return {@link AddEventCommentDtoResponse} liked comment.
+     */
+    AddEventCommentDtoResponse likeEventComment(Long eventId, UserVO user);
 }

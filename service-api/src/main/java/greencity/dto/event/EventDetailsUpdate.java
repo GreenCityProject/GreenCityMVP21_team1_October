@@ -20,7 +20,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Setter
 @EqualsAndHashCode
 public class EventDetailsUpdate {
-    @NotNull
     @Schema(example = "1", description = "Unique identifier for the event")
     private Long id;
 
