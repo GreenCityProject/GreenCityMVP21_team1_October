@@ -6,12 +6,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 @Builder
 public class PlaceByBoundsDto {
-    private long id;
-    private LocationDto locationDto;
+    private Long id;
+    private LocationDto location;
     private String name;
 }

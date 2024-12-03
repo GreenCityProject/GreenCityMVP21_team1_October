@@ -1,6 +1,8 @@
 package greencity.constant;
 
 public final class ErrorMessage {
+    public static final String NULL_MAP_BOUNDS = "Map bounds can't be null!";
+    public static final String WRONG_MAP_BOUNDS = "Map bounds validation was failed!";
     public static final String WRONG_ID_LIST = "List of Id must be Long numbers, separated by comma!";
     public static final String PLACE_NOT_FOUND_BY_ID = "Place does not exist by this id : ";
     public static final String CUSTOM_SHOPPING_LIST_ITEM_NOT_FOUND_BY_ID =
@@ -152,6 +154,7 @@ public final class ErrorMessage {
     public static final String PLACE_ALREADY_EXISTS = "Place by this name already exists.";
     public static final String COMMENT_CONTAINS_PROFANITY = "Provided comment contains profanity!";
     public static final String INVALID_FILE_PATH = "Unable to load file from provided path!";
+    public static final String YOU_CANNOT_LIKE_YOU_OWN_COMMENT = "You cannot like your own comment! Comment ID: %d, user's ID: %d";
     private ErrorMessage() {
     }
 }

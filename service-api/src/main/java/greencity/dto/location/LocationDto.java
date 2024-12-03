@@ -8,8 +8,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
+@Getter @Setter
 @EqualsAndHashCode
 public class LocationDto {
     @NonNull

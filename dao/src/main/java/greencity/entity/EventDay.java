@@ -1,16 +1,9 @@
 package greencity.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,7 +18,6 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @Getter @Setter
 @Builder
-@EqualsAndHashCode
 @ToString
 public class EventDay {
     @Id
@@ -45,10 +37,12 @@ public class EventDay {
     private LocalTime eventEndTime;
 
     @ManyToOne
+    @JoinColumn(name = "event_id", nullable = false)
     private Event event;
 
-    private Double latitude;
-    private Double longitude;
+    @ManyToOne
+    @JoinColumn(name = "location_id")
+    private Location location;
 
     @Column(name = "is_online")
     private Boolean isOnline;

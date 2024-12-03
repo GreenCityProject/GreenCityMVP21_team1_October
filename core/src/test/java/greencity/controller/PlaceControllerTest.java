@@ -33,7 +33,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.times;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -154,6 +153,28 @@ public class PlaceControllerTest {
 
         verify(placeService).bulkUpdatePlaceStatus(bulkUpdatePlaceStatusDto);
     }
+
+    @Test
+    void getPlacesByMapBoundsTest() throws Exception {
+        FilterPlaceDto dto = new FilterPlaceDto();
+        String requestJson = objectMapper.writeValueAsString(dto);
+        List<PlaceByBoundsDto> responseList = List.of(PlaceByBoundsDto.builder()
+                        .id(101L)
+                        .build());
+
+        when(placeService.getPlacesByMapBounds(any(FilterPlaceDto.class))).thenReturn(responseList);
+
+        mockMvc.perform(post(placeLink + "/getListPlaceLocationByMapsBounds")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(objectMapper.writeValueAsString(responseList)));
+
+        verify(placeService, times(1)).getPlacesByMapBounds(any(FilterPlaceDto.class));
+    }
+
 
     @Test
     void saveEcoPlaceFromUiUsingTest() throws Exception {
