@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import java.util.Calendar;
 import java.util.Date;
 
 @NoArgsConstructor
@@ -36,5 +35,8 @@ public class NotificationDto {
 
     @NotEmpty
     private String content;
+
+    @NotNull
+    private boolean markedAsRead;
 
 }

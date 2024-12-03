@@ -85,7 +85,8 @@ public class ModelUtils {
                 NotificationType.ECO_NEWS_LIKE,
                 new Date(),
                 "description1",
-                "content1"
+                "content1",
+                false
         );
     }
 
