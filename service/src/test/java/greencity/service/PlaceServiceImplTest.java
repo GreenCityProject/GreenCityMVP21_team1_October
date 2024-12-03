@@ -2,7 +2,10 @@ package greencity.service;
 
 import greencity.ModelUtils;
 import greencity.dto.PageableDto;
+import greencity.dto.category.CategoryDto;
+import greencity.dto.location.LocationDto;
 import greencity.dto.place.*;
+import greencity.dto.specification.SpecificationNameDto;
 import greencity.dto.user.UserVO;
 import greencity.entity.*;
 import greencity.enums.PlaceStatus;
@@ -17,6 +20,7 @@ import greencity.mapping.PlaceUpdateDtoMapper;
 import greencity.repository.CategoryRepo;
 import greencity.repository.LocationRepository;
 import greencity.repository.PlaceRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -338,6 +342,76 @@ class PlaceServiceImplTest {
 
         verify(placeRepository, times(1)).findById(placeId);
         verify(placeRepository, never()).save(any(Place.class));
+    }
+
+    @Test
+    void updatePlace_Success() {
+        PlaceUpdateDto updateDto = PlaceUpdateDto.builder()
+                .id(1L)
+                .name("Updated Place Name")
+                .location(LocationDto.builder()
+                        .id(1L)
+                        .address("New Address")
+                        .lat(50.45)
+                        .lng(30.52)
+                        .build())
+                .category(CategoryDto.builder()
+                        .name("Updated Category")
+                        .nameUa("Оновлена Категорія")
+                        .build())
+                .openingHoursList(List.of(
+                        OpeningHoursDto.builder()
+                                .weekDay(WeekDay.MONDAY)
+                                .openTime(LocalTime.of(8, 0))
+                                .closeTime(LocalTime.of(18, 0))
+                                .build()
+                ))
+                .discountValues(List.of(
+                        DiscountValueDto.builder()
+                                .value(10) // Обязательное поле
+                                .specification(new SpecificationNameDto("Discount Spec")) // Заполнено как пример
+                                .build()
+                ))
+                .locationAddressAndGeoForUpdate(new LocationAddressAndGeoForUpdateDto(
+                        "Updated Address", 50.45, 30.52))
+                .build();
+
+        Place place = Place.builder()
+                .id(1L)
+                .name("Old Place Name")
+                .location(new Location(1L, "Old Address", 40.45, 20.52))
+                .category(new Category(1L, "Old Category", "Стара Категорія", null, null))
+                .openHoursList(List.of(
+                        new OpenHours(1L, WeekDay.MONDAY, Time.valueOf("09:00:00"), Time.valueOf("17:00:00"), null, null)
+                ))
+                .discountValues(List.of(
+                        new DiscountValue(1L, 5, null)
+                ))
+                .build();
+
+        Place updatedPlace = Place.builder()
+                .id(1L)
+                .name("Updated Place Name")
+                .location(new Location(1L, "New Address", 50.45, 30.52))
+                .category(new Category(1L, "Updated Category", "Оновлена Категорія", null, null))
+                .openHoursList(List.of(
+                        new OpenHours(1L, WeekDay.MONDAY, Time.valueOf("08:00:00"), Time.valueOf("18:00:00"), null, null)
+                ))
+                .discountValues(List.of(
+                        new DiscountValue(1L, 10, null)
+                ))
+                .build();
+
+        Mockito.when(placeRepository.findById(updateDto.getId())).thenReturn(Optional.of(place));
+        Mockito.when(placeRepository.save(place)).thenReturn(updatedPlace);
+        Mockito.when(placeUpdateDtoMapper.convert(updatedPlace)).thenReturn(updateDto);
+
+        PlaceUpdateDto result = placeService.updatePlace(updateDto);
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(updateDto.getId(), result.getId());
+        Assertions.assertEquals(updateDto.getName(), result.getName());
+        Mockito.verify(placeRepository).save(place);
     }
 }
 

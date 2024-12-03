@@ -20,14 +20,17 @@ import greencity.repository.FavoritePlaceRepository;
 import greencity.repository.LocationRepository;
 import greencity.repository.PlaceRepository;
 import jakarta.transaction.Transactional;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 @Log4j2
@@ -169,10 +172,10 @@ public class PlaceServiceImpl implements PlaceService {
         place.setAuthor(modelMapper.map(userVO, User.class));
         place.setStatus(PlaceStatus.APPROVED);
         place.setOpenHoursList(
-            placeDto.getOpeningHoursList()
-                .stream()
-                .map(row -> modelMapper.map(row, OpenHours.class).setPlace(place))
-                .toList());
+                placeDto.getOpeningHoursList()
+                        .stream()
+                        .map(row -> modelMapper.map(row, OpenHours.class).setPlace(place))
+                        .toList());
 
         //todo: provide separate service for converting address to geo lat and lng
         Location location = locationRepository.save(Location
@@ -192,7 +195,7 @@ public class PlaceServiceImpl implements PlaceService {
     @Override
     public List<FilterPlaceResponseDto> getFilteredPlaces(FilterPlaceDto filterPlaceDto, UserVO userVO) {
         return placeRepository.findAll(getSpecification(filterPlaceDto)).stream()
-            .map(place -> modelMapper.map(place, FilterPlaceResponseDto.class)).toList();
+                .map(place -> modelMapper.map(place, FilterPlaceResponseDto.class)).toList();
     }
 
     @Override
@@ -207,22 +210,70 @@ public class PlaceServiceImpl implements PlaceService {
 
     @Override
     public PageableDto<FilterPlaceResponseDto> getFilteredPlaces(FilterPlaceDto filterPlaceDto, UserVO userVO,
-                                                                         Pageable page) {
+                                                                 Pageable page) {
         Page<Place> pageWithPlaces = placeRepository.findAll(getSpecification(filterPlaceDto), page);
         return PageableDto.<FilterPlaceResponseDto>builder()
-            .currentPage(pageWithPlaces.getNumber())
-            .totalElements(pageWithPlaces.getTotalElements())
-            .totalPages(pageWithPlaces.getTotalPages())
-            .page(
-                pageWithPlaces
-                    .getContent()
-                    .stream()
-                    .map(place -> modelMapper.map(place, FilterPlaceResponseDto.class))
-                    .toList())
-            .build();
+                .currentPage(pageWithPlaces.getNumber())
+                .totalElements(pageWithPlaces.getTotalElements())
+                .totalPages(pageWithPlaces.getTotalPages())
+                .page(
+                        pageWithPlaces
+                                .getContent()
+                                .stream()
+                                .map(place -> modelMapper.map(place, FilterPlaceResponseDto.class))
+                                .toList())
+                .build();
     }
 
     PlaceSpecification getSpecification(FilterPlaceDto filterPlaceDto) {
         return new PlaceSpecification(modelMapper.map(filterPlaceDto, FilterPlace.class));
+    }
+
+    @Override
+    @Transactional
+    public PlaceUpdateDto updatePlace(PlaceUpdateDto placeUpdateDto) {
+        Place place = placeRepository.findById(placeUpdateDto.getId())
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.PLACE_NOT_FOUND_BY_ID + placeUpdateDto.getId()));
+
+        log.info("Updating place with ID {}", place.getId());
+
+        place.setName(placeUpdateDto.getName());
+        place.setCategory(modelMapper.map(placeUpdateDto.getCategory(), Category.class));
+        place.setLocation(modelMapper.map(placeUpdateDto.getLocation(), Location.class));
+
+        updateCollections(place, placeUpdateDto);
+
+        if (placeUpdateDto.getLocationAddressAndGeoForUpdate() != null) {
+            updateGeoData(place, placeUpdateDto.getLocationAddressAndGeoForUpdate());
+        }
+
+        Place updatedPlace = placeRepository.save(place);
+        log.info("Place with ID {} successfully updated", updatedPlace.getId());
+        return placeUpdateDtoMapper.convert(updatedPlace);
+    }
+
+    private void updateCollections(Place place, PlaceUpdateDto dto) {
+        if (dto.getOpeningHoursList() != null) {
+            List<OpenHours> openHoursList = dto.getOpeningHoursList().stream()
+                    .map(openingHoursDto -> modelMapper.map(openingHoursDto, OpenHours.class))
+                    .toList();
+            place.setOpenHoursList(openHoursList);
+        }
+
+        if (dto.getDiscountValues() != null) {
+            List<DiscountValue> discountValues = dto.getDiscountValues().stream()
+                    .map(discountValueDto -> modelMapper.map(discountValueDto, DiscountValue.class))
+                    .toList();
+            place.setDiscountValues(discountValues);
+        }
+    }
+
+    private void updateGeoData(Place place, LocationAddressAndGeoForUpdateDto geoDto) {
+        if (place.getLocation() == null) {
+            place.setLocation(new Location());
+        }
+        place.getLocation().setAddress(geoDto.getAddress());
+        place.getLocation().setLat(geoDto.getLat());
+        place.getLocation().setLng(geoDto.getLng());
     }
 }
