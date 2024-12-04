@@ -211,7 +211,13 @@ public class SecurityConfig {
                                 "/friends/not-friends-yet",
                                 "/friends/user/{userId}",
                                 FAVORITE_PLACES,
-                                FAVORITE_PLACES + "/favorite/{placeId}")
+                                FAVORITE_PLACES + "/favorite/{placeId}",
+                                "/notifications/notificationTypes",
+                                "/notifications/notificationOrigins",
+                                "/notifications/popUp",
+                                "/notifications",
+                                "/notifications/search/notificationType",
+                                "/notifications/search/notificationOrigin")
                         .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)
                         .requestMatchers(HttpMethod.POST,
                                 "/category",
@@ -268,7 +274,9 @@ public class SecurityConfig {
                                 "/place/statuses",
                                 "/friends/{friendId}/acceptFriend",
                                 EVENTS_COMMENTS,
-                                "/friends/{friendId}/acceptFriend")
+                                "/friends/{friendId}/acceptFriend",
+                                "/notifications/read/{notificationId}",
+                                "/notifications/unread/{notificationId}")
                         .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)
                         .requestMatchers(HttpMethod.DELETE,
                                 ECONEWS_COMMENTS,
@@ -283,7 +291,8 @@ public class SecurityConfig {
                                 "/place",
                                 "/place/{id}",
                                 "/friends/{friendId}/declineFriend",
-                                FAVORITE_PLACES + "/{placeId}")
+                                FAVORITE_PLACES + "/{placeId}",
+                                "/notifications/{notificationId}")
                         .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)
                         .requestMatchers(HttpMethod.DELETE, "/friends/{friendId}")
                         .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)
