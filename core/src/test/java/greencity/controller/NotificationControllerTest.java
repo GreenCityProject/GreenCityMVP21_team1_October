@@ -73,7 +73,7 @@ public class NotificationControllerTest {
 
         when(userService.findByEmail(anyString())).thenReturn(userVO);
 
-        mockMvc.perform(get(notificationsLink + "/byUser/popUp")
+        mockMvc.perform(get(notificationsLink + "/popUp")
                         .principal(userVO::getEmail))
                 .andExpect(status().isOk());
 
@@ -86,7 +86,7 @@ public class NotificationControllerTest {
 
         when(userService.findByEmail(anyString())).thenReturn(userVO);
 
-        mockMvc.perform(get(notificationsLink + "/byUser")
+        mockMvc.perform(get(notificationsLink)
                         .principal(userVO::getEmail))
                 .andExpect(status().isOk());
 
@@ -100,7 +100,7 @@ public class NotificationControllerTest {
 
         when(userService.findByEmail(anyString())).thenReturn(userVO);
 
-        mockMvc.perform(get(notificationsLink + "/byUser/byNotificationType")
+        mockMvc.perform(get(notificationsLink + "/search/notificationType")
                         .param("notificationType", notificationType.name())
                         .principal(userVO::getEmail))
                 .andExpect(status().isOk());
@@ -115,7 +115,7 @@ public class NotificationControllerTest {
 
         when(userService.findByEmail(anyString())).thenReturn(userVO);
 
-        mockMvc.perform(get(notificationsLink + "/byUser/byNotificationOrigin")
+        mockMvc.perform(get(notificationsLink + "/search/notificationOrigin")
                         .param("notificationOrigin", notificationOrigin.name())
                         .principal(userVO::getEmail))
                 .andExpect(status().isOk());

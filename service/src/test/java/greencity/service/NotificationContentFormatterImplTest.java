@@ -30,7 +30,7 @@ public class NotificationContentFormatterImplTest {
 
         LocalDateTime commentDate = LocalDateTime.of(2024, 11, 30, 15, 30);
 
-        String expectedOutput = "Ivan commented on your eventTest event. Yesterday 03:30 пп";
+        String expectedOutput = "Ivan commented on your eventTest event. 30.11.2024 03:30 PM";
         String actualOutput = notificationContentFormatter.formatEventCommentNotification(userVO, eventVO, commentDate);
 
         assertEquals(expectedOutput, actualOutput);
@@ -46,7 +46,7 @@ public class NotificationContentFormatterImplTest {
 
         LocalDateTime commentDate = LocalDateTime.of(2024, 11, 29, 10, 45);
 
-        String expectedOutput = "Maria commented on your eventA long event name.... 29.11.2024 10:45 дп";
+        String expectedOutput = "Maria commented on your eventA long event name.... 29.11.2024 10:45 AM";
         String actualOutput = notificationContentFormatter.formatEventCommentNotification(userVO, eventVO, commentDate);
 
         assertEquals(expectedOutput, actualOutput);
