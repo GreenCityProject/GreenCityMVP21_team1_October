@@ -1,6 +1,5 @@
 package greencity.service;
 
-import ch.qos.logback.core.model.ModelUtil;
 import greencity.constant.ErrorMessage;
 import greencity.dto.econews.EcoNewsVO;
 import greencity.dto.econewscomment.EcoNewsCommentVO;
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Service;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -275,20 +273,9 @@ public class NotificationServiceImpl implements NotificationService {
         return NotificationOrigin.values();
     }
 
-    private List<NotificationDto> getNotificationDtoList(List<Notification> notifications) {
-        return notifications
-                .stream()
-                .map(notification -> modelMapper.map(notification, NotificationDto.class))
-                .toList();
-    }
-
-    private List<NotificationPopUpDto> getNotificationPopUpDtoList(List<Notification> notifications) {
-        return notifications
-                .stream()
-                .map(notification -> modelMapper.map(notification, NotificationPopUpDto.class))
-                .toList();
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sendCancellationNotification(EventVO event, UserVO user) {
         String formattedDateTime = NotificationContentFormatterImpl.formatCancellationDateTime(new Date());
@@ -303,6 +290,9 @@ public class NotificationServiceImpl implements NotificationService {
         );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sendEventUpdateNotifications(EventVO oldEvent, EventVO newEvent, List<UserVO> users) {
         String content = null;
@@ -325,6 +315,11 @@ public class NotificationServiceImpl implements NotificationService {
         }
     }
 
+    /**
+     *
+     * Method for scheduled cleanup of notifications marked as read
+     *
+     */
     @Scheduled(cron = "0 0 0 */7 * *")
     public void scheduleDeleteMarkedAsReadNotifications() {
         List<Notification> notifications = notificationRepo.findAll();
@@ -347,5 +342,19 @@ public class NotificationServiceImpl implements NotificationService {
                         notificationRepo.delete(notification);
                     }
                 });
+    }
+
+    private List<NotificationDto> getNotificationDtoList(List<Notification> notifications) {
+        return notifications
+                .stream()
+                .map(notification -> modelMapper.map(notification, NotificationDto.class))
+                .toList();
+    }
+
+    private List<NotificationPopUpDto> getNotificationPopUpDtoList(List<Notification> notifications) {
+        return notifications
+                .stream()
+                .map(notification -> modelMapper.map(notification, NotificationPopUpDto.class))
+                .toList();
     }
 }

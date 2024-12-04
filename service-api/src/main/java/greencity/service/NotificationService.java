@@ -155,5 +155,11 @@ public interface NotificationService {
      */
     void sendCancellationNotification(EventVO event, UserVO user);
 
+    /**
+     * Sends a notification to a user about event being updated.
+     *
+     * @param oldEvent the {@link EventVO} the event that was updated.
+     * @param newEvent  the {@link EventVO} containing data about updated event.
+     */
     void sendEventUpdateNotifications(EventVO oldEvent, EventVO newEvent, List<UserVO> users);
 }
