@@ -12,10 +12,10 @@
                     tableName="events_attenders"/>
 
         <dropTable  cascadeConstraints="true"
-                    tableName="events_comment"/>
+                    tableName="event_comments"/>
 
         <dropTable  cascadeConstraints="true"
-                    tableName="events_comment_users_likes"/>
+                    tableName="event_comments_users_liked"/>
 
         <dropTable  cascadeConstraints="true"
                     tableName="events_dates_locations"/>

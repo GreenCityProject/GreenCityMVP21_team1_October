@@ -4,7 +4,7 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet id="1732400957753-1" author="Andrii-Danylenko">
+    <changeSet id="1732400957753-3" author="Andrii-Danylenko">
         <createTable tableName="event_comments_users_liked">
             <column name="event_comment_id" type="BIGINT">
                 <constraints nullable="false" />
@@ -24,5 +24,6 @@
                                  constraintName="fk_event_comments_users_like_user"
                                  referencedTableName="users"
                                  referencedColumnNames="id"/>
+        <addPrimaryKey tableName="event_comments_users_liked" columnNames="users_liked_id, event_comment_id"/>
     </changeSet>
 </databaseChangeLog>
