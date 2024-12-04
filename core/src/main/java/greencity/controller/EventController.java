@@ -6,6 +6,7 @@ import greencity.constant.HttpStatuses;
 import greencity.dto.event.EventDetailsUpdate;
 import greencity.dto.event.EventRequestDto;
 import greencity.dto.event.EventResponseDto;
+import greencity.dto.event.PageableAdvancedDtoOfEventDto;
 import greencity.dto.user.UserVO;
 import greencity.service.EventService;
 import greencity.service.UserService;
@@ -25,6 +26,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/events")
@@ -115,5 +120,51 @@ public class EventController {
         return ResponseEntity.status(HttpStatus.CREATED).body(eventService.save(eventRequestDto,
                 userVO.getName(),
                 files));
+    }
+
+    /**
+     * Method for retrieving events with optional filters and pagination.
+     *
+     * <p>If no filter parameters are provided, this method retrieves all events with pagination.
+     * Otherwise, it applies the specified filters to fetch a filtered list of events.</p>
+     *
+     * @param page the page index to retrieve (default is 0).
+     * @param size the number of records per page (default is 5).
+     * @param eventTime the filter for event time (optional). Valid values are "Upcoming" or "Passed".
+     * @param location the filter for event location (optional). Use "Online" for online events or a city name.
+     * @param tags a list of tags to filter by (optional).
+     * @param status the filter for event status (optional). Valid values are "Open", "Closed", "Joined", "Created".
+     *               For unauthenticated users, only "Open" and "Closed" are allowed.
+     * @param currentUser the currently authenticated user (optional).
+     * @return a paginated list of events, either filtered or unfiltered.
+     */
+    @Operation(summary = "Get all events with pagination")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(schema = @Schema(implementation = PageableAdvancedDtoOfEventDto.class))),
+            @ApiResponse(responseCode = "400", description = "Bad Request",
+                    content = @Content(schema = @Schema(implementation = String.class)))
+    })
+    @GetMapping
+    public ResponseEntity<PageableAdvancedDtoOfEventDto> getAllEvents(
+            @Parameter(description = "Page index you want to retrieve [0..N]. If page index is less than 0, default value is used (0).")
+            @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Number of records per page [1..100]. If size is less than 1 or not specified, default value is used (5).")
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(required = false) String eventTime,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) List<String> tags,
+            @RequestParam(required = false) String status,
+            @Parameter(hidden = true) @CurrentUser UserVO currentUser) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        PageableAdvancedDtoOfEventDto result;
+        if (eventTime == null && location == null && (tags == null || tags.isEmpty()) && status == null) {
+            result = eventService.getAllEvents(pageable);
+        } else {
+            result = eventService.getFilteredEvents(pageable, eventTime, location, tags, status, currentUser);
+        }
+        return ResponseEntity.ok(result);
     }
 }

@@ -28,53 +28,62 @@ public class EventRepositoryImpl implements CustomEventRepository {
         Map<String, Object> parameters = new HashMap<>();
 
         // Filter by time
-        if ("Upcoming".equalsIgnoreCase(eventTime)) {
-            queryBuilder.append(" AND ed.eventDate > :currentDate");
-            parameters.put("currentDate", LocalDate.now());
-        } else if ("Passed".equalsIgnoreCase(eventTime)) {
-            queryBuilder.append(" AND ed.eventDate < :currentDate");
-            parameters.put("currentDate", LocalDate.now());
+        if (eventTime != null) {
+            if ("upcoming".equalsIgnoreCase(eventTime)) {
+                queryBuilder.append(" AND ed.eventDate >= :currentDate");
+                parameters.put("currentDate", LocalDate.now());
+            } else if ("passed".equalsIgnoreCase(eventTime)) {
+                queryBuilder.append(" AND ed.eventDate < :currentDate");
+                parameters.put("currentDate", LocalDate.now());
+            }
         }
 
         // Filter by location (online or city)
         if (location != null) {
-            if ("Online".equalsIgnoreCase(location)) {
-                queryBuilder.append(" AND e.isOnline = true");
-            } //else {
-//                queryBuilder.append(" AND ed.city = :city");
-//                parameters.put("city", location);
-//            }
+            if ("online".equalsIgnoreCase(location)) {
+                queryBuilder.append(" AND ed.isOnline = true");
+            } else {
+                queryBuilder.append(" AND LOWER(ed.location.address) LIKE LOWER(:location)");
+                parameters.put("location" +
+                        "", "%" + location + "%");
+            }
         }
 
         // Filter by status
         if (status != null) {
+            String lowerStatus = status.toLowerCase();
             if (currentUser == null) {
-                if ("Open".equalsIgnoreCase(status)) {
+                if ("open".equals(lowerStatus)) {
                     queryBuilder.append(" AND e.isOpen = true");
-                } else if ("Closed".equalsIgnoreCase(status)) {
+                } else if ("closed".equals(lowerStatus)) {
                     queryBuilder.append(" AND e.isOpen = false");
                 }
             } else {
-                switch (status) {
-                    case "Open" -> queryBuilder.append(" AND e.isOpen = true");
-                    case "Closed" -> queryBuilder.append(" AND e.isOpen = false");
-//                    case "Joined" -> {
+                switch (lowerStatus) {
+                    case "open" -> queryBuilder.append(" AND e.isOpen = true");
+                    case "closed" -> queryBuilder.append(" AND e.isOpen = false");
+                    //cases "joined" and "saved" for future functionality
+//                    case "joined" -> {
 //                        queryBuilder.append(" AND :userId MEMBER OF e.attendants");
 //                        parameters.put("userId", currentUser.getId());
 //                    }
-//                    case "Saved" -> queryBuilder.append(" AND e.isFavorite = true");
-//                    case "Created" -> {
-//                        queryBuilder.append(" AND e.organizer.id = :organizerId");
-//                        parameters.put("organizerId", currentUser.getId());
-//                    }
+//                    case "saved" -> queryBuilder.append(" AND e.isFavorite = true");
+                    case "created" -> {
+                        queryBuilder.append(" AND e.organizer.id = :organizerId");
+                        parameters.put("organizerId", currentUser.getId());
+                    }
+                    default -> throw new IllegalArgumentException("Invalid status value: " + status);
                 }
             }
         }
 
         // Filter by tags
         if (tags != null && !tags.isEmpty()) {
-            queryBuilder.append(" AND e.tags.name IN :tags");
-            parameters.put("tags", tags);
+            queryBuilder.append(" AND EXISTS (SELECT 1 FROM e.tags t JOIN t.tagTranslations tt WHERE LOWER(tt.name) IN :tags)");
+            List<String> lowerCaseTags = tags.stream()
+                    .map(String::toLowerCase)
+                    .toList();
+            parameters.put("tags", lowerCaseTags);
         }
 
         TypedQuery<Event> query = entityManager.createQuery(queryBuilder.toString(), Event.class);
