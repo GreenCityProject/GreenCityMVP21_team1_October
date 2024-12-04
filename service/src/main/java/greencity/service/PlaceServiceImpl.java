@@ -178,7 +178,6 @@ public class PlaceServiceImpl implements PlaceService {
                         .map(row -> modelMapper.map(row, OpenHours.class).setPlace(place))
                         .toList());
 
-        //todo: provide separate service for converting address to geo lat and lng
         Location location = locationRepository.save(Location
                 .builder()
                 .address(placeDto.getLocationName())

@@ -10,6 +10,8 @@ import greencity.dto.eventcomment.EventCommentVO;
 import greencity.dto.user.UserVO;
 import greencity.entity.Event;
 import greencity.entity.EventComment;
+import greencity.enums.NotificationOrigin;
+import greencity.enums.NotificationType;
 import greencity.entity.User;
 import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.CannotLikeYourOwnCommentException;
@@ -35,6 +37,8 @@ public class EventCommentServiceImpl implements EventCommentService {
     private HttpServletRequest httpServletRequest;
     private final greencity.rating.RatingCalculation ratingCalculation;
     private final EmailService emailService;
+    private final NotificationService notificationService;
+    private final NotificationContentFormatter notificationContentFormatter;
 
     @Override
     public AddEventCommentDtoResponse save(Long eventId, AddEventCommentDtoRequest addEventCommentDtoRequest, UserVO user) {
@@ -63,6 +67,8 @@ public class EventCommentServiceImpl implements EventCommentService {
                             modelMapper.map(saved, EventCommentVO.class)
                     )
             );
+            String notificationContent = notificationContentFormatter.formatEventCommentNotification(user, eventVO, saved.getCreatedDate());
+            notificationService.save(user.getId(), NotificationOrigin.GREEN_CITY, NotificationType.EVENT_COMMENTED, notificationContent);
         }
         AddEventCommentDtoResponse addEventCommentDtoResponse = modelMapper.map(eventComment, AddEventCommentDtoResponse.class);
         addEventCommentDtoResponse.setAuthor(EventCommentAuthorDto.builder()

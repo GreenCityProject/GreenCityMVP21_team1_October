@@ -29,6 +29,8 @@ public final class ErrorMessage {
             "Shopping list item translation not found for habit with id : ";
     public static final String INVALID_LANGUAGE_CODE = "Given language code is not supported.";
 
+    public static final String NOTIFICATION_NOT_FOUND_BY_ID = "Notification does not exist by this id : ";
+
     public static final String CATEGORY_NOT_FOUND_BY_ID = "The category does not exist by this id: ";
     public static final String CATEGORY_NOT_FOUND_BY_NAME = "The category does not exist by this name: ";
     public static final String CATEGORY_ALREADY_EXISTS_BY_THIS_NAME = "Category by this name already exists.";

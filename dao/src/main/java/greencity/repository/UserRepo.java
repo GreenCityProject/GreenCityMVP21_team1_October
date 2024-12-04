@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import java.sql.Timestamp;
@@ -56,6 +57,15 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      */
     @Query("SELECT id FROM User WHERE email=:email")
     Optional<Long> findIdByEmail(String email);
+
+    /**
+     * Find user IDs by event ID.
+     *
+     * @param eventId the ID of the event.
+     * @return List of user IDs attending the event.
+     */
+    @Query(value = "SELECT user_id FROM events_attendants WHERE event_id = :eventId", nativeQuery = true)
+    List<Long> findUsersByEventId(@Param("eventId") Long eventId);
 
     /**
      * Updates last activity time for a given user.

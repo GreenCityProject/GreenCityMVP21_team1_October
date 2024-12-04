@@ -13,6 +13,8 @@ import greencity.dto.habitfact.HabitFactTranslationVO;
 import greencity.dto.language.LanguageDTO;
 import greencity.dto.language.LanguageTranslationDTO;
 import greencity.dto.language.LanguageVO;
+import greencity.dto.notification.NotificationDto;
+import greencity.dto.notification.NotificationPopUpDto;
 import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.place.*;
 import greencity.dto.search.SearchNewsDto;
@@ -54,6 +56,54 @@ public class ModelUtils {
     public static String TEST_EMAIL_2 = "test2@mail.com";
     public static ZonedDateTime zonedDateTime = ZonedDateTime.now();
     public static LocalDateTime localDateTime = LocalDateTime.now();
+
+    public static Notification getNotification() {
+        return new Notification(
+                1L,
+                new Date(),
+                NotificationOrigin.GREEN_CITY,
+                NotificationType.ECO_NEWS_LIKE,
+                "description1",
+                "content1",
+                false
+        );
+    }
+
+    public static Notification getNotificationReadyForScheduledDeletion() {
+        Date date = new Date();
+        date.setMonth(Calendar.SEPTEMBER);
+
+        return new Notification(
+                1L,
+                date,
+                NotificationOrigin.GREEN_CITY,
+                NotificationType.ECO_NEWS_LIKE,
+                "description1",
+                "content1",
+                true
+        );
+    }
+
+    public static NotificationPopUpDto getNotificationPopUpDto() {
+        return new NotificationPopUpDto(
+                1L,
+                NotificationOrigin.GREEN_CITY,
+                "description1",
+                "content1"
+        );
+    }
+
+    public static NotificationDto getNotificationDto() {
+        return new NotificationDto(
+                1L,
+                NotificationOrigin.GREEN_CITY,
+                NotificationType.ECO_NEWS_LIKE,
+                new Date(),
+                "description1",
+                "content1",
+                false
+        );
+    }
 
     public static AddPlaceDto getAddPlaceDto() {
         return new AddPlaceDto("name", "name", List.of(), "name");
