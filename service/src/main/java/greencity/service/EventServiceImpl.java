@@ -2,13 +2,10 @@ package greencity.service;
 
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
-import greencity.dto.event.EventDayDto;
+import greencity.dto.event.*;
 import greencity.dto.event.EventDetailsUpdate;
-import greencity.dto.event.EventRequestDto;
-import greencity.dto.event.EventResponseDto;
-import greencity.dto.event.EventDetailsUpdate;
-import greencity.dto.event.EventVO;
 import greencity.dto.location.LocationDto;
+import greencity.dto.user.UserVO;
 import greencity.entity.Event;
 import greencity.entity.EventDay;
 import greencity.entity.EventImages;
@@ -27,6 +24,7 @@ import greencity.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -233,5 +231,69 @@ public class EventServiceImpl implements EventService {
         return userRepo.findById(userId)
                 .map(User::getRole)
                 .orElse(Role.ROLE_USER) == Role.ROLE_ADMIN;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageableAdvancedDtoOfEventDto getAllEvents(Pageable pageable) {
+
+        List<Event> allEvents = eventRepo.findAll();
+
+        List<EventDto> eventDtos = allEvents.stream()
+                .skip((long) pageable.getPageNumber() * pageable.getPageSize())
+                .limit(pageable.getPageSize())
+                .map(event -> modelMapper.map(event, EventDto.class))
+                .toList();
+
+        int totalElements = allEvents.size();
+        int totalPages = (int) Math.ceil((double) totalElements / pageable.getPageSize());
+
+        return PageableAdvancedDtoOfEventDto.builder()
+                .currentPage(pageable.getPageNumber())
+                .page(eventDtos)
+                .totalElements((long) totalElements)
+                .totalPages(totalPages)
+                .first(pageable.getPageNumber() == 0)
+                .last(pageable.getPageNumber() == totalPages - 1)
+                .hasNext(pageable.getPageNumber() < totalPages - 1)
+                .hasPrevious(pageable.getPageNumber() > 0)
+                .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageableAdvancedDtoOfEventDto getFilteredEvents(
+            Pageable pageable,
+            String eventTime,
+            String location,
+            List<String> tags,
+            String status,
+            UserVO currentUser) {
+        List<Event> filteredEvents = eventRepo.findFilteredEvents(eventTime, location, tags, status, currentUser);
+
+        int totalElements = filteredEvents.size();
+        int pageSize = pageable.getPageSize();
+        int totalPages = (int) Math.ceil((double) totalElements / pageSize);
+        int currentPage = pageable.getPageNumber();
+        boolean hasNext = currentPage < totalPages - 1;
+        boolean hasPrevious = currentPage > 0;
+
+        List<EventDto> eventDtos = filteredEvents.stream()
+                .skip((long) currentPage * pageSize)
+                .limit(pageSize)
+                .map(event -> modelMapper.map(event, EventDto.class))
+                .toList();
+
+        return PageableAdvancedDtoOfEventDto.builder()
+                .currentPage(currentPage)
+                .first(currentPage == 0)
+                .last(currentPage == totalPages - 1)
+                .hasNext(hasNext)
+                .hasPrevious(hasPrevious)
+                .number(currentPage)
+                .page(eventDtos)
+                .totalElements((long) totalElements)
+                .totalPages(totalPages)
+                .build();
     }
 }
