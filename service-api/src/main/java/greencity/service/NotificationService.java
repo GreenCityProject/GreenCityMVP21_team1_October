@@ -2,6 +2,7 @@ package greencity.service;
 
 import greencity.dto.econews.EcoNewsVO;
 import greencity.dto.econewscomment.EcoNewsCommentVO;
+import greencity.dto.event.EventVO;
 import greencity.dto.notification.NotificationDto;
 import greencity.dto.notification.NotificationPopUpDto;
 import greencity.dto.user.UserVO;
@@ -145,4 +146,14 @@ public interface NotificationService {
      * @return array of {@link NotificationOrigin}
      */
     NotificationOrigin[] getNotificationOrigins();
+
+    /**
+     * Sends a cancellation notification to a user about a specific event.
+     *
+     * @param event the {@link EventVO} representing the event that was canceled.
+     * @param user  the {@link UserVO} representing the user to notify.
+     */
+    void sendCancellationNotification(EventVO event, UserVO user);
+
+    void sendEventUpdateNotifications(EventVO oldEvent, EventVO newEvent, List<UserVO> users);
 }

@@ -3,6 +3,7 @@ package greencity.service;
 import greencity.ModelUtils;
 import greencity.dto.econews.EcoNewsVO;
 import greencity.dto.econewscomment.EcoNewsCommentVO;
+import greencity.dto.event.EventVO;
 import greencity.dto.notification.NotificationDto;
 import greencity.dto.notification.NotificationPopUpDto;
 import greencity.dto.user.UserVO;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
@@ -255,6 +257,85 @@ public class NotificationServiceImplTest {
         NotificationOrigin[] actual = notificationServiceImpl.getNotificationOrigins();
 
         assertArrayEquals(expected, actual);
+    }
+
+
+    @Test
+    void sendCancellationNotificationTest() {
+        EventVO eventVO = new EventVO();
+        eventVO.setTitle("Test Event");
+
+        UserVO userVO = new UserVO();
+        userVO.setId(1L);
+
+        notificationServiceImpl.sendCancellationNotification(eventVO, userVO);
+
+        verify(notificationRepo, times(1)).save(any());
+    }
+
+    @Test
+    void sendCancellationNotificationTest_VerifyContent() {
+        EventVO eventVO = new EventVO();
+        eventVO.setTitle("Test Event");
+
+        UserVO userVO = new UserVO();
+        userVO.setId(1L);
+
+        notificationServiceImpl.sendCancellationNotification(eventVO, userVO);
+
+        verify(notificationRepo, times(1)).save(Mockito.argThat(notification ->
+                notification.getContent().contains("The event \"Test Event\" scheduled for") &&
+                        notification.getContent().contains("was cancelled.")
+        ));
+    }
+
+    @Test
+    void sendEventUpdateNotificationsTest_TitleChanged() {
+        EventVO oldEventVO = new EventVO();
+        oldEventVO.setTitle("Old Event");
+        EventVO newEventVO = new EventVO();
+        newEventVO.setTitle("New Event");
+        UserVO user1 = new UserVO();
+        user1.setId(1L);
+        UserVO user2 = new UserVO();
+        user2.setId(2L);
+
+        List<UserVO> users = List.of(user1, user2);
+        notificationServiceImpl.sendEventUpdateNotifications(oldEventVO, newEventVO, users);
+        verify(notificationRepo, times(2)).save(any());
+    }
+
+    @Test
+    void sendEventUpdateNotificationsTest_VerifyContent() {
+        EventVO oldEventVO = new EventVO();
+        oldEventVO.setTitle("Old Event");
+        EventVO newEventVO = new EventVO();
+        newEventVO.setTitle("New Event");
+        UserVO user1 = new UserVO();
+        user1.setId(1L);
+        UserVO user2 = new UserVO();
+        user2.setId(2L);
+
+        List<UserVO> users = List.of(user1, user2);
+        notificationServiceImpl.sendEventUpdateNotifications(oldEventVO, newEventVO, users);
+        verify(notificationRepo, times(2)).save(Mockito.argThat(notification ->
+                notification.getContent().contains("Event \"Old Event\" was updated.") &&
+                        notification.getContent().contains("New name is New Event.")
+        ));
+    }
+
+    @Test
+    void sendEventUpdateNotificationsTest_NoUpdate() {
+        EventVO oldEventVO = new EventVO();
+        oldEventVO.setTitle("Same Event");
+        EventVO newEventVO = new EventVO();
+        newEventVO.setTitle("Same Event");
+        UserVO user = new UserVO();
+        user.setId(1L);
+
+        List<UserVO> users = List.of(user);
+        notificationServiceImpl.sendEventUpdateNotifications(oldEventVO, newEventVO, users);
+        verify(notificationRepo, times(0)).save(any());
     }
 
     @Test

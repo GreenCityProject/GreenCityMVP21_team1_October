@@ -47,10 +47,7 @@ public class EventCommentServiceImplTest {
     @InjectMocks
     private EventCommentServiceImpl eventCommentService;
     @Mock
-    private EventService eventService;
-    @Mock
     private HttpServletRequest request;
-
 
     @Test
     void saveTest() {
@@ -70,6 +67,57 @@ public class EventCommentServiceImplTest {
         when(modelMapper.map(eventComment, AddEventCommentDtoResponse.class)).thenReturn(addEventCommentDtoResponse);
         eventCommentService.save(1L, addEventCommentDtoRequest, userVO);
         verify(eventCommentRepo).save(any(EventComment.class));
+    }
+
+    @Test
+    void saveTest_NoParentComment() {
+        UserVO userVO = getUserVO();
+        User user = getUser();
+        Event event = ModelUtils.getEvent();
+        EventVO eventVO = ModelUtils.getEventVO();
+        AddEventCommentDtoRequest addEventCommentDtoRequest = ModelUtils.getEventCommentDtoRequest();
+        EventComment eventComment = ModelUtils.getEventComment();
+        AddEventCommentDtoResponse addEventCommentDtoResponse = new AddEventCommentDtoResponse();
+
+        when(modelMapper.map(eventRepository.findById(anyLong()), EventVO.class)).thenReturn(eventVO);
+        when(modelMapper.map(addEventCommentDtoRequest, EventComment.class)).thenReturn(eventComment);
+        when(request.getHeader(AUTHORIZATION)).thenReturn("token");
+        when(modelMapper.map(userVO, User.class)).thenReturn(user);
+        when(modelMapper.map(eventVO, Event.class)).thenReturn(event);
+        when(eventCommentRepo.save(eventComment)).thenReturn(eventComment);
+        when(modelMapper.map(eventComment, AddEventCommentDtoResponse.class)).thenReturn(addEventCommentDtoResponse);
+
+        AddEventCommentDtoResponse response = eventCommentService.save(1L, addEventCommentDtoRequest, userVO);
+
+        verify(eventCommentRepo).save(any(EventComment.class));
+        assertNotNull(response);
+    }
+
+    @Test
+    void saveTest_WithParentComment() {
+        UserVO userVO = getUserVO();
+        User user = getUser();
+        Event event = ModelUtils.getEvent();
+        EventVO eventVO = ModelUtils.getEventVO();
+        AddEventCommentDtoRequest addEventCommentDtoRequest = ModelUtils.getEventCommentDtoRequest();
+        addEventCommentDtoRequest.setParentCommentId(1L); // Додаємо батьківський коментар
+        EventComment eventComment = ModelUtils.getEventComment();
+        EventComment parentComment = ModelUtils.getEventComment();
+        AddEventCommentDtoResponse addEventCommentDtoResponse = new AddEventCommentDtoResponse();
+
+        when(eventCommentRepo.findById(anyLong())).thenReturn(Optional.of(parentComment));
+        when(modelMapper.map(eventRepository.findById(anyLong()), EventVO.class)).thenReturn(eventVO);
+        when(modelMapper.map(addEventCommentDtoRequest, EventComment.class)).thenReturn(eventComment);
+        when(request.getHeader(AUTHORIZATION)).thenReturn("token");
+        when(modelMapper.map(userVO, User.class)).thenReturn(user);
+        when(modelMapper.map(eventVO, Event.class)).thenReturn(event);
+        when(eventCommentRepo.save(eventComment)).thenReturn(eventComment);
+        when(modelMapper.map(eventComment, AddEventCommentDtoResponse.class)).thenReturn(addEventCommentDtoResponse);
+
+        AddEventCommentDtoResponse response = eventCommentService.save(1L, addEventCommentDtoRequest, userVO);
+
+        verify(eventCommentRepo).save(any(EventComment.class));
+        assertNotNull(response);
     }
 
     @Test

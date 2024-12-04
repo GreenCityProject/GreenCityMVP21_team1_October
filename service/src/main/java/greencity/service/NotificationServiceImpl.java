@@ -1,8 +1,10 @@
 package greencity.service;
 
+import ch.qos.logback.core.model.ModelUtil;
 import greencity.constant.ErrorMessage;
 import greencity.dto.econews.EcoNewsVO;
 import greencity.dto.econewscomment.EcoNewsCommentVO;
+import greencity.dto.event.EventVO;
 import greencity.dto.notification.NotificationDto;
 import greencity.dto.notification.NotificationPopUpDto;
 import greencity.dto.user.UserVO;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -73,7 +76,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public void delete(Long notificationId) {
         Notification notification = notificationRepo.findById(notificationId)
-                        .orElseThrow(() -> new NotFoundException(ErrorMessage.NOTIFICATION_NOT_FOUND_BY_ID + notificationId));
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOTIFICATION_NOT_FOUND_BY_ID + notificationId));
         notificationRepo.delete(notification);
     }
 
@@ -272,6 +275,56 @@ public class NotificationServiceImpl implements NotificationService {
         return NotificationOrigin.values();
     }
 
+    private List<NotificationDto> getNotificationDtoList(List<Notification> notifications) {
+        return notifications
+                .stream()
+                .map(notification -> modelMapper.map(notification, NotificationDto.class))
+                .toList();
+    }
+
+    private List<NotificationPopUpDto> getNotificationPopUpDtoList(List<Notification> notifications) {
+        return notifications
+                .stream()
+                .map(notification -> modelMapper.map(notification, NotificationPopUpDto.class))
+                .toList();
+    }
+
+    @Override
+    public void sendCancellationNotification(EventVO event, UserVO user) {
+        String formattedDateTime = NotificationContentFormatterImpl.formatCancellationDateTime(new Date());
+        String truncatedEventName = NotificationContentFormatterImpl.truncateEventName(event.getTitle());
+        String content = "The event \"" + truncatedEventName + "\" scheduled for " + formattedDateTime + " was cancelled.";
+
+        save(
+                user.getId(),
+                NotificationOrigin.GREEN_CITY,
+                NotificationType.EVENT_CANCELLED,
+                content
+        );
+    }
+
+    @Override
+    public void sendEventUpdateNotifications(EventVO oldEvent, EventVO newEvent, List<UserVO> users) {
+        String content = null;
+        String formattedDateTime = NotificationContentFormatterImpl.formatCancellationDateTime(new Date());
+
+        if (!oldEvent.getTitle().equals(newEvent.getTitle())) {
+            content = "Event \"" + oldEvent.getTitle() + "\" was updated. New name is " + newEvent.getTitle() + ". " + formattedDateTime;
+        }
+
+        if (content != null && !content.isEmpty()) {
+            String finalContent = content;
+            users.forEach(user -> {
+                save(
+                        user.getId(),
+                        NotificationOrigin.GREEN_CITY,
+                        NotificationType.EVENT_UPDATED,
+                        finalContent
+                );
+            });
+        }
+    }
+
     @Scheduled(cron = "0 0 0 */7 * *")
     public void scheduleDeleteMarkedAsReadNotifications() {
         List<Notification> notifications = notificationRepo.findAll();
@@ -294,19 +347,5 @@ public class NotificationServiceImpl implements NotificationService {
                         notificationRepo.delete(notification);
                     }
                 });
-    }
-
-    private List<NotificationDto> getNotificationDtoList(List<Notification> notifications) {
-        return notifications
-                .stream()
-                .map(notification -> modelMapper.map(notification, NotificationDto.class))
-                .toList();
-    }
-
-    private List<NotificationPopUpDto> getNotificationPopUpDtoList(List<Notification> notifications) {
-        return notifications
-                .stream()
-                .map(notification -> modelMapper.map(notification, NotificationPopUpDto.class))
-                .toList();
     }
 }
