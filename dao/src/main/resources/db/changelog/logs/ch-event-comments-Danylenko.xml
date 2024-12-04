@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="1733305805061-1" author="Andrii-Danylenko">
+
+        <createTable tableName="event_comments">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="comment" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="java.sql.Types.TIMESTAMP_WITH_TIMEZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="modified_date" type="java.sql.Types.TIMESTAMP_WITH_TIMEZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="deleted" type="bool"/>
+            <column name="event_id" type="BIGINT"/>
+            <column name="parent_comment_id" type="BIGINT"/>
+            <column name="user_id" type="bigint"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="event_comments"
+                                 baseColumnNames="event_id"
+                                 constraintName="fk_event_comments_event_id"
+                                 referencedTableName="events"
+                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="event_comments"
+                                 baseColumnNames="parent_comment_id"
+                                 constraintName="fk_event_comments_parent_comment_id"
+                                 referencedTableName="event_comments"
+                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="event_comments"
+                                 baseColumnNames="user_id"
+                                 constraintName="fk_event_comments_user_id"
+                                 referencedTableName="users"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>

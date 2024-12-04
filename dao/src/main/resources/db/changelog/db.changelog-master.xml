@@ -102,6 +102,7 @@
     <include file="db/changelog/logs/ch-add-column-to-crat-room-fedorkiv.xml"/>
     <include file="db/changelog/logs/ch-update-column-status-in-users_friends.xml"/>
     <include file="db/changelog/logs/ch-add-eco_news-Boiarchuk.xml"/>
+<!--    <include file="db/changelog/logs/ch-drop-all-events-tables-Bokalo.xml"/>-->
     <include file="db/changelog/logs/ch-add-table-events-Bohonko.xml"/>
     <include file="db/changelog/logs/ch-insert-into-languages-Kozak.xml"/>
     <include file="db/changelog/logs/ch-insert-into-categories-Kozak.xml"/>
@@ -128,10 +129,10 @@
     <include file="db/changelog/logs/ch-add-table-filters-Hural.xml"/>
     <include file="db/changelog/logs/ch-add-event-organizer-raring-Hlynskyi.xml"/>
     <include file="db/changelog/logs/ch-add-name-unique-constraint-Sakhno.xml"/>
-    <include file="db/changelog/logs/ch-add-event-comment-Yashna.xml"/>
     <include file="db/changelog/logs/ch-insert-into-employee-authority-Hlazova.xml"/>
     <include file="db/changelog/logs/ch-update-into-tag-translations-Hlazova.xml"/>
-    <include file="db/changelog/logs/ch-add-column-parentComment-Vatuliak.xml"/>
+    <include file="db/changelog/logs/ch-event-comments-Danylenko.xml"/>
+    <include file="db/changelog/logs/ch-event-comment-users-liked.xml"/>
     <include file="db/changelog/logs/ch-change-eco-news-create-user-dislikes.xml"/>
     <include file="db/changelog/logs/ch-insert-into-employees-authorities-Korzh.xml"/>
     <include file="db/changelog/logs/ch-add-table-positions-Korzh.xml"/>
@@ -146,8 +147,6 @@
     <include file="db/changelog/logs/сh-add-new-columns-habit-Mokhnatska.xml"/>
     <include file="db/changelog/logs/ch-change-tables-events-events-dates-locations-Golik.xml"/>
     <include file="db/changelog/logs/сh-add-new-column-habit-assign-Mokhnatska.xml"/>
-    <include file="db/changelog/logs/ch-add-column-deleted-to-events-comment-Lenets-1.xml"/>
-    <include file="db/changelog/logs/ch-add-tables-events-comment-user-likes-dislikes-Lenets.xml"/>
     <include file="db/changelog/logs/ch-update-fact-of-the-day-translations-Vatuliak.xml"/>
     <include file="db/changelog/logs/ch-update-habit-translation-Vatuliak.xml"/>
     <include file="db/changelog/logs/ch-update-habit-translations-Mokhnatska.xml"/>
@@ -160,7 +159,6 @@
     <include file="/db/changelog/logs/ch-drop-table-achievement-translation-Bokalo.xml"/>
     <include file="/db/changelog/logs/ch-drop-table-achievements-categories-Bokalo.xml"/>
     <include file="db/changelog/logs/ch-drop-all-employee-tables-Bokalo.xml"/>
-    <include file="db/changelog/logs/ch-drop-all-events-tables-Bokalo.xml"/>
     <include file="db/changelog/logs/ch-drop-table-user-achievemets.xml"/>
     <include file="db/changelog/logs/ch-drop-all-positions-tables.xml"/>
     <include file="db/changelog/logs/ch-drop-all-advices-tables-Bokalo.xml"/>
@@ -183,8 +181,6 @@
     <include file="db/changelog/logs/ch-add-user-friends-Porplenko.xml"/>
     <include file="db/changelog/logs/ch-add-friend-requests-Porplenko.xml"/>
     <include file="db/changelog/logs/ch-update-user-friends-Porplenko.xml"/>
-    <include file="/db/changelog/logs/ch-event-comment-Danylenko.xml"/>
-    <include file="/db/changelog/logs/ch-event-comment-users-liked.xml"/>
     <include file="db/changelog/logs/ch-add-table-locations-Zamorii.xml"/>
     <include file="db/changelog/logs/ch-update-event-days-add-location-Kaplun.xml"/>
     <include file="db/changelog/logs/ch-drop-coordinates-eventDay-Kaplun.xml"/>

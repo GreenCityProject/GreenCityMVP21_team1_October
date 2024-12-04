@@ -49,4 +49,24 @@
             <dropTable tableName="events_attenders"/>
         </rollback>
     </changeSet>
+    <changeSet id="1733310480102-1" author="Andrii-Danylenko">
+        <addColumn tableName="events">
+            <column name="image" type="varchar"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="1733310656767-1" author="Andrii-Danylenko">
+        <addColumn tableName="events">
+            <column name="type" type="varchar(50)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="1733310779376-1" author="Andrii-Danylenko">
+        <addColumn tableName="events">
+            <column name="user_id" type="BIGINT"/>
+        </addColumn>
+        <addForeignKeyConstraint baseTableName="events"
+                                 baseColumnNames="user_id"
+                                 constraintName="fk_events_user_id"
+                                 referencedTableName="users"
+                                 referencedColumnNames="id"/>
+    </changeSet>
 </databaseChangeLog>
